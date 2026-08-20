@@ -5,6 +5,8 @@ import { EventEmitter } from 'node:events';
 import { render as inkRender } from 'ink';
 import type { ReactElement } from 'react';
 
+import type { OpenExternalResult } from '../../src/tui/openExternal.js';
+
 /** Let queued React/Ink work settle before asserting on frames. */
 export function tick(ms = 0): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -78,4 +80,33 @@ export function renderAt(width: number, tree: ReactElement) {
     },
     unmount: () => instance.unmount(),
   };
+}
+
+/** The Down/Up/Left/Right arrow keys. */
+export const DOWN = '\u001b[B';
+export const UP = '\u001b[A';
+export const LEFT = '\u001b[D';
+export const RIGHT = '\u001b[C';
+
+/** An injected open/reveal/preview helper that records its paths and resolves a result. */
+export function recorder(result: OpenExternalResult = { ok: true }) {
+  const paths: string[] = [];
+  const action: ExternalAction = (absPath) => {
+    paths.push(absPath);
+    return Promise.resolve(result);
+  };
+  return { paths, action };
+}
+
+export type ExternalAction = (absPath: string) => Promise<OpenExternalResult>;
+
+export const okAction: ExternalAction = () => Promise.resolve({ ok: true });
+
+/** Assert zero overflow: no rendered line wider than the terminal. */
+export function expectNoOverflow(frame: string, width: number): void {
+  for (const line of frame.split('\n')) {
+    if (line.length > width) {
+      throw new Error(`line overflows ${width} columns: ${JSON.stringify(line)}`);
+    }
+  }
 }

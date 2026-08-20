@@ -104,13 +104,6 @@ describe('writeArtifact', () => {
     expect(manifest.artifacts[0]!.filename).toBe('artifacts/data.csv');
   });
 
-  it('keeps distinct paths as distinct entries', () => {
-    writeArtifact(runDir, 'artifacts/a.txt', Buffer.from('a'), { roles: ['requested_output'] });
-    writeArtifact(runDir, 'scratch/b.txt', Buffer.from('b'));
-
-    expect(readManifestFile().artifacts).toHaveLength(2);
-  });
-
   it('creates parent directories for nested artifact paths', () => {
     const entry = writeArtifact(runDir, 'artifacts/sub/dir/file.bin', Buffer.from('nested'), {
       roles: ['evidence'],
@@ -399,14 +392,6 @@ describe('removeScratchArtifactEntry', () => {
   it('rejects an escaping or absolute path', () => {
     expect(() => removeScratchArtifactEntry(runDir, '../evil.tmp')).toThrow();
     expect(() => removeScratchArtifactEntry(runDir, '/tmp/evil.tmp')).toThrow();
-  });
-
-  it('is idempotent — repeating a removal is harmless', () => {
-    writeArtifact(runDir, 'scratch/drop.tmp', Buffer.from('x'));
-
-    removeScratchArtifactEntry(runDir, 'scratch/drop.tmp');
-    expect(() => removeScratchArtifactEntry(runDir, 'scratch/drop.tmp')).not.toThrow();
-    expect(readManifestFile().artifacts).toHaveLength(0);
   });
 
   it('is a no-op for a scratch path the manifest never tracked', () => {

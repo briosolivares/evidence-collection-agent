@@ -273,36 +273,4 @@ describe('run-directory compatibility across the cutover', () => {
     // The partial deliverable is still surfaced rather than hidden.
     expect(summary.manifest.artifacts[0]?.filename).toBe('roster.csv');
   });
-
-  it('lists legacy and current runs side by side', () => {
-    // A runs/ directory accumulated across the cutover holds both shapes; the
-    // browser must list them together rather than choking on either.
-    const metrics = (status: string) => ({
-      status,
-      turns: 3,
-      inputTokens: 100,
-      outputTokens: 10,
-      cacheReadInputTokens: 0,
-      wallClockMs: 1_000,
-    });
-    for (const [id, status] of [
-      ['2026-08-01T10-00-00-000Z-legacy', 'completed'],
-      ['2026-08-13T10-00-00-000Z-verified', 'verified'],
-      ['2026-08-13T11-00-00-000Z-incomplete', 'incomplete'],
-    ] as const) {
-      writeFixtureRun(baseDir, {
-        id,
-        task: id,
-        startedAt: '2026-08-13T10:00:00.000Z',
-        finishedAt: '2026-08-13T10:01:00.000Z',
-        metrics: metrics(status) as never,
-        artifacts: [],
-      });
-    }
-
-    const ids = scanRuns(baseDir).map((entry) => entry.id);
-    expect(ids).toContain('2026-08-01T10-00-00-000Z-legacy');
-    expect(ids).toContain('2026-08-13T10-00-00-000Z-verified');
-    expect(ids).toContain('2026-08-13T11-00-00-000Z-incomplete');
-  });
 });

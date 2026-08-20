@@ -187,65 +187,27 @@ describe('requireBrowserbaseApiKey', () => {
 });
 
 describe('BrowserbaseBrowserSessionProvider.createSession happy path', () => {
-  it('creates a session with recording on by default', async () => {
+  it('creates a recorded session, connects over CDP, and prepares the default page', async () => {
+    const { context, page, cdp } = fakeContext();
     const { client, create } = fakeClient();
-    const { browser } = fakeBrowser({ contexts: [fakeContext().context] });
-    const provider = buildProvider({ client, connectOverCDP: async () => browser });
-
-    await provider.createSession();
-
-    expect(create).toHaveBeenCalledTimes(1);
-    const params = create.mock.calls[0]?.[0];
-    expect(params.browserSettings.recordSession).toBe(true);
-  });
-
-  it('connects over CDP with the connectUrl the client returned', async () => {
-    const { client } = fakeClient();
-    const { browser } = fakeBrowser({ contexts: [fakeContext().context] });
+    const { browser } = fakeBrowser({ contexts: [context] });
     const connectOverCDP = vi.fn(async () => browser);
     const provider = buildProvider({ client, connectOverCDP });
 
-    await provider.createSession();
+    const controller = await provider.createSession();
 
+    expect(create).toHaveBeenCalledTimes(1);
+    expect(create.mock.calls[0]?.[0].browserSettings.recordSession).toBe(true);
     expect(connectOverCDP).toHaveBeenCalledWith(FAKE_CONNECT_URL);
-  });
-
-  it("prepares the default context's blank page and anchors both CDP capabilities on it", async () => {
-    const { context, page } = fakeContext();
-    const { client } = fakeClient();
-    const { browser } = fakeBrowser({ contexts: [context] });
-    const provider = buildProvider({ client, connectOverCDP: async () => browser });
-
-    await provider.createSession();
-
-    // The existing default page is reused, not replaced.
+    // The existing default page is reused, not replaced, and anchors both CDP capabilities.
     expect(context.newPage).not.toHaveBeenCalled();
     expect(context.newCDPSession).toHaveBeenCalledWith(page);
     expect(context.newCDPSession).toHaveBeenCalledTimes(2);
-  });
-
-  it('sends Browser.setDownloadBehavior with exactly the expected params', async () => {
-    const { context, cdp } = fakeContext();
-    const { client } = fakeClient();
-    const { browser } = fakeBrowser({ contexts: [context] });
-    const provider = buildProvider({ client, connectOverCDP: async () => browser });
-
-    await provider.createSession();
-
     expect(cdp.send).toHaveBeenCalledWith('Browser.setDownloadBehavior', {
       behavior: 'allow',
       downloadPath: 'downloads',
       eventsEnabled: true,
     });
-  });
-
-  it('returns a PlaywrightBrowserController', async () => {
-    const { client } = fakeClient();
-    const { browser } = fakeBrowser({ contexts: [fakeContext().context] });
-    const provider = buildProvider({ client, connectOverCDP: async () => browser });
-
-    const controller = await provider.createSession();
-
     expect(controller).toBeInstanceOf(PlaywrightBrowserController);
   });
 });

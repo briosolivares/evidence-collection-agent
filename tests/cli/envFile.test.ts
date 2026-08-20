@@ -31,19 +31,17 @@ describe('setEnvFileValue', () => {
     expect(statSync(path).mode & 0o777).toBe(0o600);
   });
 
-  it('appends to an existing file, preserving every other line byte-for-byte, ending without a trailing newline originally', () => {
-    const original = '# a comment\nBAR=baz';
-    writeFileSync(path, original);
-    setEnvFileValue(path, 'FOO', 'bar');
-    expect(readFileSync(path, 'utf8')).toBe('# a comment\nBAR=baz\nFOO=bar\n');
-  });
-
-  it('appends to an existing file that already ends with a trailing newline, producing exactly one', () => {
-    const original = '# a comment\nBAR=baz\n';
-    writeFileSync(path, original);
-    setEnvFileValue(path, 'FOO', 'bar');
-    expect(readFileSync(path, 'utf8')).toBe('# a comment\nBAR=baz\nFOO=bar\n');
-  });
+  it.each([
+    ['without a trailing newline', '# a comment\nBAR=baz'],
+    ['with a trailing newline (producing exactly one)', '# a comment\nBAR=baz\n'],
+  ])(
+    'appends to an existing file %s, preserving every other line byte-for-byte',
+    (_case, original) => {
+      writeFileSync(path, original);
+      setEnvFileValue(path, 'FOO', 'bar');
+      expect(readFileSync(path, 'utf8')).toBe('# a comment\nBAR=baz\nFOO=bar\n');
+    },
+  );
 
   it('rewrites an existing assignment in place, leaving surrounding lines untouched and appending no duplicate', () => {
     const original = '# header\nFOO=old\nBAR=baz\n';
@@ -54,19 +52,14 @@ describe('setEnvFileValue', () => {
     expect(updated.match(/^FOO=/gm)).toHaveLength(1);
   });
 
-  it('recognizes an `export FOO=bar` line as a match and rewrites that line rather than appending a shadowed duplicate', () => {
-    writeFileSync(path, 'export FOO=old\nBAR=baz\n');
-    setEnvFileValue(path, 'FOO', 'new');
-    const updated = readFileSync(path, 'utf8');
-    // The matched line is replaced with the bare assignment (the form this
-    // function always writes); what matters here is that it is a REWRITE of
-    // the `export` line in place, not a second line appended below it.
-    expect(updated).toBe('FOO=new\nBAR=baz\n');
-    expect(updated.match(/FOO=/g)).toHaveLength(1);
-  });
-
-  it('recognizes a leading-whitespace `  FOO=bar` line as a match and rewrites that line rather than appending a shadowed duplicate', () => {
-    writeFileSync(path, '  FOO=old\nBAR=baz\n');
+  // The matched line is replaced with the bare assignment (the form this
+  // function always writes); what matters is that each spelling is a REWRITE
+  // of the existing line in place, not a shadowed duplicate appended below it.
+  it.each([
+    ['an `export FOO=bar` line', 'export FOO=old\nBAR=baz\n'],
+    ['a leading-whitespace `  FOO=bar` line', '  FOO=old\nBAR=baz\n'],
+  ])('recognizes %s as a match and rewrites it in place', (_case, original) => {
+    writeFileSync(path, original);
     setEnvFileValue(path, 'FOO', 'new');
     const updated = readFileSync(path, 'utf8');
     expect(updated).toBe('FOO=new\nBAR=baz\n');

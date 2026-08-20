@@ -7,12 +7,7 @@ import { z } from 'zod';
 
 import type { BrowserController } from '../../src/browser/controller.js';
 import type { OutputContract } from '../../src/agent/initializer/outputContract.schema.js';
-import type { Message } from '../../src/model/messages.js';
-import type {
-  AcceptedModelResponse,
-  ModelDriver,
-  ModelGenerateOptions,
-} from '../../src/model/modelDriver.js';
+import type { AcceptedModelResponse, ModelDriver } from '../../src/model/modelDriver.js';
 import { initManifest, readManifest, writeArtifact } from '../../src/run/artifacts.js';
 import {
   createBusyResourceRegistry,
@@ -24,13 +19,10 @@ import {
 } from '../../src/tools/registry.js';
 import { publishArtifactTool } from '../../src/tools/publishArtifact/publishArtifact.js';
 import { finishTool, type FinishInput } from '../../src/tools/finish/finish.js';
-import { HARNESS_DIR, RUN_CHECKPOINT_FILENAME } from '../../src/agent/checkpoint.js';
-import {
-  checkpointSchema,
-  type Checkpoint,
-  type DurableRunConfiguration,
-} from '../../src/agent/checkpoint.schema.js';
+import { HARNESS_DIR } from '../../src/agent/checkpoint.js';
+import type { Checkpoint, DurableRunConfiguration } from '../../src/agent/checkpoint.schema.js';
 import { runAgent } from '../../src/agent/lifecycle.js';
+import { readCheckpoint, scriptedDriver, unexpectedDriver } from './modelDrivers.js';
 import { FINDINGS_REPORT_FILENAME } from '../../src/agent/findingsReport.js';
 import { raceWithRunSignal } from '../../src/run/runDeadline.js';
 
@@ -142,7 +134,7 @@ describe('coordinator correction lifecycle', () => {
       'Continue evidence collection for this requirement',
     );
     expect(JSON.stringify(worker.requests[2])).not.toContain('nextAction');
-    expect(readCheckpoint()).toMatchObject({
+    expect(readCheckpoint(runDir)).toMatchObject({
       phase: 'terminal',
       progress: { verifierCycles: 2, completionCheckFailures: 0 },
       outcome: { status: 'verified' },
@@ -203,7 +195,7 @@ describe('coordinator correction lifecycle', () => {
     });
 
     expect(outcome).toEqual({ status: 'verified', finalText: FINISH.summary });
-    expect(readCheckpoint()).toMatchObject({
+    expect(readCheckpoint(runDir)).toMatchObject({
       phase: 'terminal',
       outcome: { status: 'verified' },
     });
@@ -248,7 +240,7 @@ describe('coordinator correction lifecycle', () => {
     expect(verifier.generate).toHaveBeenCalledOnce();
     expect(JSON.stringify(worker.requests[2])).toContain('deterministic_finish_checks');
     expect(JSON.stringify(worker.requests[2])).toContain('exact_row_count');
-    expect(readCheckpoint()).toMatchObject({
+    expect(readCheckpoint(runDir)).toMatchObject({
       phase: 'terminal',
       progress: { verifierCycles: 1, completionCheckFailures: 1 },
       outcome: { status: 'verified' },
@@ -359,36 +351,6 @@ describe('coordinator correction lifecycle', () => {
     });
   });
 
-  it('returns deterministic check defects to the worker before verifying its repair', async () => {
-    const worker = scriptedDriver([
-      publishReport(['Alice', 'Bob'], 'publish-invalid'),
-      finishResponse('finish-invalid'),
-      publishReport('Carol', 'publish-repaired'),
-      finishResponse('finish-repaired'),
-    ]);
-    const verifier = scriptedDriver([verifierResponse('verified')]);
-    const browser = fakeBrowser();
-
-    const outcome = await runCoordinator({
-      initializer: scriptedDriver([initializerAccepted()]),
-      worker,
-      verifier,
-      browser: browser.controller,
-    });
-
-    expect(outcome.status).toBe('verified');
-    expect(readFileSync(join(runDir, 'artifacts/report.csv'), 'utf8')).toBe('name\nCarol\n');
-    expect(verifier.generate).toHaveBeenCalledOnce();
-    expect(JSON.stringify(worker.requests[2])).toContain('deterministic_finish_checks');
-    expect(JSON.stringify(worker.requests[2])).toContain('exact_row_count');
-    expect(readCheckpoint()).toMatchObject({
-      phase: 'terminal',
-      progress: { verifierCycles: 1, completionCheckFailures: 1 },
-      outcome: { status: 'verified' },
-    });
-    expectBrowserLifecycle(browser);
-  });
-
   it('waits for an abandoned tool effect before running finish checks or the verifier', async () => {
     const effectOrder: string[] = [];
     const delayedPublisher = delayedPublishTool(40, () => {
@@ -473,7 +435,7 @@ describe('coordinator correction lifecycle', () => {
     });
     expect(effectSettled).toBe(true);
     expect(verifier.generate).not.toHaveBeenCalled();
-    const results = toolResultsFor(readCheckpoint(), 'finish-before-cancel');
+    const results = toolResultsFor(readCheckpoint(runDir), 'finish-before-cancel');
     expect(results).toHaveLength(1);
     expect(results[0]).toMatchObject({ is_error: true });
     expect(results[0]?.content).toContain('"source":"run_terminal"');
@@ -538,14 +500,14 @@ describe('coordinator terminal lifecycle', () => {
       });
       expect(worker.generate).toHaveBeenCalledTimes(workerResponses);
       expect(verifier.generate).toHaveBeenCalledTimes(verifierResponses);
-      expect(readCheckpoint()).toMatchObject({
+      expect(readCheckpoint(runDir)).toMatchObject({
         phase: 'terminal',
         outcome: { status: 'incomplete', reason: 'budget_exceeded' },
       });
       expect(readManifest(runDir).finishedAt).toBeDefined();
       expect(browser.closeTaskPages).toHaveBeenCalledOnce();
       if (verifierResponses === 1) {
-        const results = toolResultsFor(readCheckpoint(), 'finish-before-deadline');
+        const results = toolResultsFor(readCheckpoint(runDir), 'finish-before-deadline');
         expect(results).toHaveLength(1);
         expect(results[0]).toMatchObject({ is_error: true });
         expect(results[0]?.content).toContain('"source":"run_budget"');
@@ -597,7 +559,7 @@ describe('coordinator terminal lifecycle', () => {
       status: 'incomplete',
       reason: 'verifier_unavailable',
     });
-    const results = toolResultsFor(readCheckpoint(), 'finish-verifier-outage');
+    const results = toolResultsFor(readCheckpoint(runDir), 'finish-verifier-outage');
     expect(results).toHaveLength(1);
     expect(results[0]).toMatchObject({ is_error: true });
     expect(results[0]?.content).toContain('"source":"verifier"');
@@ -639,7 +601,7 @@ describe('coordinator terminal lifecycle', () => {
       reason: 'verification_incomplete',
     });
     expect(outcome).not.toMatchObject({ reason: 'verifier_unavailable' });
-    const results = toolResultsFor(readCheckpoint(), 'finish-before-invalid-verdict');
+    const results = toolResultsFor(readCheckpoint(runDir), 'finish-before-invalid-verdict');
     expect(results).toHaveLength(1);
     expect(results[0]).toMatchObject({ is_error: true });
     expect(results[0]?.content).toContain('"source":"verifier"');
@@ -711,7 +673,7 @@ describe('coordinator terminal lifecycle', () => {
     });
 
     expect(outcome).toMatchObject({ status: 'verified' });
-    const results = toolResultsFor(readCheckpoint(), 'finish-correction-limit');
+    const results = toolResultsFor(readCheckpoint(runDir), 'finish-correction-limit');
     expect(results).toHaveLength(1);
     expect(results[0]?.content).toContain('"status":"needs_correction"');
     expectBrowserLifecycle(browser);
@@ -758,7 +720,7 @@ describe('coordinator terminal lifecycle', () => {
       });
       expect(worker.generate).toHaveBeenCalledOnce();
       expect(verifier.generate).not.toHaveBeenCalled();
-      expect(readCheckpoint()).toMatchObject({
+      expect(readCheckpoint(runDir)).toMatchObject({
         phase: 'terminal',
         outcome: { status: 'incomplete', reason: 'budget_exceeded' },
       });
@@ -793,7 +755,7 @@ describe('coordinator terminal lifecycle', () => {
     expect(outcome).not.toMatchObject({
       reason: expect.stringContaining('unrelated provider failure'),
     });
-    expect(readCheckpoint()).toMatchObject({
+    expect(readCheckpoint(runDir)).toMatchObject({
       phase: 'terminal',
       outcome: { status: 'cancelled' },
     });
@@ -816,7 +778,7 @@ describe('coordinator terminal lifecycle', () => {
       reason: 'worker_incomplete',
       detail: expect.stringContaining('provider request aborted internally'),
     });
-    expect(readCheckpoint()).toMatchObject({
+    expect(readCheckpoint(runDir)).toMatchObject({
       phase: 'terminal',
       outcome: { status: 'incomplete', reason: 'worker_incomplete' },
     });
@@ -844,7 +806,7 @@ describe('coordinator terminal lifecycle', () => {
     });
     expect(worker.generate).not.toHaveBeenCalled();
     expect(verifier.generate).not.toHaveBeenCalled();
-    expect(readCheckpoint()).toMatchObject({
+    expect(readCheckpoint(runDir)).toMatchObject({
       phase: 'terminal',
       outcome: { status: 'failed' },
     });
@@ -914,13 +876,13 @@ describe('coordinator terminal lifecycle', () => {
       status: 'failed',
       message: expect.stringContaining('did not settle within 10ms'),
     });
-    expect(readCheckpoint()).toMatchObject({
+    expect(readCheckpoint(runDir)).toMatchObject({
       phase: 'terminal',
       outcome: { status: 'failed' },
     });
     expect(readManifest(runDir).finishedAt).toBeDefined();
     expect(readFileSync(join(runDir, 'metrics.json'), 'utf8')).toContain('"status": "failed"');
-    const results = toolResultsFor(readCheckpoint(), 'finish-before-wedged-cleanup');
+    const results = toolResultsFor(readCheckpoint(runDir), 'finish-before-wedged-cleanup');
     expect(results).toHaveLength(1);
     expect(results[0]).toMatchObject({ is_error: true });
     expect(results[0]?.content).toContain('"source":"run_terminal"');
@@ -954,7 +916,7 @@ describe('coordinator terminal lifecycle', () => {
       status: 'cancelled',
       reason: expect.stringContaining('operator cancelled during cleanup'),
     });
-    const results = toolResultsFor(readCheckpoint(), 'finish-before-cleanup-cancel');
+    const results = toolResultsFor(readCheckpoint(runDir), 'finish-before-cleanup-cancel');
     expect(results).toHaveLength(1);
     expect(results[0]?.content).toContain('"outcome":"cancelled"');
   });
@@ -987,7 +949,7 @@ describe('coordinator terminal lifecycle', () => {
       reason: 'budget_exceeded',
       detail: expect.stringContaining('wall_time'),
     });
-    const results = toolResultsFor(readCheckpoint(), 'finish-before-cleanup-deadline');
+    const results = toolResultsFor(readCheckpoint(runDir), 'finish-before-cleanup-deadline');
     expect(results).toHaveLength(1);
     expect(results[0]?.content).toContain('"outcome":"incomplete"');
   });
@@ -1178,36 +1140,6 @@ function accepted(
   };
 }
 
-type ScriptStep =
-  | AcceptedModelResponse
-  | Error
-  | ((options: ModelGenerateOptions) => AcceptedModelResponse | Promise<AcceptedModelResponse>);
-
-function scriptedDriver(steps: ScriptStep[]): ModelDriver & {
-  generate: ReturnType<typeof vi.fn>;
-  requests: Array<readonly Message[]>;
-} {
-  const requests: Array<readonly Message[]> = [];
-  const generate = vi.fn(async (options: ModelGenerateOptions) => {
-    requests.push(structuredClone(options.messages));
-    const step = steps.shift();
-    if (step === undefined) throw new Error('scripted model exhausted');
-    if (step instanceof Error) throw step;
-    return typeof step === 'function' ? await step(options) : step;
-  });
-  return { generate, requests };
-}
-
-function unexpectedDriver(role: string): ModelDriver & {
-  generate: ReturnType<typeof vi.fn>;
-} {
-  return {
-    generate: vi.fn(async () => {
-      throw new Error(`${role} model must not be called`);
-    }),
-  };
-}
-
 function neverSettlingDriver(): ModelDriver & {
   generate: ReturnType<typeof vi.fn>;
 } {
@@ -1343,12 +1275,6 @@ function delayedPublishTool(
       return { status: 'settled' };
     },
   };
-}
-
-function readCheckpoint(): Checkpoint {
-  return checkpointSchema.parse(
-    JSON.parse(readFileSync(join(runDir, HARNESS_DIR, RUN_CHECKPOINT_FILENAME), 'utf8')),
-  );
 }
 
 function toolResultsFor(

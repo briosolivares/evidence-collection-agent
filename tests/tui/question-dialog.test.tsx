@@ -7,14 +7,13 @@ import { App } from '../../src/tui/components/App.js';
 import { createConfig } from '../../src/tui/config.js';
 import { createInitialState, reduce } from '../../src/tui/store/reducer.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
-import { ENTER, ESC, tick, typeText } from './helpers.js';
+import { DOWN, ENTER, ESC, tick, typeText } from './helpers.js';
 
 // Interaction-heavy suites type through a fake stdin tick by tick and
 // can exceed the 5 s default under full-suite parallel load.
 vi.setConfig({ testTimeout: 30_000 });
 
 const config = createConfig();
-const DOWN = '[B';
 
 /** A fake runner that stays live forever and exposes the App-provided
  * requestPermission callback, so tests can pose questions on demand. */

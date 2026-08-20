@@ -65,9 +65,8 @@ describe('stub grader', () => {
     expect(results[0]!.passed).toBe(true); // the file does exist
     expect(results[1]!.passed).toBe(false);
     expect(results[1]!.detail).toMatch(/mismatch/);
-  });
 
-  it('throws on malformed oracle data — a harness bug, not a failed trial', async () => {
+    // Malformed oracle data is a harness bug, not a failed trial.
     await expect(async () => grade(runDir, { wrong: 'shape' })).rejects.toThrow(/oracle/);
   });
 });

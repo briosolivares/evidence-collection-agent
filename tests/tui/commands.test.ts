@@ -70,13 +70,6 @@ describe('registry drives routeInput and HELP_TEXT', () => {
     });
   });
 
-  it('HELP_TEXT lists every registry name with its description', () => {
-    for (const entry of SLASH_COMMANDS) {
-      expect(HELP_TEXT).toContain(entry.name);
-      expect(HELP_TEXT).toContain(entry.description);
-    }
-  });
-
   it('HELP_TEXT is locked byte-for-byte (one aligned name column)', () => {
     expect(HELP_TEXT).toBe(
       [

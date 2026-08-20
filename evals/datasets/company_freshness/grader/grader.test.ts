@@ -7,6 +7,7 @@ import { initManifest, writeArtifact } from '../../../../src/run/artifacts.js';
 import type { AssertionResult } from '../../../types.js';
 import type { CompanyFreshnessOracle } from '../oracle/companyContentClient.js';
 import { grade } from './grader.js';
+import { byName } from '../../../testSupport.js';
 
 const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3]);
 const ORACLE: CompanyFreshnessOracle = {
@@ -66,11 +67,6 @@ function writeScreenshots(): void {
   for (const [filename, sourceUrl] of pairs) {
     writeArtifact(runDir, filename!, PNG, { sourceUrl, roles: ['requested_output', 'evidence'] });
   }
-}
-function byName(results: AssertionResult[], name: string): AssertionResult {
-  const found = results.find((result) => result.name === name);
-  if (!found) throw new Error(`missing assertion ${name}`);
-  return found;
 }
 
 describe('company_freshness grader', () => {

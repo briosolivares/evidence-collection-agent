@@ -19,6 +19,13 @@ describe('createInitialState', () => {
     expect(state.mode).toBe('idle');
     expect(state.transcript).toHaveLength(1);
     expect(state.transcript[0]).toMatchObject({ kind: 'banner', apiKeyPresent: true });
+    expect(state.artifactUi).toEqual({ cursor: 0, view: 'rows' });
+    expect(state.composer).toEqual({
+      value: '',
+      dismissed: false,
+      selectedIndex: 0,
+      completions: 0,
+    });
   });
 });
 
@@ -142,8 +149,6 @@ describe('reduce (session store, step 2 scope)', () => {
   });
 
   it('handles an unknown command as a gentle notice, staying idle', () => {
-    const routed = routeInput('/frobnicate');
-    expect(routed.kind).toBe('unknown');
     const notice = unknownCommandNotice('/frobnicate');
     const state = reduce(createInitialState(), { type: 'notice', text: notice });
     expect(state.mode).toBe('idle');
@@ -786,10 +791,6 @@ describe('reduce (artifact UI substate)', () => {
     published(2, publishedEntry({ filename: 'artifacts/b.csv', roles: ['requested_output'] })),
   ];
 
-  it('starts at cursor 0 in the rows view', () => {
-    expect(createInitialState().artifactUi).toEqual({ cursor: 0, view: 'rows' });
-  });
-
   it('artifact_nav moves the cursor, clamped at both ends', () => {
     let state = fold(twoArtifacts);
     state = reduce(state, { type: 'artifact_nav', delta: -1 });
@@ -806,21 +807,15 @@ describe('reduce (artifact UI substate)', () => {
     expect(reduce(state, { type: 'artifact_open_detail' })).toEqual(state);
   });
 
-  it('open/close flip the detail view; a redundant close is a no-op', () => {
+  it('open/close flip the detail view without touching the run; a redundant close is a no-op', () => {
     let state = fold(twoArtifacts);
     state = reduce(state, { type: 'artifact_open_detail' });
     expect(state.artifactUi.view).toBe('detail');
     const closed = reduce(state, { type: 'artifact_close_detail' });
     expect(closed.artifactUi.view).toBe('rows');
+    expect(closed.mode).toBe('running');
+    expect(closed.live).toBeDefined();
     expect(reduce(closed, { type: 'artifact_close_detail' })).toEqual(closed);
-  });
-
-  it('closing the detail never touches the run — mode stays running', () => {
-    let state = fold(twoArtifacts);
-    state = reduce(state, { type: 'artifact_open_detail' });
-    state = reduce(state, { type: 'artifact_close_detail' });
-    expect(state.mode).toBe('running');
-    expect(state.live).toBeDefined();
   });
 
   it('run_started resets the substate for the next run', () => {
@@ -1027,15 +1022,6 @@ describe('reduce (artifacts focus mode)', () => {
 // ————— Composer substate: reducer-owned input, derived suggestions —————
 
 describe('reduce (composer substate)', () => {
-  it('starts with an empty, undismissed line', () => {
-    expect(createInitialState().composer).toEqual({
-      value: '',
-      dismissed: false,
-      selectedIndex: 0,
-      completions: 0,
-    });
-  });
-
   it('composer_changed sets the value and re-arms panel + selection', () => {
     const state = fold([
       { type: 'composer_changed', value: '/e' },
@@ -1183,15 +1169,6 @@ describe('reduce (tab_pressed routing)', () => {
     expect(state.mode).toBe('idle');
     expect(state.completedRun).toBeDefined();
     expect(state.artifacts).toHaveLength(1);
-  });
-
-  it('keeps the artifacts_focus guard: no artifacts, no focus', () => {
-    const bare = fold([
-      ...started,
-      { type: 'run_finished', outcome: 'completed', runDir: '/runs/abc', at: 2_000 },
-    ]);
-    expect(bare.completedRun).toBeDefined();
-    expect(reduce(bare, { type: 'tab_pressed' })).toEqual(bare);
   });
 
   it('is a no-op while idle without a completed run', () => {

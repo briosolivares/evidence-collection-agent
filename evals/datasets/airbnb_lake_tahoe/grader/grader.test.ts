@@ -7,6 +7,7 @@ import { initManifest, writeArtifact } from '../../../../src/run/artifacts.js';
 import type { AssertionResult } from '../../../types.js';
 import type { AirbnbLakeTahoeOracle } from '../oracle/oracle.js';
 import { grade, parseNumberedSections } from './grader.js';
+import { byName } from '../../../testSupport.js';
 
 const ORACLE: AirbnbLakeTahoeOracle = {
   locationTerms: ['lake tahoe', 'tahoe'],
@@ -35,11 +36,6 @@ function passingAnswer(): string {
       `A distinct mountain property with a kitchen, two bedrooms, parking, and convenient access to Lake Tahoe activities.`,
   ).join('\n\n');
   return `# Lake Tahoe options\n\nCheck-in: ${start.toISOString().slice(0, 10)}\nCheck-out: ${end.toISOString().slice(0, 10)}\n\n${items}\n\n## Overall Summary\n${'The set spans cabins and condos with varied amenities, locations, and tradeoffs for a week near the lake. '.repeat(2)}`;
-}
-function byName(results: AssertionResult[], name: string): AssertionResult {
-  const found = results.find((result) => result.name === name);
-  if (!found) throw new Error(`missing assertion ${name}`);
-  return found;
 }
 
 describe('airbnb_lake_tahoe grader', () => {

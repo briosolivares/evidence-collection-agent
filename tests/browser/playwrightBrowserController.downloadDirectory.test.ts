@@ -34,7 +34,7 @@ afterEach(() => {
 });
 
 describe('pinProfileDownloadDirectory', () => {
-  it('points Chrome at a downloads directory inside the profile', () => {
+  it('points Chrome at a downloads directory inside the profile and creates it', () => {
     const profileDir = makeProfileDir();
 
     pinProfileDownloadDirectory(profileDir);
@@ -43,13 +43,6 @@ describe('pinProfileDownloadDirectory', () => {
       default_directory: join(profileDir, 'downloads'),
       prompt_for_download: false,
     });
-  });
-
-  it('creates the download directory, so Chrome has somewhere to write', () => {
-    const profileDir = makeProfileDir();
-
-    pinProfileDownloadDirectory(profileDir);
-
     expect(statSync(join(profileDir, 'downloads')).isDirectory()).toBe(true);
   });
 

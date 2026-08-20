@@ -5,17 +5,13 @@ import { App } from '../../src/tui/components/App.js';
 import { CommandSuggestions } from '../../src/tui/components/CommandSuggestions.js';
 import { createConfig } from '../../src/tui/config.js';
 import { SLASH_COMMANDS } from '../../src/tui/store/commands.js';
-import { ENTER, ESC, renderAt, tick, typeText } from './helpers.js';
+import { DOWN, ENTER, ESC, expectNoOverflow, renderAt, tick, typeText, UP } from './helpers.js';
 
 // Interaction-heavy suites type through a fake stdin tick by tick and
 // can exceed the 5 s default under full-suite parallel load.
 vi.setConfig({ testTimeout: 30_000 });
 
 const config = createConfig();
-
-/** Arrow keys as explicit escape sequences (never invisible bytes). */
-const UP = '\u001b[A';
-const DOWN = '\u001b[B';
 
 // Descriptions only ever render in the panel (or a /help notice we never
 // trigger here), so they are the unambiguous visibility probe — command
@@ -172,14 +168,6 @@ describe('slash-command autosuggest panel (R1)', () => {
     expect(lastFrame()).not.toContain(DESCRIPTIONS.help);
     unmount();
   });
-
-  it('locks the open panel frame (all commands, /help selected)', async () => {
-    const { lastFrame, stdin, unmount } = render(<App config={config} apiKeyPresent={true} />);
-    await tick();
-    await typeText(stdin, '/');
-    expect(lastFrame()).toMatchSnapshot();
-    unmount();
-  });
 });
 
 describe('CommandSuggestions rendering contract', () => {
@@ -202,9 +190,7 @@ describe('CommandSuggestions rendering contract', () => {
     const { lastFrame, unmount } = renderAt(44, panel('/', 0));
     await tick();
     const frame = lastFrame();
-    for (const line of frame.split('\n')) {
-      expect(line.length).toBeLessThanOrEqual(44);
-    }
+    expectNoOverflow(frame, 44);
     expect(frame).toMatchSnapshot();
     unmount();
   });

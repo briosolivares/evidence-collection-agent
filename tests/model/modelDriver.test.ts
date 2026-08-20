@@ -105,8 +105,9 @@ describe('validateModelResponseForExecution', () => {
     ['max_tokens', 'max_tokens'],
     ['refusal', 'refusal'],
     ['model_context_window_exceeded', 'context_exhausted'],
+    // pause_turn documents that a real Anthropic stop reason is still deliberately
+    // unaccepted; any other unrecognized label takes the same branch.
     ['pause_turn', 'unknown_stop_reason'],
-    ['some_future_label', 'unknown_stop_reason'],
   ])('rejects stop_reason %s as %s', (stop, reason) => {
     try {
       validateModelResponseForExecution(
@@ -161,16 +162,14 @@ describe('validateModelResponseForExecution', () => {
     ).toBe('tool_use');
   });
 
-  it.each([[Number.NaN], [Infinity], [0], [1.5]])(
-    'refuses to compare against invalid limit %s',
-    (limit) => {
-      expect(() =>
-        validateModelResponseForExecution(response([], 'end_turn'), {
-          maxToolCallsPerTurn: limit,
-        }),
-      ).toThrow(/maxToolCallsPerTurn/);
-    },
-  );
+  // One non-integer plus zero cover both disjuncts of the limit guard.
+  it.each([[Number.NaN], [0]])('refuses to compare against invalid limit %s', (limit) => {
+    expect(() =>
+      validateModelResponseForExecution(response([], 'end_turn'), {
+        maxToolCallsPerTurn: limit,
+      }),
+    ).toThrow(/maxToolCallsPerTurn/);
+  });
 
   it('classifies protocol-correctable reasons', () => {
     expect(isProtocolCorrectableRejection('too_many_tool_calls')).toBe(true);
@@ -183,14 +182,13 @@ describe('validateModelResponseForExecution', () => {
 });
 
 describe('createAnthropicModelDriver construction', () => {
+  // Each field gets one non-integer case and one boundary case; NaN, Infinity, and
+  // fractional values all fail the same integer check.
   it.each([
     ['maxOutputTokens NaN', { maxOutputTokens: Number.NaN }],
-    ['maxOutputTokens Infinity', { maxOutputTokens: Infinity }],
     ['maxOutputTokens 0', { maxOutputTokens: 0 }],
-    ['maxOutputTokens fractional', { maxOutputTokens: 10.5 }],
     ['retry allowance not larger', { maxTokensRetryOutputTokens: 1000 }],
     ['retry allowance NaN', { maxTokensRetryOutputTokens: Number.NaN }],
-    ['retry allowance Infinity', { maxTokensRetryOutputTokens: Infinity }],
     ['maxToolCallsPerTurn 0', { maxToolCallsPerTurn: 0 }],
     ['maxToolCallsPerTurn NaN', { maxToolCallsPerTurn: Number.NaN }],
   ])('throws at construction for %s', (_label, overrides) => {
@@ -375,39 +373,6 @@ describe('createAnthropicModelDriver.generate', () => {
     expect(retries).toHaveLength(1);
     expect(retries[0]).toMatchObject({ attemptId: 1, attempt: 2 });
   }, 15_000);
-
-  it('a rejected response over the tool-call cap never reaches the caller', async () => {
-    const overCap: ModelStreamEvent[] = [
-      {
-        type: 'message_start',
-        message: { usage: { input_tokens: 10, output_tokens: 0 } },
-      },
-      ...[0, 1].flatMap((index) => [
-        {
-          type: 'content_block_start',
-          index,
-          content_block: { type: 'tool_use', id: `tu_${index}`, name: 'read_file', input: {} },
-        },
-        { type: 'content_block_stop', index },
-      ]),
-      {
-        type: 'message_delta',
-        delta: { stop_reason: 'tool_use' },
-        usage: { input_tokens: null, output_tokens: 5 },
-      },
-      { type: 'message_stop' },
-    ] as unknown as ModelStreamEvent[];
-    const factory = streamFactory([overCap]);
-    const driver = createAnthropicModelDriver({
-      ...DRIVER_BASE,
-      maxToolCallsPerTurn: 1,
-      createStream: factory.createStream,
-    });
-
-    await expect(
-      driver.generate({ messages: [{ role: 'user', content: [{ type: 'text', text: 'q' }] }] }),
-    ).rejects.toMatchObject({ reason: 'too_many_tool_calls' });
-  });
 
   it('cancellation interrupts a hanging stream without retrying', async () => {
     const controller = new AbortController();

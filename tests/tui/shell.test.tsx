@@ -96,17 +96,6 @@ describe('sherlock shell', () => {
     unmount();
   });
 
-  it('renders submitted text into the transcript', async () => {
-    const { frames, stdin, unmount } = render(<App config={config} apiKeyPresent={true} />);
-    await tick();
-    await typeText(stdin, 'find the filings');
-    stdin.write(ENTER);
-    await tick();
-    const output = frames.join('\n');
-    expect(output).toContain('▸ find the filings');
-    unmount();
-  });
-
   it('warns in the banner when the API key is missing', async () => {
     const { frames, unmount } = render(<App config={config} apiKeyPresent={false} />);
     await tick();

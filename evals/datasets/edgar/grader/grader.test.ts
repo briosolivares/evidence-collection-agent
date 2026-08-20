@@ -7,6 +7,7 @@ import { initManifest, writeArtifact } from '../../../../src/run/artifacts.js';
 import { sha256Hex } from '../../../grading/hash.js';
 import type { EdgarOracle } from '../oracle/edgarClient.js';
 import { grade } from './grader.js';
+import { byName } from '../../../testSupport.js';
 
 const PNG_MAGIC_BYTES = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 const DOCUMENT_BYTES = Buffer.from('<html>the 8-K filing body</html>');
@@ -33,12 +34,6 @@ beforeEach(() => {
 afterEach(() => {
   rmSync(runDir, { recursive: true, force: true });
 });
-
-function byName(results: { name: string; passed: boolean }[], name: string) {
-  const found = results.find((r) => r.name === name);
-  if (found === undefined) throw new Error(`no assertion named "${name}"`);
-  return found;
-}
 
 describe('edgar grader', () => {
   it('passes every assertion when the download matches and a real screenshot exists', async () => {
@@ -139,9 +134,8 @@ describe('edgar grader', () => {
     expect(
       byName(results, "downloaded document hash-matches the accession's document").passed,
     ).toBe(true);
-  });
 
-  it('throws on malformed oracle data — a harness bug, not a failed trial', async () => {
+    // Malformed oracle data is a harness bug, not a failed trial.
     await expect(async () => grade(runDir, { wrong: 'shape' })).rejects.toThrow(/oracle/);
   });
 });

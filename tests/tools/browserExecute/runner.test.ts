@@ -9,6 +9,7 @@ import {
   runBrowserProgram,
   type BrowserProgramOptions,
 } from '../../../src/tools/browserExecute/runner.js';
+import { createControlledWatchdog, wait, waitForPath } from '../../helpers/processFixtures.js';
 
 const DEFAULT_TIMEOUT_MS = 5_000;
 const DEFAULT_OUTPUT_BYTES = 1_000_000;
@@ -23,62 +24,6 @@ afterEach(() => {
   rmSync(cwd, { recursive: true, force: true });
   vi.restoreAllMocks();
 });
-
-function wait(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function waitForPath(path: string, timeoutMs = 3_000): Promise<void> {
-  const deadline = Date.now() + timeoutMs;
-  while (!existsSync(path)) {
-    if (Date.now() >= deadline) {
-      throw new Error(`timed out waiting for ${path}`);
-    }
-    await wait(10);
-  }
-}
-
-function createControlledWatchdog(): {
-  watchdog: parentDeathWatchdogModule.ParentDeathWatchdog;
-  fail(): void;
-  processGroupId(): number;
-} {
-  let failureListener:
-    | ((error: parentDeathWatchdogModule.ParentDeathWatchdogError) => void)
-    | undefined;
-  let armedProcessGroupId: number | undefined;
-
-  return {
-    watchdog: {
-      arm: async (processGroupId) => {
-        armedProcessGroupId = processGroupId;
-      },
-      disarm: async () => undefined,
-      onFailure: (listener) => {
-        failureListener = listener;
-        return () => {
-          if (failureListener === listener) failureListener = undefined;
-        };
-      },
-    },
-    fail: () => {
-      if (failureListener === undefined) {
-        throw new Error('watchdog failure listener was not installed');
-      }
-      failureListener(
-        new parentDeathWatchdogModule.ParentDeathWatchdogError(
-          'parent-death watchdog stopped while its target was active',
-        ),
-      );
-    },
-    processGroupId: () => {
-      if (armedProcessGroupId === undefined) {
-        throw new Error('watchdog was not armed');
-      }
-      return armedProcessGroupId;
-    },
-  };
-}
 
 function options(
   code: string,

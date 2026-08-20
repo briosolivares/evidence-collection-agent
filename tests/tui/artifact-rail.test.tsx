@@ -11,7 +11,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { ManifestEntry } from '../../src/run/artifacts.js';
 import { ArtifactRail } from '../../src/tui/components/ArtifactRail.js';
-import type { OpenExternalResult } from '../../src/tui/openExternal.js';
 import {
   createInitialState,
   reduce,
@@ -19,14 +18,21 @@ import {
   type UiAction,
 } from '../../src/tui/store/reducer.js';
 import type { SessionState } from '../../src/tui/store/state.js';
-import { renderAt, tick } from './helpers.js';
+import {
+  DOWN,
+  expectNoOverflow,
+  type ExternalAction,
+  okAction,
+  recorder,
+  renderAt,
+  tick,
+  UP,
+} from './helpers.js';
 
 // Interaction-heavy suites type through a fake stdin tick by tick and
 // can exceed the 5 s default under full-suite parallel load.
 vi.setConfig({ testTimeout: 30_000 });
 
-const DOWN = '\u001b[B';
-const UP = '\u001b[A';
 const ENTER = '\r';
 
 const ROWS_HINT = '↑↓ select · enter details · space preview · o open · r reveal';
@@ -64,20 +70,6 @@ function runningState(count: number, runDir: string | null = RUN_DIR): SessionSt
   ];
   return actions.reduce(reduce, createInitialState());
 }
-
-type ExternalAction = (absPath: string) => Promise<OpenExternalResult>;
-
-/** An injected helper that records its paths and resolves a result. */
-function recorder(result: OpenExternalResult = { ok: true }) {
-  const paths: string[] = [];
-  const action: ExternalAction = (absPath) => {
-    paths.push(absPath);
-    return Promise.resolve(result);
-  };
-  return { paths, action };
-}
-
-const okAction: ExternalAction = () => Promise.resolve({ ok: true });
 
 /** Mounts the rail over the real reducer, recording every dispatch. */
 function Harness({
@@ -172,9 +164,7 @@ describe('ArtifactRail (rows view)', () => {
     await tick();
     const frame = lastFrame();
     expect(frame).toContain('◆ artifacts/file-0.png');
-    for (const line of frame.split('\n')) {
-      expect(line.length).toBeLessThanOrEqual(44);
-    }
+    expectNoOverflow(frame, 44);
     unmount();
   });
 });

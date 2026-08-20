@@ -152,19 +152,16 @@ describe('App run-session wiring', () => {
 // ————— Step 7: /runs overlay —————
 
 describe('App /runs browsing', () => {
-  it('/runs browses list ↔ detail with arrows through the real reducer', async () => {
+  it('/runs opens real run summaries and closing returns control to the composer', async () => {
+    // List/detail navigation mechanics are covered by runs-list.test.tsx; this
+    // test proves the App wires the real scanRuns/loadRunSummary into the overlay.
     const { mkdtempSync, rmSync } = await import('node:fs');
     const { tmpdir } = await import('node:os');
     const { join } = await import('node:path');
     const { writeFixtureRun } = await import('./runFixtures.js');
 
-    const DOWN = '\u001b[B';
-    const UP = '\u001b[A';
-    const LEFT = '\u001b[D';
-
     const baseDir = mkdtempSync(join(tmpdir(), 'sherlock-app-runs-'));
     try {
-      // Newest first: ids sort lexically descending.
       writeFixtureRun(baseDir, {
         id: '2026-08-11T11-00-00-000Z-new',
         task: 'the newest investigation',
@@ -180,13 +177,6 @@ describe('App /runs browsing', () => {
         },
         artifacts: [{ filename: 'out.csv', content: 'a,b\n', sha256: 'feedfacedead0000' }],
       });
-      writeFixtureRun(baseDir, {
-        id: '2026-08-11T10-00-00-000Z-old',
-        task: 'the older investigation',
-        startedAt: '2026-08-11T10:00:00.000Z',
-        finishedAt: '2026-08-11T10:00:30.000Z',
-        artifacts: [{ filename: 'page.png', content: 'png-bytes', sha256: 'cafebabe12340000' }],
-      });
 
       const runsConfig = createConfig({ runsBaseDir: baseDir });
       const { frames, lastFrame, stdin, unmount } = render(
@@ -196,34 +186,18 @@ describe('App /runs browsing', () => {
       await submitLine(stdin, '/runs');
       expect(lastFrame()).toContain('Past runs');
       expect(lastFrame()).toContain('the newest investigation');
-      expect(lastFrame()).toContain('the older investigation');
 
-      // ↓ then Enter opens the older run's detail inside the overlay.
-      stdin.write(DOWN);
-      await tick();
+      // Enter opens the highlighted run's detail from the real loadRunSummary.
       stdin.write('\r');
       await tick();
-      expect(lastFrame()).toContain('sha256 cafebabe1234');
-      expect(lastFrame()).toContain('page.png');
-      expect(lastFrame()).toContain('↑↓ prev/next run · ← back · esc back');
-
-      // ↑ jumps straight to the newer run's detail (real loadRunSummary).
-      stdin.write(UP);
-      await tick();
       expect(lastFrame()).toContain('sha256 feedfacedead');
+      expect(lastFrame()).toContain('out.csv');
       expect(lastFrame()).toContain('1m 24s');
-      stdin.write(DOWN); // and back down to the older one
-      await tick();
-      expect(lastFrame()).toContain('sha256 cafebabe1234');
 
-      // ← returns to the list with the cursor still on the older run.
-      stdin.write(LEFT);
-      await tick();
-      expect(lastFrame()).toContain('↑↓ select · enter view · esc close');
-      expect(lastFrame()).toContain('› ✗ the older investigation');
-
-      // Esc from the list closes the overlay; nothing was appended to the
+      // Esc unwinds detail then closes the list; nothing was appended to the
       // transcript, and the composer is usable again.
+      stdin.write(ESC);
+      await tick(150);
       stdin.write(ESC);
       await tick(150);
       expect(lastFrame()).not.toContain('Past runs');
@@ -482,16 +456,9 @@ describe('App completion summary panel', () => {
     expect(lastFrame()).toContain(PASSIVE_HINT);
     expect(lastFrame()).not.toContain('› ◆');
     expect(lastFrame()).not.toContain('(browsing artifacts');
-    unmount();
-  });
 
-  it('Tab toggles focus in and out, panel visible throughout', async () => {
-    const bridge = fakeRunner();
-    const { lastFrame, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
-    );
-    await tick();
-    await completeRun(bridge, stdin);
+    // Tab can also blur directly (without the Esc chain), leaving the
+    // composer typable after the round trip.
     stdin.write(TAB);
     await tick();
     expect(lastFrame()).toContain('› ◆ artifacts/page.png');
@@ -499,7 +466,6 @@ describe('App completion summary panel', () => {
     await tick();
     expect(lastFrame()).toContain(PASSIVE_HINT);
     expect(lastFrame()).not.toContain('› ◆');
-    // Still typable after the round trip.
     await typeText(stdin, 'follow-up');
     expect(lastFrame()).toContain('follow-up');
     unmount();
@@ -591,24 +557,6 @@ describe('App completion summary panel', () => {
     );
     // Still idle: no focused panel, composer usable.
     expect(lastFrame()).not.toContain('(browsing artifacts');
-    unmount();
-  });
-
-  it('renders no panel after a cancelled run', async () => {
-    const bridge = fakeRunner();
-    const { lastFrame, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} runner={bridge.runner} />,
-    );
-    await tick();
-    await submitLine(stdin, 'to be interrupted');
-    bridge.emit({ type: 'turn_start', turn: 1 });
-    stdin.write(ESC);
-    await tick(150);
-    bridge.emit({ type: 'run_cancelled', at: 9_000 });
-    bridge.finish();
-    await tick();
-    expect(lastFrame()).toContain('Interrupted after');
-    expect(lastFrame()).not.toContain(PASSIVE_HINT);
     unmount();
   });
 

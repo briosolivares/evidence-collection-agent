@@ -22,15 +22,6 @@ describe('loadEvalTask', () => {
     await expect(task.fetchOracle()).resolves.toEqual({ expectedFile: 'artifacts/answer.md' });
   });
 
-  it('loads explicit headed-lane metadata without inferring from task text', async () => {
-    for (const name of ['elon_tweets', 'mit_sororities', 'edgar']) {
-      await expect(loadEvalTask(evalsDir, name)).resolves.toMatchObject({
-        name,
-        headed: true,
-      });
-    }
-  });
-
   it('rejects non-boolean headed-lane metadata', async () => {
     const tmpEvals = mkdtempSync(join(tmpdir(), 'load-task-headed-test-'));
     try {
@@ -46,11 +37,13 @@ describe('loadEvalTask', () => {
     }
   });
 
-  it('reads the sessions a task cannot run without, defaulting to none', async () => {
+  it('reads explicit headed-lane and required-session metadata, never inferring from task text', async () => {
     await expect(loadEvalTask(evalsDir, 'mit_sororities')).resolves.toMatchObject({
+      headed: true,
       requiresLogin: ['google-sheets'],
     });
     await expect(loadEvalTask(evalsDir, 'elon_tweets')).resolves.toMatchObject({
+      headed: true,
       requiresLogin: ['x'],
     });
     // edgar is headed to dodge bot-blocking, not for a session: the two

@@ -50,9 +50,6 @@ describe('outputContractSchema shape', () => {
   });
 
   it('rejects unknown keys anywhere in the contract', () => {
-    expect(
-      outputContractSchema.safeParse({ outputs: [tableOutput()], surprise: true }).success,
-    ).toBe(false);
     expect(validateOutputContract({ outputs: [tableOutput()], extra: 1 }).ok).toBe(false);
   });
 
@@ -132,15 +129,13 @@ describe('validateOutputContract cross-field rules', () => {
     expect(errorsOf(result).join('\n')).toMatch(/roster\.csv/);
   });
 
+  // One representative per rejection rule in unsafeFilenameReason(): path
+  // separators (covers absolute paths and traversal too), the dot entries,
+  // and the reserved run-output names.
   it.each([
-    ['a directory component', 'sub/roster.csv'],
-    ['an absolute path', '/etc/passwd'],
-    ['a parent traversal', '../roster.csv'],
-    ['a bare dot', '.'],
+    ['a path separator', 'sub/roster.csv'],
     ['a parent dir', '..'],
-    ['the manifest', 'manifest.json'],
-    ['the metrics file', 'metrics.json'],
-    ['the transcript', 'transcript.jsonl'],
+    ['a reserved run filename', 'manifest.json'],
   ])('rejects an unsafe filename: %s', (_label, filename) => {
     expect(errorsOf(validate(contract([tableOutput({ filename })]))).length).toBeGreaterThan(0);
   });

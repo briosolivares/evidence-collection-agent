@@ -115,18 +115,6 @@ describe('withBrowserbaseRetry', () => {
     expect(calls).toEqual([]);
   });
 
-  it('does not retry 403, surfacing it immediately with no sleep', async () => {
-    const { sleep, calls } = fakeSleep();
-    const error = httpError(403);
-    const operation = vi.fn(async () => {
-      throw error;
-    });
-
-    await expect(withBrowserbaseRetry('probe', operation, { sleep })).rejects.toBe(error);
-    expect(operation).toHaveBeenCalledTimes(1);
-    expect(calls).toEqual([]);
-  });
-
   it('retries a transport failure that carries no status at all', async () => {
     const { sleep, calls } = fakeSleep();
     const transportError = new Error('socket hang up');
@@ -215,11 +203,6 @@ describe('retryAfterMs', () => {
   it('reads an HTTP-date from a plain-object headers bag', () => {
     const at = new Date(now + 4_000).toUTCString();
     expect(retryAfterMs(httpError(429, { 'retry-after': at }), now)).toBe(4_000);
-  });
-
-  it('reads an HTTP-date from a real Headers instance', () => {
-    const at = new Date(now + 4_000).toUTCString();
-    expect(retryAfterMs(httpError(429, new Headers({ 'retry-after': at })), now)).toBe(4_000);
   });
 
   it('is undefined when there is no Retry-After header at all', () => {

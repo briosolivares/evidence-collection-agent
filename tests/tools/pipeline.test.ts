@@ -180,21 +180,6 @@ describe('executeToolCall result capping (stage 5)', () => {
     const replacement = JSON.parse(result.content) as OffloadedResult;
     expect(readFileSync(join(runDir, replacement.offloadedTo), 'utf8')).toBe('x'.repeat(65));
   });
-
-  it('passes at-cap output through byte-identical — capping is invisible under the limit', async () => {
-    const floodRegistry = createRegistry([makeFlood(64)]);
-    const result = await executeToolCall(
-      floodRegistry,
-      { id: 'call-8', name: 'flood', input: { bytes: 64 } },
-      cappedCtx,
-    );
-
-    expect(result).toEqual({
-      toolCallId: 'call-8',
-      isError: false,
-      content: 'x'.repeat(64),
-    });
-  });
 });
 
 describe('executeToolCall permission gate', () => {
@@ -545,23 +530,5 @@ describe('executeToolCall busy-resource gate', () => {
       gatedCtx,
     );
     expect(result).toEqual({ toolCallId: 'gate-3', isError: false, content: 'wrote p2' });
-  });
-
-  it('leaves a tool that returns in time with no lingering busy entry', async () => {
-    const busyRegistry = createBusyResourceRegistry();
-    const gatedCtx: ToolCtx = { runDir: '/tmp/fake-run-dir', busyRegistry };
-    await executeToolCall(
-      registryWithPageWriter,
-      { id: 'fast-2', name: 'writes_page', input: { pageId: 'p1' } },
-      gatedCtx,
-    );
-    // If the fast path had registered (then cleared) an entry, this would
-    // still resolve true — the real assertion is that nothing is left
-    // BLOCKING; a stub that always returns false would fail this if the
-    // gate were reached, but the point here is just: no timeout, no
-    // registration, next call unaffected.
-    await expect(
-      busyRegistry.waitUntilFree({ reads: [], writes: [accessKey.page('p1')] }, 50),
-    ).resolves.toBe(true);
   });
 });

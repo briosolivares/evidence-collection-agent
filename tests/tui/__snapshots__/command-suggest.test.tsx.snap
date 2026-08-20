@@ -15,35 +15,3 @@ exports[`CommandSuggestions rendering contract > renders with zero overflow at 4
   /evals      Run eval tasks
   /exit       Quit Sherlock"
 `;
-
-exports[`slash-command autosuggest panel (R1) > locks the open panel frame (all commands, /help selected) 1`] = `
-"╭─ Sherlock — evidence collection agent ───────────────────────╮
-│                        Welcome back!                         │
-│                                                              │
-│                         .-~~~~~~~~~~-.                       │
-│                        / . , .  . , . \\                      │
-│                       ;   ___    ___   ;                     │
-│                       |  '   '~~'   '  |                     │
-│                       | .-~~~-..-~~~-. |                     │
-│                      |  (( ◉ ))(( ◉ ))  |                    │
-│                       ; '-___-''-___-' ;                     │
-│                       \\  '-. \\  / .-'  /                     │
-│                    ,__  \\  '~~\\/~~'  /  __,                  │
-│                    \\   '-.   ░░░░   .-'   /                  │
-│                     \\     \\ ░▒▒▒▒░ /     /                   │
-│                      \\     ;░▒▒▒▒░;     /                    │
-│                       \\    |▒▒▓▓▒▒|    /                     │
-│                        '~~~|      |~~~'                      │
-╰──────────────────────────────────────────────────────────────╯
-
-
-› /help       Show this list
-  /runs       Browse past run directories
-  /artifacts  Browse the last run's artifacts
-  /evals      Run eval tasks
-  /exit       Quit Sherlock
-╭──────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ › / help                                                                                         │
-╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
-  /help for commands"
-`;

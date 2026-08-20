@@ -7,7 +7,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { BrowserController } from '../../src/browser/controller.js';
 import { LocalChromeBrowserSessionProvider } from '../../src/browser/playwrightBrowserController.js';
-import type { CallModel, ModelResponse } from '../../src/model/messages.js';
 import { readManifest } from '../../src/run/artifacts.js';
 import type { RunTracing } from '../../src/tracing/runTracing.js';
 import { createTuiRuntime } from '../../src/tui/bridge/runtime.js';
@@ -18,7 +17,12 @@ import {
   RUN_CHECKPOINT_FILENAME,
   RUN_LOCK_FILENAME,
 } from '../../src/agent/checkpoint.js';
-import { scriptedResponse, scriptedStreamFactory } from './streamFixtures.js';
+import {
+  contractInitializerCallModel,
+  scriptedResponse,
+  scriptedStreamFactory,
+  verifiedVerifierCallModel,
+} from './streamFixtures.js';
 
 const BROWSER_CANCELLATION_TASK =
   'Exercise browser cancellation without publishing the requested output.';
@@ -35,48 +39,18 @@ const MARKER_TIMEOUT_MS = 15_000;
 
 type StreamFactory = NonNullable<RunSessionDeps['createStream']>;
 
-const initializerCallModel: CallModel = async () => ({
-  content: [
-    {
-      type: 'tool_use',
-      id: 'contract-cancellation-acceptance',
-      name: 'set_output_contract',
-      input: {
-        contract: {
-          outputs: [
-            {
-              id: 'success',
-              kind: 'document',
-              filename: 'success.md',
-              format: 'markdown',
-              evidenceRequirement: 'none',
-              evidencePresentation: 'hidden',
-            },
-          ],
-        },
-      },
-    },
-  ],
-  stop_reason: 'tool_use',
-  usage: { input_tokens: 40, output_tokens: 10 },
-});
+const initializerCallModel = contractInitializerCallModel([
+  {
+    id: 'success',
+    kind: 'document',
+    filename: 'success.md',
+    format: 'markdown',
+    evidenceRequirement: 'none',
+    evidencePresentation: 'hidden',
+  },
+]);
 
-const verifierCallModel: CallModel = async () => verifiedResponse();
-
-function verifiedResponse(): ModelResponse {
-  return {
-    content: [
-      {
-        type: 'tool_use',
-        id: 'verify-cancellation-recovery',
-        name: 'report_verification',
-        input: { status: 'verified', findings: [] },
-      },
-    ],
-    stop_reason: 'tool_use',
-    usage: { input_tokens: 10, output_tokens: 2 },
-  };
-}
+const verifierCallModel = verifiedVerifierCallModel();
 
 function stubbornDescendantSource(): string {
   return [

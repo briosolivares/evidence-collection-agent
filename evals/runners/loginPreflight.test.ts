@@ -83,7 +83,8 @@ describe('formatLoginPreflightFailure', () => {
 
   // A Browserbase batch is fixed by a human clicking through Live View, not
   // by anything that runs on the operator's own machine — so the fix line
-  // has to name that command and say nothing about local Chrome.
+  // has to name that and say nothing about local Chrome. The shared message
+  // shape is covered by the local-branch test above; only the delta matters.
   it('points a browserbase failure at Live View, not local Chrome', () => {
     const statuses: ServiceLoginStatus[] = [
       { service: GOOGLE_SHEETS, state: 'logged-out' },
@@ -91,12 +92,9 @@ describe('formatLoginPreflightFailure', () => {
     ];
     const message = formatLoginPreflightFailure(statuses, requirements, 'browserbase');
 
-    expect(message).toContain('LOGIN REQUIRED');
-    expect(message).toContain('Google (Sheets): NOT LOGGED IN');
-    expect(message).toContain('blocks mit_sororities');
-    expect(message).toContain('npm run login');
     expect(message).toContain('Browserbase Live View');
-    expect(message).toContain('--skip-login-check');
+    expect(message).not.toContain('--manual');
+    expect(message).not.toContain('Chrome');
   });
 
   // `--manual` launches a local Chrome on a local profile; a Browserbase

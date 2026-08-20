@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { writeArtifact } from '../../../../src/run/artifacts.js';
 import type { GithubPullRequest, OpenClawPrOracle } from '../oracle/githubClient.js';
 import { grade } from './grader.js';
+import { byName } from '../../../testSupport.js';
 
 const RUN_STARTED_AT = '2026-01-10T00:00:00Z';
 const RUN_FINISHED_AT = '2026-01-10T12:00:00Z';
@@ -64,12 +65,6 @@ beforeEach(() => {
 afterEach(() => {
   rmSync(runDir, { recursive: true, force: true });
 });
-
-function byName(results: { name: string; passed: boolean; detail: string }[], name: string) {
-  const found = results.find((r) => r.name === name);
-  if (found === undefined) throw new Error(`no assertion named "${name}"`);
-  return found;
-}
 
 function mentionText(pr: GithubPullRequest): string {
   return `The most recent PR is #${pr.number}, "${pr.title}".\n`;
@@ -162,9 +157,8 @@ describe('openclaw_pr grader', () => {
       byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR')
         .passed,
     ).toBe(true);
-  });
 
-  it('throws on malformed oracle data — a harness bug, not a failed trial', async () => {
+    // Malformed oracle data is a harness bug, not a failed trial.
     await expect(async () => grade(runDir, { wrong: 'shape' })).rejects.toThrow(/oracle/);
   });
 });

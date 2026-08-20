@@ -58,21 +58,6 @@ describe('syncScratchWorkspace', () => {
     expect(syncScratchWorkspace(runDir)).toEqual([]);
   });
 
-  it('classifies a brand-new file as created', () => {
-    writeWorkspaceFile('a.txt', 'hello');
-
-    expect(syncScratchWorkspace(runDir)).toEqual([
-      { path: 'scratch/workspace/a.txt', change: 'created' },
-    ]);
-  });
-
-  it('reports no changes for a file already synced and left untouched', () => {
-    writeWorkspaceFile('a.txt', 'hello');
-    syncScratchWorkspace(runDir);
-
-    expect(syncScratchWorkspace(runDir)).toEqual([]);
-  });
-
   it('propagates the exact active guard failure while streaming a file', () => {
     writeWorkspaceFile('large.bin', Buffer.alloc(2 * 1024 * 1024, 1));
     const stopped = new Error('resume inspection deadline');

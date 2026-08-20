@@ -12,12 +12,16 @@ import {
   requestedOutputs,
   verifyManifestHashes,
 } from '../../evals/grading/manifestVerification.js';
-import type { CallModel, ModelResponse } from '../../src/model/messages.js';
 import { TRANSCRIPT_FILENAME } from '../../src/run/transcript.js';
 import { startRun } from '../../src/tui/bridge/runSession.js';
 import { createInitialState, reduce, type StoreAction } from '../../src/tui/store/reducer.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
-import { scriptedResponse, scriptedStreamFactory } from './streamFixtures.js';
+import {
+  contractInitializerCallModel,
+  scriptedResponse,
+  scriptedStreamFactory,
+  verifiedVerifierCallModel,
+} from './streamFixtures.js';
 import { stubBrowser } from './stubBrowser.js';
 
 const TASK =
@@ -45,56 +49,26 @@ afterEach(() => {
   rmSync(runsBaseDir, { recursive: true, force: true });
 });
 
-const initializerCallModel: CallModel = async () => ({
-  content: [
-    {
-      type: 'tool_use',
-      id: 'contract-vertical',
-      name: 'set_output_contract',
-      input: {
-        contract: {
-          outputs: [
-            {
-              id: 'answer',
-              kind: 'document',
-              filename: 'answer.md',
-              format: 'markdown',
-              evidenceRequirement: 'at_least_one',
-              evidencePresentation: 'hidden',
-            },
-            {
-              id: 'export',
-              kind: 'download',
-              count: { exact: 1 },
-              filenamePattern: 'export.bin',
-              allowedMediaTypes: ['application/octet-stream'],
-              sourceUrlPattern: 'https://files.example.test/*',
-            },
-          ],
-        },
-      },
-    },
-  ],
-  stop_reason: 'tool_use',
-  usage: { input_tokens: 100, output_tokens: 20 },
-});
+const initializerCallModel = contractInitializerCallModel([
+  {
+    id: 'answer',
+    kind: 'document',
+    filename: 'answer.md',
+    format: 'markdown',
+    evidenceRequirement: 'at_least_one',
+    evidencePresentation: 'hidden',
+  },
+  {
+    id: 'export',
+    kind: 'download',
+    count: { exact: 1 },
+    filenamePattern: 'export.bin',
+    allowedMediaTypes: ['application/octet-stream'],
+    sourceUrlPattern: 'https://files.example.test/*',
+  },
+]);
 
-const verifierCallModel: CallModel = async () => verifiedResponse();
-
-function verifiedResponse(): ModelResponse {
-  return {
-    content: [
-      {
-        type: 'tool_use',
-        id: 'verification-vertical',
-        name: 'report_verification',
-        input: { status: 'verified', findings: [] },
-      },
-    ],
-    stop_reason: 'tool_use',
-    usage: { input_tokens: 10, output_tokens: 2 },
-  };
-}
+const verifierCallModel = verifiedVerifierCallModel();
 
 function publicationResponse() {
   return scriptedResponse(

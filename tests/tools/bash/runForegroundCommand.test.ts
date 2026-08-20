@@ -5,67 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import * as parentDeathWatchdogModule from '../../../src/process/parentDeathWatchdog.js';
 import { runForegroundCommand } from '../../../src/tools/bash/runForegroundCommand.js';
+import { createControlledWatchdog, wait, waitForPath } from '../../helpers/processFixtures.js';
 
 const SHELL = '/bin/bash';
-
-function wait(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function waitForPath(path: string, timeoutMs = 3_000): Promise<void> {
-  const deadline = Date.now() + timeoutMs;
-  while (!existsSync(path)) {
-    if (Date.now() >= deadline) {
-      throw new Error(`timed out waiting for ${path}`);
-    }
-    await wait(10);
-  }
-}
-
-function createControlledWatchdog(options: { armNeverSettles?: boolean } = {}): {
-  watchdog: parentDeathWatchdogModule.ParentDeathWatchdog;
-  fail(): void;
-  processGroupId(): number;
-} {
-  let failureListener:
-    | ((error: parentDeathWatchdogModule.ParentDeathWatchdogError) => void)
-    | undefined;
-  let armedProcessGroupId: number | undefined;
-
-  return {
-    watchdog: {
-      arm: (processGroupId) => {
-        armedProcessGroupId = processGroupId;
-        return options.armNeverSettles === true
-          ? new Promise<void>(() => undefined)
-          : Promise.resolve();
-      },
-      disarm: async () => undefined,
-      onFailure: (listener) => {
-        failureListener = listener;
-        return () => {
-          if (failureListener === listener) failureListener = undefined;
-        };
-      },
-    },
-    fail: () => {
-      if (failureListener === undefined) {
-        throw new Error('watchdog failure listener was not installed');
-      }
-      failureListener(
-        new parentDeathWatchdogModule.ParentDeathWatchdogError(
-          'parent-death watchdog stopped while its target was active',
-        ),
-      );
-    },
-    processGroupId: () => {
-      if (armedProcessGroupId === undefined) {
-        throw new Error('watchdog was not armed');
-      }
-      return armedProcessGroupId;
-    },
-  };
-}
 
 // A generous default: real child processes are fast, but CI machines are
 // not, so budgets stay comfortably above what any of these commands need.
@@ -98,10 +40,10 @@ describe('runForegroundCommand', () => {
     expect(result.stderr).toBe('BD');
   });
 
-  it('reports status "exited" with exit code 0 on success', async () => {
+  it.each([[0], [7]])('reports status "exited" with exit code %i', async (code) => {
     const result = await runForegroundCommand({
       shellPath: SHELL,
-      command: 'exit 0',
+      command: `exit ${code}`,
       cwd: workDir,
       env: process.env,
       timeoutMs: DEFAULT_TIMEOUT_MS,
@@ -109,22 +51,8 @@ describe('runForegroundCommand', () => {
     });
 
     expect(result.status).toBe('exited');
-    expect(result.exitCode).toBe(0);
+    expect(result.exitCode).toBe(code);
     expect(result.terminationSignal).toBeNull();
-  });
-
-  it('reports status "exited" with a nonzero exit code on failure', async () => {
-    const result = await runForegroundCommand({
-      shellPath: SHELL,
-      command: 'exit 7',
-      cwd: workDir,
-      env: process.env,
-      timeoutMs: DEFAULT_TIMEOUT_MS,
-      maxOutputBytes: DEFAULT_MAX_OUTPUT_BYTES,
-    });
-
-    expect(result.status).toBe('exited');
-    expect(result.exitCode).toBe(7);
   });
 
   it('reports the signal that terminated the process when it kills itself', async () => {
@@ -439,9 +367,10 @@ describe('runForegroundCommand', () => {
     }
   }, 10_000);
 
-  it('releases the abort listener once the call completes normally', async () => {
+  it('releases the abort listener and clears its timers once the call completes normally', async () => {
     const controller = new AbortController();
     const removeSpy = vi.spyOn(controller.signal, 'removeEventListener');
+    const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout');
 
     await runForegroundCommand({
       shellPath: SHELL,
@@ -454,20 +383,6 @@ describe('runForegroundCommand', () => {
     });
 
     expect(removeSpy).toHaveBeenCalledWith('abort', expect.any(Function));
-  });
-
-  it('clears its timers once the call completes normally', async () => {
-    const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout');
-
-    await runForegroundCommand({
-      shellPath: SHELL,
-      command: 'exit 0',
-      cwd: workDir,
-      env: process.env,
-      timeoutMs: DEFAULT_TIMEOUT_MS,
-      maxOutputBytes: DEFAULT_MAX_OUTPUT_BYTES,
-    });
-
     // At minimum, the pending timeout-budget timer must be cleared rather
     // than left to fire after the call has already settled.
     expect(clearTimeoutSpy).toHaveBeenCalled();

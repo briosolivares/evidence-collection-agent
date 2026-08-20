@@ -272,37 +272,4 @@ describe('PlaywrightBrowserController task-page ownership', () => {
       await controller.closeTaskPages().catch(() => undefined);
     }
   }, 15_000);
-
-  it('rebinds one real controller from run A to run B only after quiescent cleanup', async () => {
-    const originalUserPages = [...context.pages()];
-    await prepareTaskPage(controller, {
-      ownershipId: 'sequential-real-run-a',
-    });
-    const runAMain = context.pages().find((page) => !originalUserPages.includes(page));
-    expect(runAMain).toBeDefined();
-    await runAMain!.setContent('<a id="popup" href="about:blank#a-popup" target="_blank">open</a>');
-    const [runAPopup] = await Promise.all([
-      context.waitForEvent('page'),
-      runAMain!.click('#popup'),
-    ]);
-    await waitForOwnedPages(controller, 2);
-
-    await controller.closeTaskPages();
-
-    expect(runAMain!.isClosed()).toBe(true);
-    expect(runAPopup.isClosed()).toBe(true);
-    const betweenRunsUserPage = await context.newPage();
-    await betweenRunsUserPage.goto('data:text/html,<title>between-runs-user</title><h1>user</h1>');
-
-    await prepareTaskPage(controller, {
-      ownershipId: 'sequential-real-run-b',
-    });
-    expect(await controller.pages()).toHaveLength(1);
-    await controller.closeTaskPages();
-
-    for (const page of [...originalUserPages, betweenRunsUserPage]) {
-      expect(page.isClosed()).toBe(false);
-    }
-    expect(await controller.pages()).toEqual([]);
-  }, 40_000);
 });

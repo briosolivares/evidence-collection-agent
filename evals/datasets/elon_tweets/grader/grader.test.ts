@@ -7,6 +7,7 @@ import { initManifest, writeArtifact } from '../../../../src/run/artifacts.js';
 import type { AssertionResult } from '../../../types.js';
 import type { ElonTweetsOracle } from '../oracle/oracle.js';
 import { grade } from './grader.js';
+import { byName as assertion } from '../../../testSupport.js';
 
 const ORACLE: ElonTweetsOracle = {
   accountHandle: 'elonmusk',
@@ -26,11 +27,6 @@ function writeCsv(
   body = 'text,likes,time_posted\nFirst tweet,"1,234",9:15 AM\nSecond tweet,2.5K,2h ago\n',
 ): void {
   writeArtifact(runDir, 'artifacts/tweets.csv', Buffer.from(body), { roles: ['requested_output'] });
-}
-function assertion(results: AssertionResult[], name: string): AssertionResult {
-  const found = results.find((result) => result.name === name);
-  if (!found) throw new Error(`missing assertion ${name}`);
-  return found;
 }
 
 describe('elon_tweets grader', () => {
@@ -100,10 +96,8 @@ describe('elon_tweets grader', () => {
       'text,likes,time_posted\nChanged,1,now\n',
     );
     expect(assertion(await grade(runDir, ORACLE), 'manifest hashes verify').passed).toBe(false);
-  });
 
-  it('throws on malformed oracle data', async () => {
-    writeCsv();
+    // Malformed oracle data is a harness bug, not a failed trial.
     await expect(async () => grade(runDir, { wrong: true })).rejects.toThrow(/oracle/);
   });
 });

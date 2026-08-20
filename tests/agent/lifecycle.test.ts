@@ -21,7 +21,6 @@ import {
   ModelGenerationFailedError,
   type AcceptedModelResponse,
   type ModelDriver,
-  type ModelGenerateOptions,
 } from '../../src/model/modelDriver.js';
 import { initManifest, readManifest, writeArtifact } from '../../src/run/artifacts.js';
 import {
@@ -36,6 +35,7 @@ import {
   type DurableRunConfiguration,
 } from '../../src/agent/checkpoint.schema.js';
 import { runAgent } from '../../src/agent/lifecycle.js';
+import { readCheckpoint, scriptedDriver, unexpectedDriver } from './modelDrivers.js';
 import { OUTPUT_CONTRACT_PATH } from '../../src/agent/initializer/contractFile.js';
 
 const TASK = 'Publish report.csv with exactly one name column and one row.';
@@ -104,7 +104,7 @@ describe('runAgent', () => {
     expect(models.worker.generate).toHaveBeenCalledOnce();
     expect(models.verifier.generate).toHaveBeenCalledOnce();
 
-    const checkpoint = readCheckpoint();
+    const checkpoint = readCheckpoint(runDir);
     expect(checkpoint).toMatchObject({ phase: 'terminal', outcome });
     expect(readManifest(runDir).finishedAt).toBeDefined();
     expect(existsSync(join(runDir, OUTPUT_CONTRACT_PATH))).toBe(true);
@@ -147,7 +147,7 @@ describe('runAgent', () => {
     expect(initializer.generate).toHaveBeenCalledOnce();
     expect(worker.generate).not.toHaveBeenCalled();
     expect(verifier.generate).not.toHaveBeenCalled();
-    expect(readCheckpoint()).toMatchObject({
+    expect(readCheckpoint(runDir)).toMatchObject({
       phase: 'terminal',
       outcome: { status: 'incomplete', reason: 'initializer_unavailable' },
     });
@@ -200,7 +200,7 @@ describe('runAgent', () => {
     expect(initializer.generate).toHaveBeenCalledOnce();
     expect(worker.generate).not.toHaveBeenCalled();
     expect(verifier.generate).not.toHaveBeenCalled();
-    const checkpoint = readCheckpoint();
+    const checkpoint = readCheckpoint(runDir);
     expect(checkpoint).toMatchObject({
       phase: 'terminal',
       outcome: { status: 'incomplete', reason: 'budget_exceeded' },
@@ -254,7 +254,7 @@ describe('runAgent', () => {
     expect(initializer.generate).not.toHaveBeenCalled();
     expect(worker.generate).not.toHaveBeenCalled();
     expect(verifier.generate).not.toHaveBeenCalled();
-    expect(readCheckpoint()).toMatchObject({
+    expect(readCheckpoint(runDir)).toMatchObject({
       phase: 'terminal',
       outcome: { status: 'incomplete', reason: 'budget_exceeded' },
     });
@@ -285,7 +285,7 @@ describe('runAgent', () => {
     });
     expect(worker.generate).not.toHaveBeenCalled();
     expect(verifier.generate).not.toHaveBeenCalled();
-    expect(readCheckpoint()).toMatchObject({
+    expect(readCheckpoint(runDir)).toMatchObject({
       phase: 'terminal',
       budget: { toolCalls: 1 },
       outcome: { status: 'incomplete', reason: 'budget_exceeded' },
@@ -433,7 +433,7 @@ describe('runAgent', () => {
       }),
     ).rejects.toThrow(/simulated death/);
 
-    const durable = readCheckpoint();
+    const durable = readCheckpoint(runDir);
     expect(durable.phase).toBe('terminal');
     expect(readManifest(runDir).finishedAt).toBeUndefined();
     expect(terminalTranscriptEvents()).toHaveLength(0);
@@ -487,7 +487,7 @@ describe('runAgent', () => {
     mkdirSync(metricsPath);
 
     await expect(run(happyModels())).rejects.toThrow(/terminal projection repair.*metrics/i);
-    const durable = readCheckpoint();
+    const durable = readCheckpoint(runDir);
     expect(durable).toMatchObject({
       phase: 'terminal',
       outcome: {
@@ -553,7 +553,7 @@ describe('runAgent', () => {
     });
     expect(models.verifier.generate).not.toHaveBeenCalled();
 
-    const checkpoint = readCheckpoint();
+    const checkpoint = readCheckpoint(runDir);
     expect(checkpoint.phase).toBe('terminal');
     if (checkpoint.phase !== 'terminal') throw new Error('expected terminal checkpoint');
     const finishResults = checkpoint.worker?.messages.flatMap((message) =>
@@ -667,26 +667,6 @@ function accepted(content: AcceptedModelResponse['response']['content']): Accept
   };
 }
 
-function scriptedDriver(
-  steps: Array<AcceptedModelResponse | Error>,
-): ModelDriver & { generate: ReturnType<typeof vi.fn> } {
-  const generate = vi.fn(async (_options: ModelGenerateOptions) => {
-    const step = steps.shift();
-    if (step === undefined) throw new Error('scripted model exhausted');
-    if (step instanceof Error) throw step;
-    return step;
-  });
-  return { generate };
-}
-
-function unexpectedDriver(role: string): ModelDriver & { generate: ReturnType<typeof vi.fn> } {
-  return {
-    generate: vi.fn(async () => {
-      throw new Error(`${role} model must not be called`);
-    }),
-  };
-}
-
 function publishValidRunArtifacts(): void {
   writeArtifact(runDir, 'artifacts/report.csv', Buffer.from('name\nAlice\n', 'utf8'), {
     roles: ['requested_output'],
@@ -699,12 +679,6 @@ function publishValidRunArtifacts(): void {
       roles: ['evidence'],
       sourceUrl: 'https://example.test/source',
     },
-  );
-}
-
-function readCheckpoint(): Checkpoint {
-  return checkpointSchema.parse(
-    JSON.parse(readFileSync(join(runDir, HARNESS_DIR, RUN_CHECKPOINT_FILENAME), 'utf8')),
   );
 }
 

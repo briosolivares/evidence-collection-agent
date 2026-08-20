@@ -12,6 +12,7 @@ import { EvalRunCancelledError, runEvals } from './runner.js';
 import { grade } from '../datasets/stub/grader/grader.js';
 import { fetchOracle } from '../datasets/stub/oracle/oracle.js';
 import type { AssertionResult, EvalTask, Grader, RunTaskFn } from '../types.js';
+import { deferred } from '../testSupport.js';
 
 // All fake-agent run dirs land in a temp dir; the suite stays hermetic.
 let baseDir: string;
@@ -46,14 +47,6 @@ function passingTask(name: string, headed = false): EvalTask {
     fetchOracle: async () => ({ task: name }),
     grade: async () => [{ name: 'complete', passed: true, detail: 'ok' }],
   };
-}
-
-function deferred(): { promise: Promise<void>; resolve: () => void } {
-  let resolve!: () => void;
-  const promise = new Promise<void>((done) => {
-    resolve = done;
-  });
-  return { promise, resolve };
 }
 
 describe('runEvals', () => {

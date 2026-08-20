@@ -301,17 +301,16 @@ describe('runFinishChecks — manifest-derived finish facts', () => {
     expect(codes(result)).toEqual(['manifest_entry_limit_exceeded']);
   });
 
-  it.each([
-    ['roles', 42],
-    ['sourceUrl', 42],
-    ['completionStatus', 'invented'],
-  ] as const)('returns a defect for malformed optional manifest field %s', (field, value) => {
+  // One representative malformed optional field: every optional entry field fails
+  // through the same manifestShapeSchema parse into invalid_manifest_entry (the
+  // canonical-timestamp test above exercises the same funnel via capturedAt).
+  it('returns a defect for a malformed optional manifest field', () => {
     publish('artifacts/roster.csv', 'name,url\nAlpha,\n');
     const manifestPath = join(runDir, 'manifest.json');
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as {
       artifacts: Array<Record<string, unknown>>;
     };
-    manifest.artifacts[0]![field] = value;
+    manifest.artifacts[0]!.completionStatus = 'invented';
     writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 
     expect(() =>
@@ -415,9 +414,24 @@ describe('inspectManifest — bounded streaming content', () => {
     expect(retained.entries[0]!.bytes).toBeUndefined();
   });
 
-  it('propagates the trusted run guard between streamed hash chunks', () => {
-    publish('artifacts/large.bin', Buffer.alloc(1024 * 1024, 0x5a));
-    const interrupted = new Error('whole-run deadline reached');
+  it.each([
+    {
+      stream: 'streamed artifact hash chunks',
+      prepare: () => publish('artifacts/large.bin', Buffer.alloc(1024 * 1024, 0x5a)),
+      interruptAt: 8,
+    },
+    {
+      stream: 'the manifest itself',
+      prepare: () => {
+        const manifestPath = join(runDir, 'manifest.json');
+        const raw = readFileSync(manifestPath);
+        writeFileSync(manifestPath, Buffer.concat([raw, Buffer.alloc(1024 * 1024, 0x20)]));
+      },
+      interruptAt: 4,
+    },
+  ])('propagates the trusted run guard while streaming $stream', ({ prepare, interruptAt }) => {
+    prepare();
+    const interrupted = new Error('inspection deadline reached');
     let checks = 0;
 
     let thrown: unknown;
@@ -425,7 +439,7 @@ describe('inspectManifest — bounded streaming content', () => {
       inspectManifest(runDir, {
         checkActive: () => {
           checks += 1;
-          if (checks === 8) throw interrupted;
+          if (checks === interruptAt) throw interrupted;
         },
       });
     } catch (error) {
@@ -433,25 +447,7 @@ describe('inspectManifest — bounded streaming content', () => {
     }
 
     expect(thrown).toBe(interrupted);
-    expect(checks).toBe(8);
-  });
-
-  it('propagates the trusted run guard while streaming the manifest itself', () => {
-    const manifestPath = join(runDir, 'manifest.json');
-    const raw = readFileSync(manifestPath);
-    writeFileSync(manifestPath, Buffer.concat([raw, Buffer.alloc(1024 * 1024, 0x20)]));
-    const interrupted = new Error('terminal inspection deadline reached');
-    let checks = 0;
-
-    expect(() =>
-      inspectManifest(runDir, {
-        checkActive: () => {
-          checks += 1;
-          if (checks === 4) throw interrupted;
-        },
-      }),
-    ).toThrow(interrupted);
-    expect(checks).toBe(4);
+    expect(checks).toBe(interruptAt);
   });
 });
 

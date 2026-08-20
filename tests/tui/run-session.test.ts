@@ -4,12 +4,16 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { BrowserController } from '../../src/browser/controller.js';
-import type { CallModel, ModelResponse } from '../../src/model/messages.js';
 import type { ModelStreamEvent } from '../../src/model/streamAssembly.js';
 import { startRun, type RunSessionDeps } from '../../src/tui/bridge/runSession.js';
 import { createInitialState, reduce, type StoreAction } from '../../src/tui/store/reducer.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
-import { scriptedResponse, scriptedStreamFactory } from './streamFixtures.js';
+import {
+  contractInitializerCallModel,
+  scriptedResponse,
+  scriptedStreamFactory,
+  verifiedVerifierCallModel,
+} from './streamFixtures.js';
 import { stubBrowser } from './stubBrowser.js';
 
 // Public bridge coverage only: every case drives the real runTask with an
@@ -37,48 +41,18 @@ afterEach(() => {
   rmSync(runsBaseDir, { recursive: true, force: true });
 });
 
-const initializerCallModel: CallModel = async () => ({
-  content: [
-    {
-      type: 'tool_use',
-      id: 'contract-1',
-      name: 'set_output_contract',
-      input: {
-        contract: {
-          outputs: [
-            {
-              id: 'report',
-              kind: 'table',
-              filename: 'report.csv',
-              format: 'csv',
-              columns: [{ name: 'name', required: true, type: 'string' }],
-              rules: [{ type: 'exact_row_count', value: 1 }],
-            },
-          ],
-        },
-      },
-    },
-  ],
-  stop_reason: 'tool_use',
-  usage: { input_tokens: 100, output_tokens: 20 },
-});
+const initializerCallModel = contractInitializerCallModel([
+  {
+    id: 'report',
+    kind: 'table',
+    filename: 'report.csv',
+    format: 'csv',
+    columns: [{ name: 'name', required: true, type: 'string' }],
+    rules: [{ type: 'exact_row_count', value: 1 }],
+  },
+]);
 
-const verifierCallModel: CallModel = async () => verifierVerified();
-
-function verifierVerified(): ModelResponse {
-  return {
-    content: [
-      {
-        type: 'tool_use',
-        id: 'verification-1',
-        name: 'report_verification',
-        input: { status: 'verified', findings: [] },
-      },
-    ],
-    stop_reason: 'tool_use',
-    usage: { input_tokens: 10, output_tokens: 2 },
-  };
-}
+const verifierCallModel = verifiedVerifierCallModel();
 
 function publishResponse(prose?: string): ModelStreamEvent[] {
   return scriptedResponse(

@@ -69,13 +69,15 @@ describe('Transcript', () => {
   });
 
   it('renders the completion artifact digest under the ✓ line', async () => {
+    // A configured verb and a minute-range duration exercise the same line's
+    // formatting alongside the digest.
     const { frames, unmount } = render(
       <Transcript
         items={items({
           kind: 'completion',
           outcome: 'complete',
-          verb: 'Brewed',
-          elapsedMs: 42_000,
+          verb: 'Distilled',
+          elapsedMs: 84_000,
           tokens: 18_700,
           runDir: '/runs/abc',
           artifacts: [
@@ -88,7 +90,7 @@ describe('Transcript', () => {
     );
     await tick();
     const output = frames.join('\n');
-    expect(output).toContain('✓ Brewed in 42s · 18.7k tokens');
+    expect(output).toContain('✓ Distilled in 1m 24s · 18.7k tokens');
     expect(output).toContain('◆ artifacts/top5.csv · 96 B · requested output');
     expect(output).toContain('◆ artifacts/page.png · 2.0 KB · evidence');
     // No stat and no roles degrade gracefully, never render "undefined".

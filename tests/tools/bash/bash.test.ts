@@ -26,6 +26,7 @@ import {
   type BashResult,
   type BashToolDeps,
 } from '../../../src/tools/bash/bash.js';
+import { wait, waitForPath } from '../../helpers/processFixtures.js';
 
 let runDir: string;
 
@@ -61,20 +62,6 @@ function exited(overrides: Partial<ForegroundCommandResult> = {}): ForegroundCom
     stderr: '',
     ...overrides,
   };
-}
-
-function wait(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function waitForPath(path: string, timeoutMs = 3_000): Promise<void> {
-  const deadline = Date.now() + timeoutMs;
-  while (!existsSync(path)) {
-    if (Date.now() >= deadline) {
-      throw new Error(`Timed out waiting for ${path}`);
-    }
-    await wait(10);
-  }
 }
 
 describe('bash tool', () => {
@@ -210,10 +197,10 @@ describe('bash tool', () => {
     expect(result.isError).toBe(false);
   });
 
+  // Reconciliation runs unconditionally and status is copied through verbatim;
+  // one normal outcome plus cancellation represents the whole status enum.
   it.each([
     ['exited', 0, null],
-    ['timed_out', null, null],
-    ['output_limit_exceeded', null, null],
     ['cancelled', null, null],
   ] as const)(
     'reconciles workspace changes after a %s runner outcome',

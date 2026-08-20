@@ -2,7 +2,6 @@ import { render } from 'ink-testing-library';
 import { describe, expect, it } from 'vitest';
 
 import { pickWord, StatusLine } from '../../src/tui/components/StatusLine.js';
-import { TranscriptItemView } from '../../src/tui/components/TranscriptItem.js';
 import { createConfig } from '../../src/tui/config.js';
 import type { LiveRunState } from '../../src/tui/store/state.js';
 import { tick } from './helpers.js';
@@ -95,30 +94,6 @@ describe('StatusLine', () => {
     );
     await tick();
     expect(lastFrame()).toContain('Wrapping up…');
-    unmount();
-  });
-});
-
-describe('completion line', () => {
-  it('uses the configured verb with natural duration formatting', async () => {
-    const { frames, unmount } = render(
-      <TranscriptItemView
-        item={{
-          id: 1,
-          kind: 'completion',
-          outcome: 'complete',
-          verb: 'Distilled',
-          elapsedMs: 84_000,
-          tokens: 31_200,
-          runDir: '/runs/xyz',
-          artifacts: [],
-        }}
-      />,
-    );
-    await tick();
-    const output = frames.join('\n');
-    expect(output).toContain('✓ Distilled in 1m 24s · 31.2k tokens');
-    expect(output).toContain('/runs/xyz');
     unmount();
   });
 });

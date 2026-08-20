@@ -11,7 +11,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { ManifestEntry } from '../../src/run/artifacts.js';
 import { ArtifactsPanel } from '../../src/tui/components/ArtifactsPanel.js';
-import type { OpenExternalResult } from '../../src/tui/openExternal.js';
 import {
   createInitialState,
   reduce,
@@ -19,13 +18,20 @@ import {
   type UiAction,
 } from '../../src/tui/store/reducer.js';
 import type { SessionState } from '../../src/tui/store/state.js';
-import { renderAt, tick } from './helpers.js';
+import {
+  DOWN,
+  expectNoOverflow,
+  type ExternalAction,
+  okAction,
+  recorder,
+  renderAt,
+  tick,
+} from './helpers.js';
 
 // Interaction-heavy suites type through a fake stdin tick by tick and
 // can exceed the 5 s default under full-suite parallel load.
 vi.setConfig({ testTimeout: 30_000 });
 
-const DOWN = '\u001b[B';
 const ENTER = '\r';
 
 const PASSIVE_HINT = 'tab to browse artifacts';
@@ -106,20 +112,6 @@ function completedState(
   ];
   return actions.reduce(reduce, createInitialState());
 }
-
-type ExternalAction = (absPath: string) => Promise<OpenExternalResult>;
-
-/** An injected helper that records its paths and resolves a result. */
-function recorder(result: OpenExternalResult = { ok: true }) {
-  const paths: string[] = [];
-  const action: ExternalAction = (absPath) => {
-    paths.push(absPath);
-    return Promise.resolve(result);
-  };
-  return { paths, action };
-}
-
-const okAction: ExternalAction = () => Promise.resolve({ ok: true });
 
 /** Mounts the panel over the real reducer, as App does. */
 function Harness({
@@ -300,9 +292,7 @@ describe('ArtifactsPanel (passive)', () => {
     await tick();
     const frame = lastFrame();
     expect(frame).toContain('◆ artifacts/top5.csv');
-    for (const line of frame.split('\n')) {
-      expect(line.length).toBeLessThanOrEqual(44);
-    }
+    expectNoOverflow(frame, 44);
     unmount();
   });
 });
@@ -362,26 +352,6 @@ describe('ArtifactsPanel (focused)', () => {
     expect(preview.paths).toEqual([expected]);
     expect(open.paths).toEqual([expected]);
     expect(reveal.paths).toEqual([expected]);
-    unmount();
-  });
-
-  it('a failed helper result dispatches a notice, never a crash', async () => {
-    const preview = recorder({
-      ok: false,
-      message: 'qlmanage failed to launch: spawn qlmanage ENOENT',
-    });
-    const log: UiAction[] = [];
-    const { stdin, unmount } = render(
-      <Harness initial={completedState({ focused: true })} log={log} preview={preview.action} />,
-    );
-    await tick();
-    stdin.write(' ');
-    await tick();
-    expect(preview.paths).toHaveLength(1);
-    expect(log).toContainEqual({
-      type: 'notice',
-      text: 'qlmanage failed to launch: spawn qlmanage ENOENT',
-    });
     unmount();
   });
 });
@@ -471,9 +441,7 @@ describe('ArtifactsPanel (artifacts-only, no summary)', () => {
     await tick();
     const frame = lastFrame();
     expect(frame).toContain('› ◆ artifacts/top5.csv');
-    for (const line of frame.split('\n')) {
-      expect(line.length).toBeLessThanOrEqual(44);
-    }
+    expectNoOverflow(frame, 44);
     unmount();
   });
 });

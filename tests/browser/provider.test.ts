@@ -33,12 +33,15 @@ describe('resolveBrowserProviderKind', () => {
     expect(resolveBrowserProviderKind({ [BROWSER_PROVIDER_ENV_VAR]: '' })).toBe('local');
   });
 
-  it.each(['local', 'LOCAL', ' Local '])('treats %j as local', (value) => {
-    expect(resolveBrowserProviderKind({ [BROWSER_PROVIDER_ENV_VAR]: value })).toBe('local');
+  // One value per branch, chosen to exercise the shared trim+lowercase normalization.
+  it('treats " LOCAL " as local', () => {
+    expect(resolveBrowserProviderKind({ [BROWSER_PROVIDER_ENV_VAR]: ' LOCAL ' })).toBe('local');
   });
 
-  it.each(['browserbase', 'BrowserBase'])('treats %j as browserbase', (value) => {
-    expect(resolveBrowserProviderKind({ [BROWSER_PROVIDER_ENV_VAR]: value })).toBe('browserbase');
+  it('treats "BrowserBase" as browserbase', () => {
+    expect(resolveBrowserProviderKind({ [BROWSER_PROVIDER_ENV_VAR]: 'BrowserBase' })).toBe(
+      'browserbase',
+    );
   });
 
   it('throws on an unknown value, naming the value and both valid options', () => {

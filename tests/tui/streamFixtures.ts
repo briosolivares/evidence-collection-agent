@@ -1,6 +1,7 @@
 // Scripted Anthropic raw-stream fixtures for bridge tests: build the wire
 // events of one streamed response, exactly as the SDK would yield them.
 
+import type { CallModel } from '../../src/model/messages.js';
 import type { ModelStreamEvent } from '../../src/model/streamAssembly.js';
 
 /** Usage numbers for one scripted response. */
@@ -102,4 +103,36 @@ export function scriptedStreamFactory(responses: ModelStreamEvent[][]) {
       return streamOf(events);
     },
   };
+}
+
+/** A scripted initializer that immediately sets a contract with the given outputs. */
+export function contractInitializerCallModel(outputs: unknown[]): CallModel {
+  return async () => ({
+    content: [
+      {
+        type: 'tool_use',
+        id: 'contract-1',
+        name: 'set_output_contract',
+        input: { contract: { outputs } },
+      },
+    ],
+    stop_reason: 'tool_use',
+    usage: { input_tokens: 100, output_tokens: 20 },
+  });
+}
+
+/** A scripted verifier that immediately reports a verified verdict. */
+export function verifiedVerifierCallModel(): CallModel {
+  return async () => ({
+    content: [
+      {
+        type: 'tool_use',
+        id: 'verification-1',
+        name: 'report_verification',
+        input: { status: 'verified', findings: [] },
+      },
+    ],
+    stop_reason: 'tool_use',
+    usage: { input_tokens: 10, output_tokens: 2 },
+  });
 }

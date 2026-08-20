@@ -7,6 +7,7 @@ import { initManifest, writeArtifact } from '../../../../src/run/artifacts.js';
 import type { AssertionResult } from '../../../types.js';
 import type { Contributor, OpenClawContributorsOracle } from '../oracle/githubClient.js';
 import { grade } from './grader.js';
+import { byName, csvText } from '../../../testSupport.js';
 
 /** Mirror the grader's public assertion names (this suite's convention:
  *  assert on names as plain strings). */
@@ -36,10 +37,6 @@ function passingRows(): string[][] {
     .map((c) => [c.login, c.name ?? '', `https://www.linkedin.com/in/${c.login}`]);
 }
 
-function csvText(header: string[], rows: string[][]): string {
-  return [header, ...rows].map((r) => r.join(',')).join('\n') + '\n';
-}
-
 const HEADER = ['github_handle', 'name', 'linkedin_url'];
 
 let runDir: string;
@@ -57,12 +54,6 @@ function writeCsv(rows: string[][], header: string[] = HEADER): void {
   writeArtifact(runDir, 'artifacts/contributors.csv', Buffer.from(csvText(header, rows)), {
     roles: ['requested_output'],
   });
-}
-
-function byName(results: AssertionResult[], name: string): AssertionResult {
-  const found = results.find((r) => r.name === name);
-  if (found === undefined) throw new Error(`no assertion named "${name}"`);
-  return found;
 }
 
 describe('openclaw_contributors grader', () => {
@@ -175,9 +166,8 @@ describe('openclaw_contributors grader', () => {
       expect(r.passed).toBe(false);
       expect(r.detail).not.toBe('');
     }
-  });
 
-  it('throws on malformed oracle data — a harness bug, not a failed trial', async () => {
+    // Malformed oracle data is a harness bug, not a failed trial.
     writeCsv(passingRows());
     await expect(async () => grade(runDir, { wrong: 'shape' })).rejects.toThrow(/oracle/);
   });

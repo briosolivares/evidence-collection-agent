@@ -7,6 +7,7 @@ import { initManifest, writeArtifact } from '../../../../src/run/artifacts.js';
 import type { AssertionResult } from '../../../types.js';
 import type { WikipediaReferenceOracle } from '../oracle/wikipediaClient.js';
 import { grade } from './grader.js';
+import { byName } from '../../../testSupport.js';
 
 const ORACLE: WikipediaReferenceOracle = {
   pageTitle: 'World War II',
@@ -24,12 +25,6 @@ beforeEach(() => {
   initManifest(runDir, 'wikipedia reference grader test');
 });
 afterEach(() => rmSync(runDir, { recursive: true, force: true }));
-
-function byName(results: AssertionResult[], name: string): AssertionResult {
-  const found = results.find((result) => result.name === name);
-  if (!found) throw new Error(`missing assertion ${name}`);
-  return found;
-}
 
 describe('wikipedia_reference grader', () => {
   it('passes the full source with harmless Markdown formatting', async () => {

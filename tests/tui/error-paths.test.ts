@@ -4,7 +4,6 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { BrowserController } from '../../src/browser/controller.js';
-import type { CallModel } from '../../src/model/messages.js';
 import type { ModelStreamEvent } from '../../src/model/streamAssembly.js';
 import { createTuiRuntime } from '../../src/tui/bridge/runtime.js';
 import {
@@ -15,7 +14,11 @@ import {
 } from '../../src/tui/bridge/runSession.js';
 import { createInitialState, reduce, type StoreAction } from '../../src/tui/store/reducer.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
-import { scriptedResponse } from './streamFixtures.js';
+import {
+  contractInitializerCallModel,
+  scriptedResponse,
+  verifiedVerifierCallModel,
+} from './streamFixtures.js';
 import { stubBrowser } from './stubBrowser.js';
 
 // A scripted `set_output_contract` call, hermetic and immediate — this
@@ -27,38 +30,14 @@ import { stubBrowser } from './stubBrowser.js';
 // wrong reason (an initializer failure instead of a WORKER mid-stream
 // failure). Scripting `harness.initializerCallModel`/`verifierCallModel`
 // directly keeps those roles off both the network and the dying stream.
-const initializerCallModel: CallModel = async () => ({
-  content: [
-    {
-      type: 'tool_use',
-      id: 'tu_contract',
-      name: 'set_output_contract',
-      input: {
-        contract: {
-          outputs: [{ id: 'notes', kind: 'screenshots', count: { minimum: 1 } }],
-        },
-      },
-    },
-  ],
-  stop_reason: 'tool_use',
-  usage: { input_tokens: 100, output_tokens: 20 },
-});
+const initializerCallModel = contractInitializerCallModel([
+  { id: 'notes', kind: 'screenshots', count: { minimum: 1 } },
+]);
 
 // Never actually reached by this suite's dying-worker test (the worker's
 // stream dies before any submission), but scripted anyway so nothing about
 // this file depends on the verifier's production default staying unreached.
-const verifierCallModel: CallModel = async () => ({
-  content: [
-    {
-      type: 'tool_use',
-      id: 'tu_verify',
-      name: 'report_verification',
-      input: { status: 'verified', findings: [] },
-    },
-  ],
-  stop_reason: 'tool_use',
-  usage: { input_tokens: 10, output_tokens: 2 },
-});
+const verifierCallModel = verifiedVerifierCallModel();
 
 let runsBaseDir: string;
 

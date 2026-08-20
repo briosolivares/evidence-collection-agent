@@ -3,16 +3,12 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { RunsList, type RunSummaryView } from '../../src/tui/components/RunsList.js';
 import type { RunListEntry } from '../../src/tui/runScanner.js';
-import { ESC, renderAt, tick } from './helpers.js';
+import { DOWN, ESC, expectNoOverflow, LEFT, renderAt, RIGHT, tick, UP } from './helpers.js';
 
 // Interaction-heavy suites type through a fake stdin tick by tick and
 // can exceed the 5 s default under full-suite parallel load.
 vi.setConfig({ testTimeout: 30_000 });
 
-const DOWN = '\u001b[B';
-const UP = '\u001b[A';
-const LEFT = '\u001b[D';
-const RIGHT = '\u001b[C';
 const ENTER = '\r';
 
 const LIST_HINTS = '↑↓ select · enter view · esc close';
@@ -261,9 +257,7 @@ describe('RunsList (detail level)', () => {
     const frame = lastFrame();
     expect(frame).toContain('evidence-0.csv');
     expect(frame).toContain(DETAIL_HINTS);
-    for (const line of frame.split('\n')) {
-      expect(line.length).toBeLessThanOrEqual(44);
-    }
+    expectNoOverflow(frame, 44);
     unmount();
   });
 

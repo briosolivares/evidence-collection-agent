@@ -7,6 +7,7 @@ import { initManifest, writeArtifact } from '../../../../src/run/artifacts.js';
 import type { AssertionResult } from '../../../types.js';
 import type { MergedPr, OpenClawMergedPrsOracle } from '../oracle/githubClient.js';
 import { grade } from './grader.js';
+import { byName, csvText } from '../../../testSupport.js';
 
 /** Mirror the grader's public assertion names (this suite's convention:
  *  assert on names as plain strings). */
@@ -55,10 +56,6 @@ function passingRows(): string[][] {
     .map((pr) => [`#${pr.number}`, pr.author, (pr.reviewers ?? []).join('; '), pr.mergedBy ?? '']);
 }
 
-function csvText(header: string[], rows: string[][]): string {
-  return [header, ...rows].map((r) => r.join(',')).join('\n') + '\n';
-}
-
 const HEADER = ['pr_number', 'committer', 'reviewer', 'merger'];
 
 let runDir: string;
@@ -89,12 +86,6 @@ function writeScreenshots(numbers: number[]): void {
 
 function passingNumbers(): number[] {
   return ORACLE.mergedWindow.slice(0, 10).map((pr) => pr.number);
-}
-
-function byName(results: AssertionResult[], name: string): AssertionResult {
-  const found = results.find((r) => r.name === name);
-  if (found === undefined) throw new Error(`no assertion named "${name}"`);
-  return found;
 }
 
 describe('openclaw_merged_prs grader', () => {
@@ -261,9 +252,8 @@ describe('openclaw_merged_prs grader', () => {
       expect(r.passed).toBe(false);
       expect(r.detail).not.toBe('');
     }
-  });
 
-  it('throws on malformed oracle data — a harness bug, not a failed trial', async () => {
+    // Malformed oracle data is a harness bug, not a failed trial.
     writeCsv(passingRows());
     await expect(async () => grade(runDir, { wrong: 'shape' })).rejects.toThrow(/oracle/);
   });

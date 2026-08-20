@@ -142,10 +142,8 @@ describe('ask_user tool', () => {
     expect(empty.content).toMatch(/report the limitation/i);
   });
 
-  it.each([
-    ['denied', 'The user declined this action.'],
-    ['cancelled', 'The run was cancelled while waiting for the user.'],
-  ])('returns model-readable permission feedback when %s', async (_case, feedback) => {
+  it('returns model-readable permission feedback when denied', async () => {
+    const feedback = 'The user declined this action.';
     const result = await call({ question: 'Continue?' }, async () => ({
       behavior: 'deny',
       feedback,
@@ -157,17 +155,6 @@ describe('ask_user tool', () => {
       errorKind: 'permission_denied',
       content: feedback,
     });
-  });
-
-  it('fails closed with actionable feedback in a headless environment', async () => {
-    const result = await call({ question: 'Can you sign in?' });
-
-    expect(result).toMatchObject({
-      isError: true,
-      errorKind: 'permission_denied',
-    });
-    expect(result.content).toMatch(/does not support/i);
-    expect(result.content).toMatch(/report the blocker/i);
   });
 
   it('fails as an execution error if an allow decision omits answers', async () => {

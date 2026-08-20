@@ -7,6 +7,7 @@ import { initManifest, writeArtifact } from '../../../../src/run/artifacts.js';
 import type { AssertionResult } from '../../../types.js';
 import type { HackerNewsOracle } from '../oracle/hackerNewsClient.js';
 import { grade } from './grader.js';
+import { byName, csvText } from '../../../testSupport.js';
 
 /** Mirrors grader.ts's internal COLUMN_ASSERTION_NAME constant — kept here
  *  rather than exported, matching this suite's convention of asserting on
@@ -35,9 +36,6 @@ afterEach(() => {
 });
 
 /** Build CSV text from a header and rows (test data has no commas/quotes to escape). */
-function csvText(header: string[], rows: string[][]): string {
-  return [header, ...rows].map((r) => r.join(',')).join('\n') + '\n';
-}
 
 function passingCsvRows(): string[][] {
   return ORACLE.stories.map((s, i) => [s.title, s.url, String(50 - i)]);
@@ -47,13 +45,6 @@ function passingCsvRows(): string[][] {
  *  with the requested_output role graders select deliverables by. */
 function writeCsvArtifact(csv: string): void {
   writeArtifact(runDir, 'artifacts/hn.csv', Buffer.from(csv), { roles: ['requested_output'] });
-}
-
-function byName(results: AssertionResult[], name: string): AssertionResult {
-  const found = results.find((r) => r.name === name);
-  if (found === undefined)
-    throw new Error(`no assertion named "${name}" in ${JSON.stringify(results)}`);
-  return found;
 }
 
 describe('hacker_news grader', () => {
@@ -166,10 +157,8 @@ describe('hacker_news grader', () => {
     expect(byName(results, 'CSV has 5 data rows').passed).toBe(true);
     expect(byName(results, 'at least 4 of 5 oracle titles appear in the CSV').passed).toBe(true);
     expect(byName(results, 'url column entries are well-formed URLs').passed).toBe(true);
-  });
 
-  it('throws on malformed oracle data — a harness bug, not a failed trial', async () => {
-    writeCsvArtifact(csvText(['title', 'url', 'points'], passingCsvRows()));
+    // Malformed oracle data is a harness bug, not a failed trial.
     await expect(async () => grade(runDir, { wrong: 'shape' })).rejects.toThrow(/oracle/);
   });
 });

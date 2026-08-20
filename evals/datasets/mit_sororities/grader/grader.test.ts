@@ -7,6 +7,7 @@ import { initManifest, writeArtifact } from '../../../../src/run/artifacts.js';
 import type { AssertionResult } from '../../../types.js';
 import { MIT_SORORITIES, type MitSororitiesOracle } from '../oracle/oracle.js';
 import { grade } from './grader.js';
+import { byName } from '../../../testSupport.js';
 
 const ORACLE: MitSororitiesOracle = {
   affiliations: MIT_SORORITIES,
@@ -52,11 +53,6 @@ function writePassingArtifacts(): void {
     Buffer.from('Sheet: https://docs.google.com/spreadsheets/d/abc_123/edit#gid=0\n'),
     { roles: ['requested_output'] },
   );
-}
-function byName(results: AssertionResult[], name: string): AssertionResult {
-  const found = results.find((result) => result.name === name);
-  if (!found) throw new Error(`missing assertion ${name}`);
-  return found;
 }
 
 describe('mit_sororities grader', () => {

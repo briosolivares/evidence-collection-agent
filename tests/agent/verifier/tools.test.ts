@@ -87,41 +87,43 @@ describe('verifier inspection', () => {
     expect(existsSync(join(runDir, 'scratch/tool-output'))).toBe(false);
   });
 
-  it('rejects scratch evidence even when the worker manifested it', async () => {
-    writeArtifact(
-      runDir,
-      'scratch/evidence/self-authored.txt',
-      Buffer.from('unsupported worker claim\n'),
-    );
+  // All three funnel through the same allowedArtifactPaths check, but each names a
+  // distinct leak category: scratch evidence, the raw manifest, and a published file
+  // the surfaced role set omitted.
+  it.each([
+    {
+      leak: 'scratch evidence even when the worker manifested it',
+      write: () =>
+        writeArtifact(
+          runDir,
+          'scratch/evidence/self-authored.txt',
+          Buffer.from('unsupported worker claim\n'),
+        ),
+      path: 'scratch/evidence/self-authored.txt',
+    },
+    {
+      leak: 'the raw manifest',
+      write: () => undefined,
+      path: MANIFEST_FILENAME,
+    },
+    {
+      leak: 'a published file omitted from the surfaced role set',
+      write: () =>
+        writeArtifact(
+          runDir,
+          'artifacts/unpublished-to-judge.txt',
+          Buffer.from('not in the judge payload\n'),
+          { roles: ['evidence'] },
+        ),
+      path: 'artifacts/unpublished-to-judge.txt',
+    },
+  ])('rejects $leak as outside verifier scope', async ({ write, path }) => {
+    write();
 
-    const [result] = await inspect(
-      [use('read_file', { file_path: 'scratch/evidence/self-authored.txt' })],
-      [],
-    );
+    const [result] = await inspect([use('read_file', { file_path: path })], []);
 
     expect(result).toMatchObject({ is_error: true });
     expect(JSON.stringify(result?.content)).toMatch(/outside verifier scope/i);
-  });
-
-  it('rejects the raw manifest and published files omitted from the surfaced role set', async () => {
-    writeArtifact(
-      runDir,
-      'artifacts/unpublished-to-judge.txt',
-      Buffer.from('not in the judge payload\n'),
-      { roles: ['evidence'] },
-    );
-
-    const [manifestResult, omittedResult] = await inspect(
-      [
-        use('read_file', { file_path: MANIFEST_FILENAME }, 'read-manifest'),
-        use('read_file', { file_path: 'artifacts/unpublished-to-judge.txt' }, 'read-omitted'),
-      ],
-      [],
-    );
-
-    expect(manifestResult).toMatchObject({ is_error: true });
-    expect(omittedResult).toMatchObject({ is_error: true });
-    expect(JSON.stringify([manifestResult, omittedResult])).toMatch(/outside verifier scope/i);
   });
 
   it('uses bounded literal grep instead of evaluating model-supplied regex', async () => {

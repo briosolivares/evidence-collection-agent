@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { BrowserController } from '../../src/browser/controller.js';
 import type { LocalChromeBrowserSessionOptions } from '../../src/browser/playwrightBrowserController.js';
 import { createBrowserbaseEvalBrowserAdapter, createEvalBrowserRuntime } from './browserRuntime.js';
+import { deferred } from '../testSupport.js';
 
 /**
  * Keeps a test out of the orphaned-profile reaper. Without it the runtime
@@ -17,14 +18,6 @@ import { createBrowserbaseEvalBrowserAdapter, createEvalBrowserRuntime } from '.
 const noReaping = async (): Promise<string[]> => [];
 
 const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
-
-function deferred(): { promise: Promise<void>; resolve: () => void } {
-  let resolve!: () => void;
-  const promise = new Promise<void>((done) => {
-    resolve = done;
-  });
-  return { promise, resolve };
-}
 
 function fakeBrowser(name: string, events: string[]): BrowserController {
   return {
@@ -384,6 +377,7 @@ describe('createEvalBrowserRuntime on Browserbase', () => {
     ]);
     await runtime.close();
 
+    expect(runtime.provider).toBe('browserbase');
     // Two isolated trials, two distinct sessions — a shared Context (or a
     // shared session) would let one trial's state reach the next, which is
     // exactly what isolation exists to prevent.
@@ -438,11 +432,12 @@ describe('createEvalBrowserRuntime on Browserbase', () => {
     await runtime.close();
   });
 
-  it('reuses one authenticated session, serializes its operations, opens it against the configured context, and closes it idempotently', async () => {
+  it('reuses one authenticated session opened against the configured context, never persisting it', async () => {
+    // Serialization and idempotent close of the authenticated lane are shared
+    // runtime behavior, proven by the local-adapter test above; this covers
+    // only what is Browserbase-specific — the session config.
     const events: string[] = [];
     const configs: Array<{ contextId?: string; liveView: boolean; lane: string }> = [];
-    const firstCanFinish = deferred();
-    const firstStarted = deferred();
     const adapter = createBrowserbaseEvalBrowserAdapter({
       env: { BROWSERBASE_API_KEY: 'key', BROWSERBASE_CONTEXT_ID: 'ctx-auth' },
       createProvider: (config) => {
@@ -456,30 +451,12 @@ describe('createEvalBrowserRuntime on Browserbase', () => {
       adapter,
     });
 
-    const first = runtime.withBrowser(true, async () => {
-      events.push('first:start');
-      firstStarted.resolve();
-      await firstCanFinish.promise;
-      events.push('first:end');
-    });
-    const second = runtime.withBrowser(true, async () => {
-      events.push('second:start');
-    });
-    await firstStarted.promise;
-    // The second operation must not begin until the first has finished —
-    // simultaneous sessions against the same Context would race over the
-    // same stored cookies.
-    expect(events).toEqual(['first:start']);
-
-    firstCanFinish.resolve();
-    await Promise.all([first, second]);
-    await runtime.close();
+    await runtime.withBrowser(true, async () => undefined);
+    await runtime.withBrowser(true, async () => undefined);
     await runtime.close();
 
-    // Exactly one session created, exactly one close — the second close()
-    // must be a no-op rather than a second attempt on an already-closed
-    // session.
-    expect(events).toEqual(['first:start', 'first:end', 'second:start', 'close:auth-session']);
+    // One shared session across authenticated operations, closed once.
+    expect(events).toEqual(['close:auth-session']);
     expect(configs).toHaveLength(1);
     // `persistContext: false` is the property that makes this lane a pure READ
     // of the operator's logins: a trial that gets signed out mid-batch must
@@ -491,18 +468,6 @@ describe('createEvalBrowserRuntime on Browserbase', () => {
       liveView: true,
       lane: 'authenticated',
     });
-  });
-
-  it("reports 'browserbase' as its provider", async () => {
-    const adapter = createBrowserbaseEvalBrowserAdapter({ env: { BROWSERBASE_API_KEY: 'key' } });
-    const runtime = createEvalBrowserRuntime({
-      env: {},
-      authenticatedProfileDir: UNUSED_LOCAL_PROFILE_DIR,
-      adapter,
-    });
-
-    expect(runtime.provider).toBe('browserbase');
-    await runtime.close();
   });
 
   it('fails an authenticated lane with no BROWSERBASE_CONTEXT_ID, naming `npm run login`', async () => {

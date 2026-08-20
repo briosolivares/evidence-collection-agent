@@ -178,13 +178,6 @@ describe('workerPrompt', () => {
     expect(secondPrefix).toBe(firstPrefix);
     expect(firstPrefix).not.toContain(firstTask);
     expect(secondPrefix).not.toContain(secondTask);
-    expect(first.system).toEqual([
-      {
-        type: 'text',
-        text: workerPrompt,
-        cache_control: { type: 'ephemeral' },
-      },
-    ]);
     expect(JSON.stringify(first.messages)).not.toBe(JSON.stringify(second.messages));
   });
 });

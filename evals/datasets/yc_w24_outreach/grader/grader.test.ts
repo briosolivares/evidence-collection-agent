@@ -7,6 +7,7 @@ import { initManifest, writeArtifact } from '../../../../src/run/artifacts.js';
 import type { AssertionResult } from '../../../types.js';
 import type { YcW24AiOracle } from '../oracle/ycClient.js';
 import { grade } from './grader.js';
+import { byName } from '../../../testSupport.js';
 
 const COMPANY_NAMES = ['Atlas Labs', 'Beacon AI', 'Cedar Systems', 'Delta Works', 'Ember Logic'];
 const KEYWORDS = ['robotics', 'compliance', 'forecasting', 'dispatching', 'diagnostics'];
@@ -44,11 +45,6 @@ function passingCsv(): string {
     }),
   );
   return `founder_name,linkedin_url,cold_outreach_email\n${rows.join('\n')}\n`;
-}
-function byName(results: AssertionResult[], name: string): AssertionResult {
-  const found = results.find((result) => result.name === name);
-  if (!found) throw new Error(`missing assertion ${name}`);
-  return found;
 }
 
 describe('yc_w24_outreach grader', () => {

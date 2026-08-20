@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 
 import { ArtifactDetail } from '../../src/tui/components/ArtifactDetail.js';
 import type { PublishedArtifact } from '../../src/tui/store/state.js';
-import { renderAt, tick } from './helpers.js';
+import { expectNoOverflow, renderAt, tick } from './helpers.js';
 
 const SHA = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
 const CAPTURED_AT = '2026-08-12T10:00:00.000Z';
@@ -86,9 +86,7 @@ describe('ArtifactDetail', () => {
     const { lastFrame, unmount } = renderAt(44, <ArtifactDetail artifact={artifact()} />);
     await tick();
     const frame = lastFrame();
-    for (const line of frame.split('\n')) {
-      expect(line.length).toBeLessThanOrEqual(44);
-    }
+    expectNoOverflow(frame, 44);
     // The hash hard-wraps across lines but survives in full — rejoin the
     // frame to confirm no character was truncated.
     const rejoined = frame

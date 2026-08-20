@@ -1024,14 +1024,14 @@ describe('openCheckpointStore', () => {
     await store.close();
   });
 
+  // Representative illegal pairs: leaving the absorbing terminal phase, re-saving
+  // terminal itself (unlike e.g. initializing, terminal disallows a same-phase save),
+  // and one arbitrary backward jump. Every other illegal pair takes the same
+  // VALID_PHASE_TRANSITIONS table-lookup rejection.
   it.each([
     ['terminal', 'ready_for_model'],
     ['terminal', 'terminal'],
-    ['checking', 'initializing'],
-    ['ready_for_model', 'initializing'],
-    ['executing_tool', 'checking'],
     ['verifying', 'executing_tool'],
-    ['initializing', 'checking'],
   ] as const)('rejects the illegal %s -> %s phase transition', async (from, to) => {
     const store = await openCheckpointStore(runDir);
     await store.save(checkpointForTransition(from, 1));

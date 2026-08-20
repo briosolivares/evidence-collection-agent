@@ -89,6 +89,16 @@ describe('PlaywrightBrowserController command sessions', () => {
 
       const selected = await controller.openCommandSession();
       expect(selected.pageId).toBe(selectedPage!.pageId);
+      // The session object exposes only safe identity — never a connection URL.
+      expect(Object.keys(selected).sort()).toEqual([
+        'close',
+        'navigate',
+        'pageId',
+        'send',
+        'targetId',
+        'upload',
+      ]);
+      expect(JSON.stringify(selected)).not.toMatch(/(?:wss?|https?):\/\//i);
       const navigation = await selected.navigate(
         'data:text/html,<title>Settled navigation</title><main>ready</main>',
         { timeoutMs: 5_000, waitUntil: 'domcontentloaded' },
@@ -154,36 +164,6 @@ describe('PlaywrightBrowserController command sessions', () => {
       await expect(controller.openCommandSession()).rejects.toThrow(
         /No browser task page is active/,
       );
-    },
-    TEST_TIMEOUT_MS,
-  );
-
-  it(
-    'returns no connection URL and rejects sends after an idempotent close',
-    async () => {
-      const session = await controller.openCommandSession();
-
-      expect(Object.keys(session).sort()).toEqual([
-        'close',
-        'navigate',
-        'pageId',
-        'send',
-        'targetId',
-        'upload',
-      ]);
-      expect(JSON.stringify(session)).not.toMatch(/(?:wss?|https?):\/\//i);
-      expect(JSON.stringify(session)).not.toContain(PRIVATE_CONNECT_URL);
-      await session.close();
-      await session.close();
-
-      let message = '';
-      try {
-        await session.send('Runtime.evaluate', { expression: '1 + 1' });
-      } catch (error) {
-        message = error instanceof Error ? error.message : String(error);
-      }
-      expect(message).toMatch(/command session.*closed/i);
-      expect(message).not.toContain(PRIVATE_CONNECT_URL);
     },
     TEST_TIMEOUT_MS,
   );
