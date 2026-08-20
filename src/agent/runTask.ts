@@ -70,12 +70,21 @@ export interface HarnessConfig {
   maxCompletionCheckFailures?: number;
 }
 
-/** Configuration for one fresh evidence-collection run. */
+/** Configuration for one fresh evidence-collection run. Omitted budget
+ * levers fall back to PRODUCTION_DEFAULTS. */
 export interface RunTaskConfig {
   browser: BrowserController;
   runsBaseDir?: string;
   startUrl?: string;
   model?: string;
+  /** Ceiling on worker turns; defaults to PRODUCTION_DEFAULTS.maxWorkerTurns. */
+  maxTurns?: number;
+  /** Ceiling on the worker's context window in tokens; defaults to
+   * PRODUCTION_DEFAULTS.maxContextTokens. */
+  maxContextTokens?: number;
+  /** Ceiling on the run's wall time in milliseconds; defaults to
+   * PRODUCTION_DEFAULTS.maxWallTimeMs. */
+  maxWallTimeMs?: number;
   onProgress?: (event: ProgressEvent) => void;
   callModel?: CallModel;
   createStream?: ModelDriverConfig['createStream'];
@@ -196,7 +205,9 @@ function buildFreshConfiguration(taskText: string, config: RunTaskConfig): Durab
     taskText,
     model: config.model ?? DEFAULT_MODEL,
     maxOutputTokens: PRODUCTION_DEFAULTS.maxOutputTokens,
-    maxContextTokens: ceilingToCheckpoint(PRODUCTION_DEFAULTS.maxContextTokens),
+    maxContextTokens: ceilingToCheckpoint(
+      config.maxContextTokens ?? PRODUCTION_DEFAULTS.maxContextTokens,
+    ),
     browserProvider: browserProvider(config.browser),
     authenticated,
     javascriptPolicy,
@@ -205,10 +216,12 @@ function buildFreshConfiguration(taskText: string, config: RunTaskConfig): Durab
     maxCompletionCheckFailures:
       config.harness?.maxCompletionCheckFailures ?? PRODUCTION_DEFAULTS.maxCompletionCheckFailures,
     budgetLimits: {
-      maxWorkerTurns: ceilingToCheckpoint(PRODUCTION_DEFAULTS.maxWorkerTurns),
+      maxWorkerTurns: ceilingToCheckpoint(config.maxTurns ?? PRODUCTION_DEFAULTS.maxWorkerTurns),
       maxToolCalls: ceilingToCheckpoint(PRODUCTION_DEFAULTS.maxToolCalls),
       maxModelTokens: ceilingToCheckpoint(PRODUCTION_DEFAULTS.maxModelTokens),
-      maxWallTimeMs: ceilingToCheckpoint(PRODUCTION_DEFAULTS.maxWallTimeMs),
+      maxWallTimeMs: ceilingToCheckpoint(
+        config.maxWallTimeMs ?? PRODUCTION_DEFAULTS.maxWallTimeMs,
+      ),
     },
   });
 }

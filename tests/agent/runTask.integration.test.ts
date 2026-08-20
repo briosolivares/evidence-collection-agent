@@ -133,6 +133,27 @@ describe('public runTask adapter', () => {
     });
   });
 
+  it('persists supplied maxTurns/maxContextTokens/maxWallTimeMs in the durable configuration', async () => {
+    const browser = fakeBrowser();
+    const run = await runVerified({
+      browser,
+      maxTurns: 12,
+      maxContextTokens: 250_000,
+      maxWallTimeMs: 90_000,
+    });
+
+    expect(run.result.status).toBe('verified');
+    expect(readCheckpoint(run.result.runDir).configuration).toMatchObject({
+      maxContextTokens: 250_000,
+      budgetLimits: {
+        maxWorkerTurns: 12,
+        maxToolCalls: UNBOUNDED_CEILING,
+        maxModelTokens: UNBOUNDED_CEILING,
+        maxWallTimeMs: 90_000,
+      },
+    });
+  });
+
   it('makes javascriptPolicy=deny guidance agree with the real registry refusal', async () => {
     const browser = fakeBrowser();
     const run = await runVerified({
@@ -308,6 +329,9 @@ async function runVerified(options: {
   workerResponses?: readonly ModelResponse[];
   onProgress?: (event: ProgressEvent) => void;
   tracing?: RunTracing;
+  maxTurns?: number;
+  maxContextTokens?: number;
+  maxWallTimeMs?: number;
 }) {
   const initializer = scriptedCallModel([initializerResponse()]);
   const worker = scriptedCallModel(
@@ -323,6 +347,11 @@ async function runVerified(options: {
       ? {}
       : { javascriptPolicy: options.javascriptPolicy }),
     ...(options.onProgress === undefined ? {} : { onProgress: options.onProgress }),
+    ...(options.maxTurns === undefined ? {} : { maxTurns: options.maxTurns }),
+    ...(options.maxContextTokens === undefined
+      ? {}
+      : { maxContextTokens: options.maxContextTokens }),
+    ...(options.maxWallTimeMs === undefined ? {} : { maxWallTimeMs: options.maxWallTimeMs }),
     harness: {
       initializerCallModel: initializer.callModel,
       verifierCallModel: verifier.callModel,
