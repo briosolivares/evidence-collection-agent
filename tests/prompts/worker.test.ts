@@ -40,7 +40,8 @@ describe('workerPrompt', () => {
     );
     expect(workerPrompt).toContain('perform that action at its real destination');
     expect(workerPrompt).toContain('A local file never satisfies an external destination');
-    expect(workerPrompt).toContain('never quietly downgrade the deliverable');
+    expect(workerPrompt).toContain('Never quietly downgrade the deliverable');
+    expect(workerPrompt).toContain('Only when an answered handoff still fails to unlock access');
   });
 
   it('teaches exact generic publication and the private workspace boundary', () => {
