@@ -19,9 +19,7 @@ import {
 /**
  * Run-dir filenames a contract may never claim: the run's own records. A
  * contract output that collided with one of these would make the agent
- * overwrite the provenance used to grade it. Mirrors the reserved set
- * enforced for tool-supplied paths in `src/tools/shared/evidence.ts`;
- * compared case-insensitively because run directories live on
+ * overwrite the provenance used to grade it. Compared case-insensitively because run directories live on
  * case-insensitive filesystems (macOS, Windows).
  */
 export const RESERVED_OUTPUT_FILENAMES: readonly string[] = [

@@ -3,8 +3,8 @@ import { isAbsolute, join, resolve, sep } from 'node:path';
 
 /** Name of the harness-private directory (`run.lock`, `checkpoint.json`)
  * that AGENTS.md declares "never a valid model-supplied path" — kept as a
- * literal, not imported from runCheckpointStore.ts's own HARNESS_DIR export,
- * so this leaf path-confinement module stays dependency-free. */
+ * literal, not imported from agent/checkpoint.ts's HARNESS_DIR export, so
+ * this leaf path-confinement module stays dependency-free. */
 const HARNESS_DIR_SEGMENT = 'harness';
 
 /**

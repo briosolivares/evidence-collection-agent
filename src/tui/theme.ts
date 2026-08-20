@@ -12,9 +12,7 @@ export const theme = {
   activity: '#786ECB',
   /** Muted metadata (`↳ … tokens · …s`) and dim hints (indigo-gray w500). */
   muted: '#7D7993',
-  /** Success ✓. */
   success: '#00892B',
-  /** Error ✗. */
   error: '#DC2626',
 } as const;
 
@@ -26,7 +24,6 @@ export const glyphs = {
   activity: '●',
   /** Evidence marker (stronger treatment). */
   evidence: '◆',
-  /** Success marker. */
   success: '✓',
   /** Error / interruption marker. */
   error: '✗',

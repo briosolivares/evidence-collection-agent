@@ -12,7 +12,7 @@ export interface SherlockConfig {
   workingWords: readonly string[];
   /** Render dim input/result detail under each activity line. */
   verbose: boolean;
-  /** Directory that holds run directories. */
+  /** Base directory each new run directory is created under. */
   runsBaseDir: string;
   /** Directory holding eval task definitions (<name>/task.json). */
   evalsDir: string;
@@ -47,7 +47,6 @@ export const DEFAULT_WORKING_WORDS: readonly string[] = [
   'Brewing',
 ];
 
-/** Build a config from defaults plus overrides. */
 export function createConfig(
   overrides: Partial<SherlockConfig> = {},
 ): SherlockConfig {

@@ -60,7 +60,6 @@ export interface TuiRuntime {
   shutdown(): Promise<void>;
 }
 
-/** Create the session runtime. */
 export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
   const startRunFn = deps.startRunFn ?? startRun;
   const now = deps.now ?? Date.now;

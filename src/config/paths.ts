@@ -22,7 +22,7 @@ export interface SherlockPaths {
   dataHome: string;
   /** Persistent Chrome profile — logins survive across runs. */
   profileDir: string;
-  /** Directory that holds run directories. */
+  /** Base directory each new run directory is created under. */
   runsBaseDir: string;
   /** Directory holding eval task datasets (`<name>/task.json`). */
   evalsDir: string;

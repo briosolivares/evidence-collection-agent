@@ -13,8 +13,7 @@
  * Downloads API — see `browserbaseDownloads.ts`.
  *
  * Everything downstream is unchanged either way: both readers return the same
- * {@link BrowserDownloadResult}, which the download tool still routes through
- * `writeArtifact`. The local run directory stays the evidence system of
+ * {@link BrowserDownloadResult}, published through `publish_artifact`. The local run directory stays the evidence system of
  * record; a remote browser service is a transport, not provenance.
  */
 import type { Download } from 'playwright';

@@ -25,8 +25,8 @@ export interface ToolUseBlock {
 }
 
 /** An image carried inside a tool_result block, mirroring the API's base64
- * image source shape. Produced only by the judge's screenshot reads (see
- * harness/judge.ts) — every worker-loop tool returns strings. */
+ * image source shape. Produced only by the verifier's screenshot reads (see
+ * agent/verifier/tools.ts) — every worker-loop tool returns strings. */
 export interface ImageBlock {
   type: 'image';
   source: {
@@ -47,8 +47,8 @@ export interface ToolResultBlock {
   tool_use_id: string;
   /** The model-readable result: plain text (already bounded by the
    * pipeline's size cap) for every worker tool, or a block array when the
-   * result carries an image (the judge's screenshot reads — see
-   * harness/judge.ts). The API accepts both shapes verbatim. */
+   * result carries an image (the verifier's screenshot reads — see
+   * agent/verifier/tools.ts). The API accepts both shapes verbatim. */
   content: string | Array<TextBlock | ImageBlock>;
   /** Present and true iff the call failed; the model reads `content` to
    * learn what went wrong. Omitted on success. */

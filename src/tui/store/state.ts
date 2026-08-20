@@ -246,7 +246,6 @@ export interface LiveRunState {
    * plus a light in-turn guess from streamed text (~chars/4), snapped back
    * to settled at each turn_end. */
   tokens: { settled: number; estimate: number };
-  /** Current turn number. */
   turn: number;
   /** Known once tracing captures it (step 6); shown on completion. */
   runDir?: string;

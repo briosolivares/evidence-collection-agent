@@ -1177,7 +1177,7 @@ export class PlaywrightBrowserController implements BrowserController {
     // recoverable state and invites a retry against a
     // browser that no longer exists. Measured: after a session timed out
     // mid-run, an agent alternated navigate/sleep for ~20 turns and would
-    // have continued indefinitely (DEFAULT_MAX_TURNS is Infinity).
+    // have continued indefinitely (worker turns are unbounded by default).
     //
     // Phrased so isBrowserDeathMessage() recognizes it, which routes the TUI
     // and REPL into their existing relaunch path — for a remote provider, a
