@@ -1,10 +1,7 @@
 import { Buffer } from 'node:buffer';
 
 import { LangfuseSpanProcessor } from '@langfuse/otel';
-import {
-  setLangfuseTracerProvider,
-  startObservation,
-} from '@langfuse/tracing';
+import { setLangfuseTracerProvider, startObservation } from '@langfuse/tracing';
 import { TraceFlags, type SpanContext } from '@opentelemetry/api';
 import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
@@ -12,11 +9,7 @@ import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import type { CallModel } from '../model/messages.js';
 import { knownModelUsageFromError } from '../model/modelDriver.js';
 import type { ModelRole } from '../run/runBudget.js';
-import type {
-  ToolCtx,
-  ToolDef,
-  ToolRegistry,
-} from '../tools/registry.js';
+import type { ToolCtx, ToolDef, ToolRegistry } from '../tools/registry.js';
 
 const RUN_OBSERVATION_NAME = 'run-evidence-agent';
 const MODEL_OBSERVATION_NAME = 'call-model';
@@ -38,11 +31,7 @@ export interface RunTracing {
    * compatible; the TUI uses it to cover tool-free terminal paths. */
   announceRunDir?(runDir: string): void;
   /** Return a CallModel with one generation observation per invocation. */
-  wrapCallModel(
-    callModel: CallModel,
-    model?: string,
-    role?: ModelRole,
-  ): CallModel;
+  wrapCallModel(callModel: CallModel, model?: string, role?: ModelRole): CallModel;
   /** Return a registry with one tool observation per executor invocation. */
   wrapRegistry(registry: ToolRegistry): ToolRegistry;
   /** Run an operation inside the run's root agent observation. */
@@ -64,26 +53,24 @@ export interface RunTracing {
  *   and errors; tracing setup, observation updates, export, and shutdown never
  *   make the underlying work fail, and close removes the isolated provider
  */
-export function createRunTracing(
-  options: CreateRunTracingOptions = {},
-): RunTracing {
+export function createRunTracing(options: CreateRunTracingOptions = {}): RunTracing {
   const env = options.env ?? process.env;
   if (
-    options.spanProcessor === undefined
-    && (!env.LANGFUSE_PUBLIC_KEY || !env.LANGFUSE_SECRET_KEY)
+    options.spanProcessor === undefined &&
+    (!env.LANGFUSE_PUBLIC_KEY || !env.LANGFUSE_SECRET_KEY)
   ) {
     return createNoopRunTracing();
   }
 
   let provider: NodeTracerProvider | undefined;
   try {
-    const spanProcessor = options.spanProcessor ?? new LangfuseSpanProcessor({
-      publicKey: env.LANGFUSE_PUBLIC_KEY,
-      secretKey: env.LANGFUSE_SECRET_KEY,
-      ...(env.LANGFUSE_BASE_URL === undefined
-        ? {}
-        : { baseUrl: env.LANGFUSE_BASE_URL }),
-    });
+    const spanProcessor =
+      options.spanProcessor ??
+      new LangfuseSpanProcessor({
+        publicKey: env.LANGFUSE_PUBLIC_KEY,
+        secretKey: env.LANGFUSE_SECRET_KEY,
+        ...(env.LANGFUSE_BASE_URL === undefined ? {} : { baseUrl: env.LANGFUSE_BASE_URL }),
+      });
     provider = new NodeTracerProvider({ spanProcessors: [spanProcessor] });
     setLangfuseTracerProvider(provider);
   } catch {
@@ -92,10 +79,7 @@ export function createRunTracing(
     return createNoopRunTracing();
   }
 
-  return createEnabledRunTracing(
-    provider,
-    options.spanProcessor === undefined,
-  );
+  return createEnabledRunTracing(provider, options.spanProcessor === undefined);
 }
 
 function createNoopRunTracing(): RunTracing {
@@ -117,11 +101,7 @@ function createEnabledRunTracing(
   let turnCount = 0;
   const toolsUsed = new Set<string>();
 
-  const wrapCallModel = (
-    callModel: CallModel,
-    model?: string,
-    role?: ModelRole,
-  ): CallModel => {
+  const wrapCallModel = (callModel: CallModel, model?: string, role?: ModelRole): CallModel => {
     return async (messages) => {
       if (!enabled) return callModel(messages);
 
@@ -130,34 +110,38 @@ function createEnabledRunTracing(
       // initializer/verifier calls remain visible as generations without
       // changing the root metric's meaning.
       if (role === undefined || role === 'worker') turnCount += 1;
-      const generation = safelyStartObservation(() => startObservation(
-        MODEL_OBSERVATION_NAME,
-        {
-          input: messages,
-          ...(model === undefined ? {} : { model }),
-          ...(role === undefined ? {} : { metadata: { role } }),
-        },
-        {
-          asType: 'generation',
-          ...(activeRootContext === undefined
-            ? {}
-            : { parentSpanContext: activeRootContext }),
-        },
-      ));
+      const generation = safelyStartObservation(() =>
+        startObservation(
+          MODEL_OBSERVATION_NAME,
+          {
+            input: messages,
+            ...(model === undefined ? {} : { model }),
+            ...(role === undefined ? {} : { metadata: { role } }),
+          },
+          {
+            asType: 'generation',
+            ...(activeRootContext === undefined ? {} : { parentSpanContext: activeRootContext }),
+          },
+        ),
+      );
 
       try {
         const response = await callModel(messages);
-        safelyObserve(() => generation?.update({
-          output: response,
-          usageDetails: usageDetails(response.usage),
-        }));
+        safelyObserve(() =>
+          generation?.update({
+            output: response,
+            usageDetails: usageDetails(response.usage),
+          }),
+        );
         return response;
       } catch (error) {
         const usage = knownModelUsageFromError(error);
         if (usage !== undefined) {
-          safelyObserve(() => generation?.update({
-            usageDetails: usageDetails(usage),
-          }));
+          safelyObserve(() =>
+            generation?.update({
+              usageDetails: usageDetails(usage),
+            }),
+          );
         }
         safelyRecordError(generation, error);
         throw error;
@@ -178,26 +162,28 @@ function createEnabledRunTracing(
           if (!enabled) return tool.execute(input, ctx);
 
           toolsUsed.add(tool.name);
-          const observation = safelyStartObservation(() => startObservation(
-            `execute-${tool.name}`,
-            { input },
-            {
-              asType: 'tool',
-              ...(activeRootContext === undefined
-                ? {}
-                : { parentSpanContext: activeRootContext }),
-            },
-          ));
+          const observation = safelyStartObservation(() =>
+            startObservation(
+              `execute-${tool.name}`,
+              { input },
+              {
+                asType: 'tool',
+                ...(activeRootContext === undefined
+                  ? {}
+                  : { parentSpanContext: activeRootContext }),
+              },
+            ),
+          );
 
           try {
             const output = await tool.execute(input, ctx);
             const resultBytes = getResultSizeBytes(output);
-            safelyObserve(() => observation?.update({
-              output,
-              ...(resultBytes === undefined
-                ? {}
-                : { metadata: { resultBytes } }),
-            }));
+            safelyObserve(() =>
+              observation?.update({
+                output,
+                ...(resultBytes === undefined ? {} : { metadata: { resultBytes } }),
+              }),
+            );
             return output;
           } catch (error) {
             safelyRecordError(observation, error);
@@ -211,38 +197,38 @@ function createEnabledRunTracing(
     return wrappedRegistry;
   };
 
-  const traceRun = async <T>(
-    taskText: string,
-    operation: () => Promise<T>,
-  ): Promise<T> => {
+  const traceRun = async <T>(taskText: string, operation: () => Promise<T>): Promise<T> => {
     if (!enabled) return operation();
 
     const startedMs = Date.now();
-    const root = safelyStartObservation(() => startObservation(
-      RUN_OBSERVATION_NAME,
-      { input: taskText },
-      { asType: 'agent' },
-    ));
-    activeRootContext = root === undefined
-      ? undefined
-      : {
-          traceId: root.traceId,
-          spanId: root.id,
-          traceFlags: TraceFlags.SAMPLED,
-          isRemote: false,
-        };
+    const root = safelyStartObservation(() =>
+      startObservation(RUN_OBSERVATION_NAME, { input: taskText }, { asType: 'agent' }),
+    );
+    activeRootContext =
+      root === undefined
+        ? undefined
+        : {
+            traceId: root.traceId,
+            spanId: root.id,
+            traceFlags: TraceFlags.SAMPLED,
+            isRemote: false,
+          };
 
     try {
       const result = await operation();
-      safelyObserve(() => root?.update({
-        output: result,
-        metadata: runMetadata(startedMs, turnCount, toolsUsed),
-      }));
+      safelyObserve(() =>
+        root?.update({
+          output: result,
+          metadata: runMetadata(startedMs, turnCount, toolsUsed),
+        }),
+      );
       return result;
     } catch (error) {
-      safelyObserve(() => root?.update({
-        metadata: runMetadata(startedMs, turnCount, toolsUsed),
-      }));
+      safelyObserve(() =>
+        root?.update({
+          metadata: runMetadata(startedMs, turnCount, toolsUsed),
+        }),
+      );
       safelyRecordError(root, error);
       throw error;
     } finally {
@@ -311,14 +297,9 @@ function usageDetails(usage: {
 
 function getResultSizeBytes(output: unknown): number | undefined {
   try {
-    const normalized = typeof output === 'string'
-      ? output
-      : output === undefined
-        ? ''
-        : JSON.stringify(output);
-    return normalized === undefined
-      ? undefined
-      : Buffer.byteLength(normalized, 'utf8');
+    const normalized =
+      typeof output === 'string' ? output : output === undefined ? '' : JSON.stringify(output);
+    return normalized === undefined ? undefined : Buffer.byteLength(normalized, 'utf8');
   } catch {
     return undefined;
   }
@@ -341,16 +322,17 @@ function safelyObserve(operation: () => unknown): void {
 }
 
 function safelyRecordError(
-  observation: { update(attributes: {
-    level?: 'ERROR';
-    statusMessage?: string;
-  }): unknown } | undefined,
+  observation:
+    | { update(attributes: { level?: 'ERROR'; statusMessage?: string }): unknown }
+    | undefined,
   error: unknown,
 ): void {
-  safelyObserve(() => observation?.update({
-    level: 'ERROR',
-    statusMessage: error instanceof Error ? error.message : String(error),
-  }));
+  safelyObserve(() =>
+    observation?.update({
+      level: 'ERROR',
+      statusMessage: error instanceof Error ? error.message : String(error),
+    }),
+  );
 }
 
 function safelyClearProvider(): void {

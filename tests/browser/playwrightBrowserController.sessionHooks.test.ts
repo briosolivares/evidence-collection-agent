@@ -117,7 +117,10 @@ describe('PlaywrightBrowserController sessionDiagnostics', () => {
       sessionId: 'session-abc123',
       recordingUrl: 'https://browserbase.com/sessions/session-abc123',
     };
-    const controller = new PlaywrightBrowserController({ context, sessionDiagnostics: diagnostics });
+    const controller = new PlaywrightBrowserController({
+      context,
+      sessionDiagnostics: diagnostics,
+    });
 
     expect(controller.sessionDiagnostics).toBe(diagnostics);
   });

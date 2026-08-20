@@ -2,10 +2,7 @@ import { render } from 'ink-testing-library';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { RunHandle, RunOutcome } from '../../src/tui/bridge/runSession.js';
-import type {
-  PermissionDecision,
-  PermissionRequest,
-} from '../../src/tools/registry.js';
+import type { PermissionDecision, PermissionRequest } from '../../src/tools/registry.js';
 import { App } from '../../src/tui/components/App.js';
 import { createConfig } from '../../src/tui/config.js';
 import { createInitialState, reduce } from '../../src/tui/store/reducer.js';
@@ -22,17 +19,13 @@ const DOWN = '[B';
 /** A fake runner that stays live forever and exposes the App-provided
  * requestPermission callback, so tests can pose questions on demand. */
 function interactiveRunner() {
-  let requestPermission:
-    | ((request: PermissionRequest) => Promise<PermissionDecision>)
-    | undefined;
+  let requestPermission: ((request: PermissionRequest) => Promise<PermissionDecision>) | undefined;
   const runner = (
     _task: string,
     onEvent: (event: UiEvent) => void,
     opts?: {
       startUrl?: string;
-      requestPermission?: (
-        request: PermissionRequest,
-      ) => Promise<PermissionDecision>;
+      requestPermission?: (request: PermissionRequest) => Promise<PermissionDecision>;
     },
   ): RunHandle => {
     requestPermission = opts?.requestPermission;
@@ -52,9 +45,7 @@ function interactiveRunner() {
 
 async function startRunWithQuestion(input: unknown) {
   const fake = interactiveRunner();
-  const rendered = render(
-    <App config={config} apiKeyPresent={true} runner={fake.runner} />,
-  );
+  const rendered = render(<App config={config} apiKeyPresent={true} runner={fake.runner} />);
   await tick();
   await typeText(rendered.stdin, 'investigate the login');
   rendered.stdin.write(ENTER);

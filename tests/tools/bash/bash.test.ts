@@ -39,11 +39,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function callTool(
-  deps: BashToolDeps,
-  input: unknown,
-  overrides: Partial<ToolCtx> = {},
-) {
+function callTool(deps: BashToolDeps, input: unknown, overrides: Partial<ToolCtx> = {}) {
   return executeToolCall(
     createRegistry([createBashTool(deps)]),
     { id: 'bash-1', name: 'bash', input },
@@ -55,9 +51,7 @@ function parseSuccess(content: string): BashResult {
   return JSON.parse(content) as BashResult;
 }
 
-function exited(
-  overrides: Partial<ForegroundCommandResult> = {},
-): ForegroundCommandResult {
+function exited(overrides: Partial<ForegroundCommandResult> = {}): ForegroundCommandResult {
   return {
     status: 'exited',
     exitCode: 0,
@@ -99,9 +93,9 @@ describe('bash tool', () => {
     expect(MAX_BASH_TIMEOUT_MS).toBe(120_000);
 
     expect(tool.inputSchema.safeParse({ command: 'printf ok' }).success).toBe(true);
-    expect(
-      tool.inputSchema.safeParse({ command: 'printf ok', timeout_ms: 120_000 }).success,
-    ).toBe(true);
+    expect(tool.inputSchema.safeParse({ command: 'printf ok', timeout_ms: 120_000 }).success).toBe(
+      true,
+    );
     for (const input of [
       { command: '' },
       { command: '   \n' },
@@ -120,8 +114,7 @@ describe('bash tool', () => {
     const result = await callTool(
       { secretEnvDenylist: [] },
       {
-        command:
-          'pwd; printf "warning" >&2; printf "evidence" > result.txt; exit 7',
+        command: 'pwd; printf "warning" >&2; printf "evidence" > result.txt; exit 7',
       },
     );
 
@@ -132,9 +125,7 @@ describe('bash tool', () => {
       exit_code: 7,
       termination_signal: null,
       stderr: 'warning',
-      changed_files: [
-        { path: 'scratch/workspace/result.txt', change: 'created' },
-      ],
+      changed_files: [{ path: 'scratch/workspace/result.txt', change: 'created' }],
     });
     expect(realpathSync(parsed.stdout.trim())).toBe(realpathSync(workspace));
     expect(statSync(workspace).mode & 0o777).toBe(0o700);
@@ -242,9 +233,7 @@ describe('bash tool', () => {
       expect(result.isError).toBe(false);
       expect(parseSuccess(result.content)).toMatchObject({
         status,
-        changed_files: [
-          { path: `scratch/workspace/${filename}`, change: 'created' },
-        ],
+        changed_files: [{ path: `scratch/workspace/${filename}`, change: 'created' }],
       });
     },
   );
@@ -313,40 +302,36 @@ describe('bash tool', () => {
     expect(existsSync(join(runDir, 'scratch', 'workspace'))).toBe(false);
   });
 
-  it(
-    'cancels the process group, kills descendants, and reconciles surviving files',
-    async () => {
-      const workspace = join(runDir, 'scratch', 'workspace');
-      const controller = new AbortController();
-      const pending = callTool(
-        { secretEnvDenylist: [] },
+  it('cancels the process group, kills descendants, and reconciles surviving files', async () => {
+    const workspace = join(runDir, 'scratch', 'workspace');
+    const controller = new AbortController();
+    const pending = callTool(
+      { secretEnvDenylist: [] },
+      {
+        command:
+          'printf kept > before-cancel.txt; ' +
+          '(sleep 0.4 && printf leaked > descendant.txt) & sleep 5',
+      },
+      { abortSignal: controller.signal },
+    );
+
+    await waitForPath(join(workspace, 'before-cancel.txt'));
+    controller.abort();
+    const result = await pending;
+
+    expect(result.isError).toBe(false);
+    expect(parseSuccess(result.content)).toMatchObject({
+      status: 'cancelled',
+      changed_files: [
         {
-          command:
-            "printf kept > before-cancel.txt; " +
-            "(sleep 0.4 && printf leaked > descendant.txt) & sleep 5",
+          path: 'scratch/workspace/before-cancel.txt',
+          change: 'created',
         },
-        { abortSignal: controller.signal },
-      );
-
-      await waitForPath(join(workspace, 'before-cancel.txt'));
-      controller.abort();
-      const result = await pending;
-
-      expect(result.isError).toBe(false);
-      expect(parseSuccess(result.content)).toMatchObject({
-        status: 'cancelled',
-        changed_files: [
-          {
-            path: 'scratch/workspace/before-cancel.txt',
-            change: 'created',
-          },
-        ],
-      });
-      await wait(600);
-      expect(existsSync(join(workspace, 'descendant.txt'))).toBe(false);
-    },
-    10_000,
-  );
+      ],
+    });
+    await wait(600);
+    expect(existsSync(join(workspace, 'descendant.txt'))).toBe(false);
+  }, 10_000);
 
   it('does not source BASH_ENV startup code', async () => {
     const startup = join(runDir, 'malicious-bash-env');

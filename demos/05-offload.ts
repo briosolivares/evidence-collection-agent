@@ -7,7 +7,12 @@ import { readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { z } from 'zod';
 
-import { finalizeManifest, initManifest, MANIFEST_FILENAME, type Manifest } from '../src/run/artifacts.js';
+import {
+  finalizeManifest,
+  initManifest,
+  MANIFEST_FILENAME,
+  type Manifest,
+} from '../src/run/artifacts.js';
 import { generateRunId } from '../src/run/runId.js';
 import { createRunDir } from '../src/run/runDir.js';
 import { type OffloadedResult } from '../src/tools/capResult.js';

@@ -11,10 +11,7 @@ describe('the --demo scripted event source', () => {
   it('is finite and ends the run back in idle mode', () => {
     const script = createDemoScript(0);
     expect(script.length).toBeGreaterThan(10);
-    const final = script.reduce(
-      (state, step) => reduce(state, step.action),
-      createInitialState(),
-    );
+    const final = script.reduce((state, step) => reduce(state, step.action), createInitialState());
     expect(final.mode).toBe('idle');
     expect(final.live).toBeUndefined();
   });
@@ -24,20 +21,14 @@ describe('the --demo scripted event source', () => {
       (state, step) => reduce(state, step.action),
       createInitialState(),
     );
-    const { frames, unmount } = render(
-      createElement(Transcript, { items: final.transcript }),
-    );
+    const { frames, unmount } = render(createElement(Transcript, { items: final.transcript }));
     await new Promise((resolve) => setTimeout(resolve, 0));
     const output = frames.join('\n');
     expect(output).toContain('✓ Brewed in 42s · 18.7k tokens');
     expect(output).toContain('▸ Find Acme Corp');
     expect(output).toContain('● Running a browser program');
-    expect(output).toContain(
-      '◆ Publishing a screenshot → artifacts/series-b-coverage.png',
-    );
-    expect(output).toContain(
-      '◆ Publishing an artifact → artifacts/investors.csv',
-    );
+    expect(output).toContain('◆ Publishing a screenshot → artifacts/series-b-coverage.png');
+    expect(output).toContain('◆ Publishing an artifact → artifacts/investors.csv');
     unmount();
   });
 
@@ -100,10 +91,12 @@ describe('the --demo scripted event source', () => {
   it('playDemo dispatches every step in order and honors cancellation', async () => {
     vi.useFakeTimers();
     try {
-      const script = createDemoScript(0).slice(0, 5).map((step) => ({
-        ...step,
-        delayMs: 1,
-      }));
+      const script = createDemoScript(0)
+        .slice(0, 5)
+        .map((step) => ({
+          ...step,
+          delayMs: 1,
+        }));
       const seen: StoreAction[] = [];
       const cancel = playDemo(script, (action) => seen.push(action));
       await vi.runAllTimersAsync();

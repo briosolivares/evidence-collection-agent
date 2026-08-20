@@ -39,7 +39,7 @@ const VERBOSE_MAX = 400;
 function compactDetail(value: unknown): string {
   let text: string;
   try {
-    text = typeof value === 'string' ? value : JSON.stringify(value) ?? 'undefined';
+    text = typeof value === 'string' ? value : (JSON.stringify(value) ?? 'undefined');
   } catch {
     text = String(value);
   }
@@ -100,16 +100,13 @@ export type RoutedInput =
   | { kind: 'unknown'; command: string };
 
 /** /help's name column: the longest command name plus two spaces. */
-const HELP_NAME_PAD =
-  Math.max(...SLASH_COMMANDS.map((entry) => entry.name.length)) + 2;
+const HELP_NAME_PAD = Math.max(...SLASH_COMMANDS.map((entry) => entry.name.length)) + 2;
 
 /** The /help transcript block: commands and keys (R10), driven by the
  * single SLASH_COMMANDS registry (R1). */
 export const HELP_TEXT = [
   'Commands',
-  ...SLASH_COMMANDS.map(
-    (entry) => `  ${entry.name.padEnd(HELP_NAME_PAD)}${entry.description}`,
-  ),
+  ...SLASH_COMMANDS.map((entry) => `  ${entry.name.padEnd(HELP_NAME_PAD)}${entry.description}`),
   'Keys',
   `  ${'Esc'.padEnd(HELP_NAME_PAD)}Cancel the current run`,
   `  ${'Ctrl+C'.padEnd(HELP_NAME_PAD)}Quit`,
@@ -195,9 +192,7 @@ export interface SuggestionView {
  */
 export function deriveSuggestions(state: SessionState): SuggestionView {
   const suggestions =
-    state.mode === 'idle' && !state.composer.dismissed
-      ? filterCommands(state.composer.value)
-      : [];
+    state.mode === 'idle' && !state.composer.dismissed ? filterCommands(state.composer.value) : [];
   const panelVisible = suggestions.length > 0;
   const cursor = Math.min(state.composer.selectedIndex, suggestions.length - 1);
   return {
@@ -235,9 +230,7 @@ export function orderArtifactsForSummary(
   const isRequested = (artifact: PublishedArtifact) =>
     (artifact.entry.roles ?? []).includes('requested_output');
   return [
-    ...artifacts.filter(
-      (artifact) => isRequested(artifact) && !isHelperProposalArtifact(artifact),
-    ),
+    ...artifacts.filter((artifact) => isRequested(artifact) && !isHelperProposalArtifact(artifact)),
     ...artifacts.filter(
       (artifact) => !isRequested(artifact) && !isHelperProposalArtifact(artifact),
     ),
@@ -246,9 +239,7 @@ export function orderArtifactsForSummary(
 }
 
 /** The completion item's inert artifact digest, in summary order. */
-function completionDigest(
-  artifacts: readonly PublishedArtifact[],
-): readonly CompletionArtifact[] {
+function completionDigest(artifacts: readonly PublishedArtifact[]): readonly CompletionArtifact[] {
   return orderArtifactsForSummary(artifacts).map((artifact) => ({
     filename: artifact.entry.filename,
     sizeBytes: artifact.sizeBytes,
@@ -288,22 +279,15 @@ function settleDanglingPending(state: SessionState): SessionState {
  * so the tracing seam has no tool_exec_end with which to settle them. Resolve
  * the terminal control line from the run outcome before generic dangling
  * calls become retried warnings. */
-function settleTerminalControlPending(
-  state: SessionState,
-  status: 'ok' | 'error',
-): SessionState {
+function settleTerminalControlPending(state: SessionState, status: 'ok' | 'error'): SessionState {
   const live = state.live;
   if (live === undefined) return state;
-  const controls = live.pendingTools.filter(
-    (pending) => pending.name === 'finish',
-  );
+  const controls = live.pendingTools.filter((pending) => pending.name === 'finish');
   if (controls.length === 0) return state;
   let next = state;
   for (const pending of controls) {
     const line =
-      pending.line === pending.name
-        ? deriveSemanticLine(pending.name).line
-        : pending.line;
+      pending.line === pending.name ? deriveSemanticLine(pending.name).line : pending.line;
     next = append(next, { kind: 'activity', line, status });
   }
   return {
@@ -373,10 +357,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       // derived (already-clamped) cursor.
       const { panelVisible, cursor, suggestions } = deriveSuggestions(state);
       if (!panelVisible) return state;
-      const selectedIndex = Math.max(
-        0,
-        Math.min(suggestions.length - 1, cursor + action.delta),
-      );
+      const selectedIndex = Math.max(0, Math.min(suggestions.length - 1, cursor + action.delta));
       return { ...state, composer: { ...state.composer, selectedIndex } };
     }
 
@@ -437,10 +418,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
     case 'artifact_nav': {
       // Clamped at both ends; meaningless without rows to move over.
       if (state.artifacts.length === 0) return state;
-      const cursor = clampCursor(
-        state.artifactUi.cursor + action.delta,
-        state.artifacts.length,
-      );
+      const cursor = clampCursor(state.artifactUi.cursor + action.delta, state.artifacts.length);
       return { ...state, artifactUi: { ...state.artifactUi, cursor } };
     }
 
@@ -636,10 +614,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
           live: {
             ...live,
             nextPendingId: live.nextPendingId + 1,
-            pendingTools: [
-              ...live.pendingTools,
-              { id: live.nextPendingId, ...upgraded },
-            ],
+            pendingTools: [...live.pendingTools, { id: live.nextPendingId, ...upgraded }],
           },
         };
       }
@@ -658,9 +633,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
     case 'tool_exec_end': {
       const live = state.live;
       if (live === undefined) return state;
-      const finished = live.pendingTools.find(
-        (pending) => pending.execId === action.id,
-      );
+      const finished = live.pendingTools.find((pending) => pending.execId === action.id);
       if (finished === undefined) return state;
       const remaining = live.pendingTools.filter((pending) => pending !== finished);
       const verbose =
@@ -677,19 +650,20 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       // evidence-flavored its name). Failures stay error activity.
       const published = finished.published ?? [];
       const sourceUrl = published.find((entry) => entry.sourceUrl !== undefined)?.sourceUrl;
-      const withItem = action.ok && published.length > 0
-        ? append(state, {
-            kind: 'evidence',
-            line: finished.line,
-            ...(sourceUrl !== undefined ? { sourceUrl } : {}),
-            ...(verbose !== undefined ? { verbose } : {}),
-          })
-        : append(state, {
-            kind: 'activity',
-            line: finished.line,
-            status: action.ok ? 'ok' : 'error',
-            ...(verbose !== undefined ? { verbose } : {}),
-          });
+      const withItem =
+        action.ok && published.length > 0
+          ? append(state, {
+              kind: 'evidence',
+              line: finished.line,
+              ...(sourceUrl !== undefined ? { sourceUrl } : {}),
+              ...(verbose !== undefined ? { verbose } : {}),
+            })
+          : append(state, {
+              kind: 'activity',
+              line: finished.line,
+              status: action.ok ? 'ok' : 'error',
+              ...(verbose !== undefined ? { verbose } : {}),
+            });
       return { ...withItem, live: { ...live, pendingTools: remaining } };
     }
 
@@ -731,8 +705,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
       const next = finalizeStreamingText(state);
       const live = next.live;
       if (live === undefined) return next;
-      const settled =
-        live.tokens.settled + action.usage.input + action.usage.output;
+      const settled = live.tokens.settled + action.usage.input + action.usage.output;
       return {
         ...next,
         live: { ...live, tokens: { settled, estimate: settled } },
@@ -782,9 +755,7 @@ export function reduce(state: SessionState, action: StoreAction): SessionState {
         // Synthetic legacy budget stops retain their historical diagnostic
         // rendering. Real incomplete runs take the human-facing branch above.
         const reason =
-          action.reason === 'max_turns'
-            ? 'turn limit reached'
-            : 'context budget exhausted';
+          action.reason === 'max_turns' ? 'turn limit reached' : 'context budget exhausted';
         next = append(next, {
           kind: 'error',
           message:

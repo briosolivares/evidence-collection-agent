@@ -2,14 +2,7 @@
 // Extensions and transport media types are only hints: recognizable bytes
 // always win so a mislabeled download is not described as the wrong format.
 
-type ContentFormat =
-  | 'pdf'
-  | 'spreadsheet'
-  | 'image'
-  | 'html'
-  | 'json'
-  | 'csv'
-  | 'text';
+type ContentFormat = 'pdf' | 'spreadsheet' | 'image' | 'html' | 'json' | 'csv' | 'text';
 
 interface ContentDetectionRequest {
   bytes: Uint8Array;
@@ -29,9 +22,7 @@ interface ContentDetectionRequest {
  * images. Text-shaped content then falls through to JSON/HTML/CSV/text by
  * cheap structural inspection.
  */
-export function detectContentFormat(
-  request: ContentDetectionRequest,
-): ContentFormat {
+export function detectContentFormat(request: ContentDetectionRequest): ContentFormat {
   const bytes = request.bytes;
 
   if (startsWithAscii(bytes, '%PDF-')) return 'pdf';

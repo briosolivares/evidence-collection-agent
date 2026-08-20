@@ -99,18 +99,11 @@ export function RunsList({
 
   if (detailEntry !== undefined && detail !== undefined) {
     return (
-      <RunDetail
-        entry={detailEntry}
-        detail={detail}
-        position={`${cursor + 1}/${entries.length}`}
-      />
+      <RunDetail entry={detailEntry} detail={detail} position={`${cursor + 1}/${entries.length}`} />
     );
   }
 
-  const windowStart = Math.max(
-    0,
-    Math.min(cursor - Math.floor(limit / 2), entries.length - limit),
-  );
+  const windowStart = Math.max(0, Math.min(cursor - Math.floor(limit / 2), entries.length - limit));
   const visible = entries.slice(windowStart, windowStart + limit);
 
   return (
@@ -119,21 +112,17 @@ export function RunsList({
         Past runs
       </Text>
       {entries.length === 0 ? (
-        <Text color={theme.muted}>  No runs yet — type a task to start one.</Text>
+        <Text color={theme.muted}>{'  No runs yet — type a task to start one.'}</Text>
       ) : (
         visible.map((entry, index) => {
           const absolute = windowStart + index;
           const selected = absolute === cursor;
           const { glyph, color } = statusGlyph(entry.status);
           const started = Date.parse(entry.startedAt);
-          const when = Number.isNaN(started)
-            ? '?'
-            : formatRelativeTime(started, now());
+          const when = Number.isNaN(started) ? '?' : formatRelativeTime(started, now());
           return (
             <Text key={entry.id}>
-              <Text color={selected ? theme.emphasis : undefined}>
-                {selected ? '› ' : '  '}
-              </Text>
+              <Text color={selected ? theme.emphasis : undefined}>{selected ? '› ' : '  '}</Text>
               <Text color={color}>{`${glyph} `}</Text>
               <Text color={selected ? theme.emphasis : undefined}>
                 {truncate(entry.task, TASK_SNIPPET_MAX)}
@@ -146,7 +135,7 @@ export function RunsList({
       {entries.length > limit && (
         <Text color={theme.muted}>{`  ${cursor + 1}/${entries.length}`}</Text>
       )}
-      <Text color={theme.muted}>  ↑↓ select · enter view · esc close</Text>
+      <Text color={theme.muted}>{'  ↑↓ select · enter view · esc close'}</Text>
     </Box>
   );
 }
@@ -178,7 +167,7 @@ function RunDetail({
         <RunSummaryBody glyph={glyph} glyphColor={color} summary={detail.summary} />
       )}
       <Text color={theme.muted}>{`  ${entry.runDir}`}</Text>
-      <Text color={theme.muted}>  ↑↓ prev/next run · ← back · esc back</Text>
+      <Text color={theme.muted}> ↑↓ prev/next run · ← back · esc back</Text>
     </Box>
   );
 }
@@ -206,7 +195,7 @@ function RunSummaryBody({
         </Text>
       )}
       {manifest.artifacts.length === 0 ? (
-        <Text color={theme.muted}>  no artifacts</Text>
+        <Text color={theme.muted}> no artifacts</Text>
       ) : (
         manifest.artifacts.map((artifact) => (
           <Text key={artifact.filename}>

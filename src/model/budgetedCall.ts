@@ -21,9 +21,7 @@ export interface BudgetedCallModelOptions {
   onEvent?: (event: ModelAttemptEvent) => void;
   /** Charge control/tool calls found in a fully accepted response before
    * the durable attempt hook snapshots the shared budget. */
-  onAcceptedResponse?: (
-    response: ModelResponse,
-  ) => void | Promise<void>;
+  onAcceptedResponse?: (response: ModelResponse) => void | Promise<void>;
   /** Awaited after each provider attempt settles and any known usage has
    * been charged. Durable coordinators use this to checkpoint spend before
    * a private role consumes or retries the response. */
@@ -39,9 +37,7 @@ export interface BudgetedCallModelOptions {
  * attempts. Partial transport attempts remain uncountable unless the provider
  * reported a complete usage record.
  */
-export function createBudgetedCallModel(
-  options: BudgetedCallModelOptions,
-): CallModel {
+export function createBudgetedCallModel(options: BudgetedCallModelOptions): CallModel {
   const now = options.now ?? Date.now;
   return async (messages) => {
     options.signal?.throwIfAborted();
@@ -62,11 +58,7 @@ export function createBudgetedCallModel(
       if (isRoleBudgetExceededError(error)) throw error;
       const usage = knownModelUsageFromError(error);
       if (usage !== undefined) {
-        options.budget.recordModelUsage(
-          options.role,
-          usage,
-          now() - startedMs,
-        );
+        options.budget.recordModelUsage(options.role, usage, now() - startedMs);
       }
       await options.afterAttemptSettled?.();
       // Persist any known billing before cancellation wins. Abort-shaped
@@ -81,11 +73,7 @@ export function createBudgetedCallModel(
       throw error;
     }
 
-    options.budget.recordModelUsage(
-      options.role,
-      accepted.usage,
-      now() - startedMs,
-    );
+    options.budget.recordModelUsage(options.role, accepted.usage, now() - startedMs);
     await options.onAcceptedResponse?.(accepted.response);
     await options.afterAttemptSettled?.();
     // The provider completed and reported billable usage, so charge and

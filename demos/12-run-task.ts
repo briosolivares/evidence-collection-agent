@@ -14,13 +14,9 @@ import { join, resolve } from 'node:path';
 import { createBrowserSessionProvider, describeBrowserProvider } from '../src/browser/provider.js';
 import { runTask } from '../src/agent/runTask.js';
 import type { ProgressEvent } from '../src/model/callModel.js';
-import {
-  METRICS_FILENAME,
-  type WorkerMetrics,
-} from '../src/agent/worker/worker.js';
+import { METRICS_FILENAME, type WorkerMetrics } from '../src/agent/worker/worker.js';
 
-const DEFAULT_TASK =
-  'Create a CSV of the top 5 Hacker News stories with title, URL, and points';
+const DEFAULT_TASK = 'Create a CSV of the top 5 Hacker News stories with title, URL, and points';
 const START_URL = 'https://news.ycombinator.com/';
 const PROFILE_DIR = resolve('chrome-profile');
 

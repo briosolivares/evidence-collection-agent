@@ -8,9 +8,7 @@ describe('createConfig', () => {
   });
 
   it('makes the completion verb configurable (R6)', () => {
-    expect(createConfig({ completionVerb: 'Distilled' }).completionVerb).toBe(
-      'Distilled',
-    );
+    expect(createConfig({ completionVerb: 'Distilled' }).completionVerb).toBe('Distilled');
   });
 
   it('defaults to a non-empty working-word list (R4)', () => {

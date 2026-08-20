@@ -47,11 +47,12 @@ export function parseEvalArgs(argv: string[]): EvalCliArgs {
     else if (flag === '--k') kRaw = takeValue();
     else if (flag === '--concurrency') concurrencyRaw = takeValue();
     else if (flag === '--skip-login-check') skipLoginCheck = true;
-    else throw new Error(
-      `unknown argument ${JSON.stringify(arg)} ` +
-        '(usage: --tasks <a,b,c> [--k <n>] [--concurrency <n>] ' +
+    else
+      throw new Error(
+        `unknown argument ${JSON.stringify(arg)} ` +
+          '(usage: --tasks <a,b,c> [--k <n>] [--concurrency <n>] ' +
           '[--skip-login-check])',
-    );
+      );
   }
 
   if (tasksRaw === undefined) {

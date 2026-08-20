@@ -9,10 +9,7 @@ import {
 } from 'node:fs';
 import { relative, resolve, sep } from 'node:path';
 
-import {
-  ARTIFACTS_DIR,
-  SCRATCH_DIR,
-} from '../run/artifacts.js';
+import { ARTIFACTS_DIR, SCRATCH_DIR } from '../run/artifacts.js';
 import { resolveRunPath } from '../run/runDir.js';
 
 /** Maximum source or resulting file size handled by one file-tool call. */
@@ -119,9 +116,7 @@ export function readRegularFileNoFollow(
   toolName: 'read_file' | 'write_file' | 'edit_file',
 ): Buffer {
   const flags =
-    fsConstants.O_RDONLY |
-    (fsConstants.O_NOFOLLOW ?? 0) |
-    (fsConstants.O_NONBLOCK ?? 0);
+    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
 
   let fd: number;
   try {

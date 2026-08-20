@@ -7,10 +7,7 @@ const MAX_CDP_ID_BYTES = 4_096;
 const MAX_TARGET_URL_BYTES = 16_384;
 const MAX_READ_ONLY_INVENTORY_ATTEMPTS = 2;
 
-type ArbitraryCdpSend = (
-  method: string,
-  params?: Record<string, unknown>,
-) => Promise<unknown>;
+type ArbitraryCdpSend = (method: string, params?: Record<string, unknown>) => Promise<unknown>;
 
 interface TargetInfo {
   targetId: string;
@@ -86,9 +83,7 @@ export type ChromiumTargetControlOptions = ChromiumTargetControlBaseOptions &
  * the anchor page and has a finite internal deadline.
  */
 export interface ChromiumTargetControl {
-  listPageTargets(
-    options?: ChromiumTargetOperationOptions,
-  ): Promise<readonly ChromiumPageTarget[]>;
+  listPageTargets(options?: ChromiumTargetOperationOptions): Promise<readonly ChromiumPageTarget[]>;
   createPageTarget(
     url: string,
     options?: ChromiumTargetOperationOptions,
@@ -97,10 +92,7 @@ export interface ChromiumTargetControl {
     target: ChromiumPageTargetRef,
     options?: ChromiumTargetOperationOptions,
   ): Promise<void>;
-  awaitPage(
-    target: ChromiumPageTargetRef,
-    options?: ChromiumTargetOperationOptions,
-  ): Promise<Page>;
+  awaitPage(target: ChromiumPageTargetRef, options?: ChromiumTargetOperationOptions): Promise<Page>;
   /** Snapshot the currently tracked late-create/exact-close effects. This is
    * deliberately unbounded so a caller can use it as a truthful busy fence. */
   drainContainment(): Promise<void>;
@@ -124,10 +116,7 @@ function isNonEmptyCdpId(value: unknown): value is string {
   );
 }
 
-function optionalNonEmptyCdpId(
-  value: unknown,
-  present: boolean,
-): value is string | undefined {
+function optionalNonEmptyCdpId(value: unknown, present: boolean): value is string | undefined {
   return !present || isNonEmptyCdpId(value);
 }
 
@@ -194,9 +183,7 @@ function parseCreatedTargetId(value: unknown): string {
 
 function parseBrowserContextIds(value: unknown): string[] {
   if (!isRecord(value) || !Array.isArray(value.browserContextIds)) {
-    throw new ChromiumTargetControlError(
-      'Target.getBrowserContexts returned an invalid response.',
-    );
+    throw new ChromiumTargetControlError('Target.getBrowserContexts returned an invalid response.');
   }
   const ids: string[] = [];
   for (const candidate of value.browserContextIds) {
@@ -248,11 +235,7 @@ function requireTargetUrl(value: string): string {
 
 function validateTimeout(value: number | undefined): number {
   const timeout = value ?? DEFAULT_OPERATION_TIMEOUT_MS;
-  if (
-    !Number.isSafeInteger(timeout) ||
-    timeout <= 0 ||
-    timeout > MAX_OPERATION_TIMEOUT_MS
-  ) {
+  if (!Number.isSafeInteger(timeout) || timeout <= 0 || timeout > MAX_OPERATION_TIMEOUT_MS) {
     throw new TypeError(
       `operationTimeoutMs must be an integer from 1 to ${MAX_OPERATION_TIMEOUT_MS}.`,
     );
@@ -296,10 +279,7 @@ function runWithDeadline<T>(
     };
     const onAbort = (): void => finish(() => reject(signal?.reason));
     const timer = setTimeout(
-      () =>
-        finish(() =>
-          reject(new ChromiumTargetControlError(`${operation} timed out.`)),
-        ),
+      () => finish(() => reject(new ChromiumTargetControlError(`${operation} timed out.`))),
       timeoutMs,
     );
 
@@ -325,10 +305,7 @@ function arbitrarySend(session: CDPSession): ArbitraryCdpSend {
   return session.send.bind(session) as unknown as ArbitraryCdpSend;
 }
 
-function sameContext(
-  target: TargetInfo,
-  browserContextId: string | undefined,
-): boolean {
+function sameContext(target: TargetInfo, browserContextId: string | undefined): boolean {
   return target.browserContextId === browserContextId;
 }
 
@@ -357,11 +334,7 @@ class PlaywrightChromiumTargetControl implements ChromiumTargetControl {
   ): Promise<readonly ChromiumPageTarget[]> {
     this.requireOpen();
     let response: unknown;
-    for (
-      let attempt = 1;
-      attempt <= MAX_READ_ONLY_INVENTORY_ATTEMPTS;
-      attempt += 1
-    ) {
+    for (let attempt = 1; attempt <= MAX_READ_ONLY_INVENTORY_ATTEMPTS; attempt += 1) {
       try {
         response = await this.send(
           'List Chromium page targets',
@@ -371,10 +344,7 @@ class PlaywrightChromiumTargetControl implements ChromiumTargetControl {
         );
         break;
       } catch (error) {
-        if (
-          attempt >= MAX_READ_ONLY_INVENTORY_ATTEMPTS ||
-          options.signal?.aborted
-        ) {
+        if (attempt >= MAX_READ_ONLY_INVENTORY_ATTEMPTS || options.signal?.aborted) {
           throw error;
         }
         // Target.getTargets is a pure inventory read, so one bounded replay
@@ -385,9 +355,7 @@ class PlaywrightChromiumTargetControl implements ChromiumTargetControl {
     }
     return Object.freeze(
       parseTargetListResponse(response)
-        .filter(
-          (target) => target.type === 'page' && sameContext(target, this.browserContextId),
-        )
+        .filter((target) => target.type === 'page' && sameContext(target, this.browserContextId))
         .map((target) =>
           Object.freeze({
             ref: this.refFor(target.targetId),
@@ -409,9 +377,7 @@ class PlaywrightChromiumTargetControl implements ChromiumTargetControl {
     try {
       effect = this.sendRaw('Target.createTarget', {
         url: exactUrl,
-        ...(this.browserContextId === undefined
-          ? {}
-          : { browserContextId: this.browserContextId }),
+        ...(this.browserContextId === undefined ? {} : { browserContextId: this.browserContextId }),
       });
     } catch (error) {
       throw safeOperationError('Create Chromium page target', error, options.signal);
@@ -470,11 +436,7 @@ class PlaywrightChromiumTargetControl implements ChromiumTargetControl {
     try {
       effect = this.sendRaw('Target.closeTarget', { targetId });
     } catch (error) {
-      throw safeOperationError(
-        'Close Chromium page target',
-        error,
-        options.signal,
-      );
+      throw safeOperationError('Close Chromium page target', error, options.signal);
     }
     try {
       const response = await runWithDeadline(
@@ -500,11 +462,7 @@ class PlaywrightChromiumTargetControl implements ChromiumTargetControl {
           () => undefined,
         ),
       );
-      throw safeOperationError(
-        'Close Chromium page target',
-        error,
-        options.signal,
-      );
+      throw safeOperationError('Close Chromium page target', error, options.signal);
     }
   }
 
@@ -609,10 +567,7 @@ class PlaywrightChromiumTargetControl implements ChromiumTargetControl {
     );
   }
 
-  private async targetInfo(
-    targetId: string,
-    signal: AbortSignal | undefined,
-  ): Promise<TargetInfo> {
+  private async targetInfo(targetId: string, signal: AbortSignal | undefined): Promise<TargetInfo> {
     const response = await this.send(
       'Inspect Chromium page target',
       'Target.getTargetInfo',
@@ -661,10 +616,7 @@ class PlaywrightChromiumTargetControl implements ChromiumTargetControl {
     return metadata.targetId;
   }
 
-  private async targetIdForPage(
-    page: Page,
-    signal: AbortSignal | undefined,
-  ): Promise<string> {
+  private async targetIdForPage(page: Page, signal: AbortSignal | undefined): Promise<string> {
     let attachment: Promise<CDPSession>;
     try {
       attachment = this.context.newCDPSession(page);
@@ -681,7 +633,10 @@ class PlaywrightChromiumTargetControl implements ChromiumTargetControl {
       );
     } catch (error) {
       this.trackContainment(
-        attachment.then((lateSession) => detachWithinDeadline(lateSession), () => undefined),
+        attachment.then(
+          (lateSession) => detachWithinDeadline(lateSession),
+          () => undefined,
+        ),
       );
       throw error;
     }
@@ -782,7 +737,10 @@ export async function createChromiumTargetControl(
       options.signal,
     );
   } catch (error) {
-    void attachment.then((lateSession) => detachWithinDeadline(lateSession), () => undefined);
+    void attachment.then(
+      (lateSession) => detachWithinDeadline(lateSession),
+      () => undefined,
+    );
     throw safeOperationError('Open Chromium target control', error, options.signal);
   }
 
@@ -796,12 +754,7 @@ export async function createChromiumTargetControl(
             timeoutMs,
             options.signal,
           )
-        : await inspectBrowserScopedContextId(
-            options.context,
-            session,
-            timeoutMs,
-            options.signal,
-          );
+        : await inspectBrowserScopedContextId(options.context, session, timeoutMs, options.signal);
     return new PlaywrightChromiumTargetControl(
       options.context,
       session,
@@ -811,11 +764,7 @@ export async function createChromiumTargetControl(
     );
   } catch (error) {
     await detachWithinDeadline(session);
-    throw safeOperationError(
-      'Inspect Chromium target-control anchor',
-      error,
-      options.signal,
-    );
+    throw safeOperationError('Inspect Chromium target-control anchor', error, options.signal);
   }
 }
 
@@ -835,9 +784,7 @@ async function inspectAnchorBrowserContextId(
     );
   }
   if (anchorPage.isClosed() || !pages.includes(anchorPage)) {
-    throw new ChromiumTargetControlError(
-      'Chromium target-control anchor closed during setup.',
-    );
+    throw new ChromiumTargetControlError('Chromium target-control anchor closed during setup.');
   }
   const response = await runWithDeadline(
     'Inspect Chromium target-control anchor',
@@ -847,9 +794,7 @@ async function inspectAnchorBrowserContextId(
   );
   const anchor = parseTargetInfoResponse(response, 'Target.getTargetInfo');
   if (anchor.type !== 'page') {
-    throw new ChromiumTargetControlError(
-      'Chromium target-control anchor is not a page target.',
-    );
+    throw new ChromiumTargetControlError('Chromium target-control anchor is not a page target.');
   }
   return anchor.browserContextId;
 }
@@ -874,11 +819,7 @@ async function inspectBrowserScopedContextId(
     try {
       pageAttachment = context.newCDPSession(page);
     } catch (error) {
-      throw safeOperationError(
-        'Inspect Chromium target-control context',
-        error,
-        signal,
-      );
+      throw safeOperationError('Inspect Chromium target-control context', error, signal);
     }
     let pageSession: CDPSession;
     try {

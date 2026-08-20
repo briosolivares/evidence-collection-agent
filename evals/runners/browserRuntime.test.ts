@@ -516,9 +516,7 @@ describe('createEvalBrowserRuntime on Browserbase', () => {
       adapter,
     });
 
-    await expect(runtime.withBrowser(true, async () => undefined)).rejects.toThrow(
-      /npm run login/,
-    );
+    await expect(runtime.withBrowser(true, async () => undefined)).rejects.toThrow(/npm run login/);
     await runtime.close();
   });
 });

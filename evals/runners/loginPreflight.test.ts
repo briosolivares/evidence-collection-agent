@@ -66,7 +66,9 @@ describe('formatLoginPreflightFailure', () => {
       { service: GOOGLE_SHEETS, state: 'logged-out' },
       { service: X_HOME, state: 'logged-in' },
     ];
-    expect(formatLoginPreflightFailure(statuses, requirements, 'local')).not.toContain('elon_tweets');
+    expect(formatLoginPreflightFailure(statuses, requirements, 'local')).not.toContain(
+      'elon_tweets',
+    );
   });
 
   // An unverified session is the case that silently burned two batches:

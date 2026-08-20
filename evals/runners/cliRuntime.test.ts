@@ -51,9 +51,7 @@ describe('createBrowserBackedRunTask', () => {
       startUrl: 'https://example.com/',
       signal,
     });
-    expect(progress).toEqual([
-      ['headed-task', 1, 2, { type: 'turn_start', turn: 1 }],
-    ]);
+    expect(progress).toEqual([['headed-task', 1, 2, { type: 'turn_start', turn: 1 }]]);
   });
 
   it('drops non-HTTP(S) start URLs instead of passing them to runTask', async () => {

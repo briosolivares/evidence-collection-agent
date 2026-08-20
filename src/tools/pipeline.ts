@@ -113,8 +113,7 @@ export async function executeToolCall(
       isError: true,
       errorKind: 'unknown_tool',
       content:
-        `Unknown tool "${call.name}". Available tools: ` +
-        `${[...registry.keys()].join(', ')}.`,
+        `Unknown tool "${call.name}". Available tools: ` + `${[...registry.keys()].join(', ')}.`,
     };
   }
 

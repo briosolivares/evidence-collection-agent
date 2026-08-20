@@ -63,10 +63,7 @@ export interface EvalRunOptions {
   signal: AbortSignal;
 }
 
-export type RunTaskFn = (
-  taskText: string,
-  opts: EvalRunOptions,
-) => Promise<{ runDir: string }>;
+export type RunTaskFn = (taskText: string, opts: EvalRunOptions) => Promise<{ runDir: string }>;
 
 /** One eval task, loaded from evals/<name>/, ready for the runner. */
 export interface EvalTask {

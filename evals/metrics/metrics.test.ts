@@ -58,10 +58,7 @@ describe('metric math', () => {
   });
 
   it('one failed trial among passing ones flips task-pass to false', () => {
-    const report = summarizeTask('t', [
-      trial([true, true, true]),
-      trial([true, true, false]),
-    ]);
+    const report = summarizeTask('t', [trial([true, true, true]), trial([true, true, false])]);
 
     expect(report.trials.map((t) => t.completed)).toEqual([true, false]);
     expect(report.taskPassed).toBe(false);

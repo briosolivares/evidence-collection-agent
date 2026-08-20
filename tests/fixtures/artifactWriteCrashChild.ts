@@ -28,21 +28,13 @@ const entry: ManifestEntry = {
   ...(meta.sourceUrl === undefined ? {} : { sourceUrl: meta.sourceUrl }),
   ...(meta.roles === undefined ? {} : { roles: meta.roles }),
   capturedAt: new Date().toISOString(),
-  ...(meta.completionStatus === undefined
-    ? {}
-    : { completionStatus: meta.completionStatus }),
+  ...(meta.completionStatus === undefined ? {} : { completionStatus: meta.completionStatus }),
 };
 
 commitArtifactWriteTransaction(runDir, entry, bytes, {
-  ...(boundaryValue === 'after_journal'
-    ? { afterJournalPersisted: killNow }
-    : {}),
-  ...(boundaryValue === 'after_temp'
-    ? { afterArtifactTempFileSync: killNow }
-    : {}),
-  ...(boundaryValue === 'after_artifact'
-    ? { afterArtifactCommitted: killNow }
-    : {}),
+  ...(boundaryValue === 'after_journal' ? { afterJournalPersisted: killNow } : {}),
+  ...(boundaryValue === 'after_temp' ? { afterArtifactTempFileSync: killNow } : {}),
+  ...(boundaryValue === 'after_artifact' ? { afterArtifactCommitted: killNow } : {}),
 });
 
 throw new Error(`artifact crash fixture passed ${boundaryValue} without being killed`);

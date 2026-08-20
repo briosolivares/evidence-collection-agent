@@ -67,9 +67,7 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
   let started = false;
   let browserDead = false;
 
-  const ensureBrowser = async (
-    onEvent: (event: UiEvent) => void,
-  ): Promise<BrowserController> => {
+  const ensureBrowser = async (onEvent: (event: UiEvent) => void): Promise<BrowserController> => {
     if (!started) {
       throw new Error('runtime not started — no browser session');
     }
@@ -99,9 +97,7 @@ export function createTuiRuntime(deps: TuiRuntimeDeps): TuiRuntime {
         type: 'browser_session',
         provider: diagnostics.provider,
         ...(diagnostics.sessionId === undefined ? {} : { sessionId: diagnostics.sessionId }),
-        ...(diagnostics.liveViewUrl === undefined
-          ? {}
-          : { liveViewUrl: diagnostics.liveViewUrl }),
+        ...(diagnostics.liveViewUrl === undefined ? {} : { liveViewUrl: diagnostics.liveViewUrl }),
       });
     }
     return browser;

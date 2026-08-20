@@ -90,11 +90,7 @@ export function Composer({
   return (
     <Box flexDirection="column">
       {panelVisible && (
-        <CommandSuggestions
-          prefix={value}
-          suggestions={matches}
-          selectedIndex={cursor}
-        />
+        <CommandSuggestions prefix={value} suggestions={matches} selectedIndex={cursor} />
       )}
       <Box borderStyle="round" borderColor={theme.muted} paddingX={1}>
         <Text color={theme.primary}>{'› '}</Text>

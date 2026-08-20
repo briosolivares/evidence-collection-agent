@@ -9,15 +9,9 @@ import type {
   ModelDriver,
   ModelGenerateOptions,
 } from '../../src/model/modelDriver.js';
-import {
-  createRegistry,
-  type ToolDef,
-} from '../../src/tools/registry.js';
+import { createRegistry, type ToolDef } from '../../src/tools/registry.js';
 import { writeArtifact } from '../../src/run/artifacts.js';
-import type {
-  Checkpoint,
-  DurableRunConfiguration,
-} from '../../src/agent/checkpoint.schema.js';
+import type { Checkpoint, DurableRunConfiguration } from '../../src/agent/checkpoint.schema.js';
 import { runAgent } from '../../src/agent/lifecycle.js';
 
 type Scenario =
@@ -99,20 +93,14 @@ const effectTool: ToolDef<Record<string, never>> = {
   async execute(_input, ctx) {
     effectCalls += 1;
     if (args.scenario === 'cancelled_workspace_recovery') {
-      const workspaceFile = join(
-        ctx.runDir,
-        'scratch',
-        'workspace',
-        'killed-command.txt',
-      );
+      const workspaceFile = join(ctx.runDir, 'scratch', 'workspace', 'killed-command.txt');
       mkdirSync(dirname(workspaceFile), { recursive: true });
       writeFileSync(workspaceFile, 'bytes left by the killed tool\n', 'utf8');
     }
     appendEvent({ type: 'tool_effect' });
     await sendToParent({ type: 'tool_effect' });
     if (
-      (args.scenario === 'uncertain_tool' ||
-        args.scenario === 'cancelled_workspace_recovery') &&
+      (args.scenario === 'uncertain_tool' || args.scenario === 'cancelled_workspace_recovery') &&
       args.invocation === 'initial'
     ) {
       await hangUntilKilled();
@@ -127,19 +115,16 @@ const repairTool: ToolDef<Record<string, never>> = {
   inputSchema: z.strictObject({}),
   getAccess: () => ({ reads: [], writes: ['fixture:report'] }),
   execute(_input, ctx) {
-    writeArtifact(
-      ctx.runDir,
-      'artifacts/report.csv',
-      Buffer.from('name\nAlice\n', 'utf8'),
-      { roles: ['requested_output'] },
-    );
+    writeArtifact(ctx.runDir, 'artifacts/report.csv', Buffer.from('name\nAlice\n', 'utf8'), {
+      roles: ['requested_output'],
+    });
     appendEvent({ type: 'report_repaired' });
     return { repaired: true };
   },
 };
 
 void main().catch(async (error: unknown) => {
-  const message = error instanceof Error ? error.stack ?? error.message : String(error);
+  const message = error instanceof Error ? (error.stack ?? error.message) : String(error);
   appendEvent({ type: 'fixture_error', message });
   try {
     await sendToParent({ type: 'fixture_error', message });
@@ -151,10 +136,7 @@ void main().catch(async (error: unknown) => {
 
 async function main(): Promise<void> {
   const abort = new AbortController();
-  if (
-    args.scenario === 'cancelled_workspace_recovery' &&
-    args.invocation === 'resume'
-  ) {
+  if (args.scenario === 'cancelled_workspace_recovery' && args.invocation === 'resume') {
     abort.abort(new DOMException('cancel before resume recovery', 'AbortError'));
   }
   const outcome = await runAgent({
@@ -215,8 +197,7 @@ async function afterCheckpoint(checkpoint: Checkpoint): Promise<void> {
   }
 
   if (
-    (args.scenario === 'uncertain_tool' ||
-      args.scenario === 'cancelled_workspace_recovery') &&
+    (args.scenario === 'uncertain_tool' || args.scenario === 'cancelled_workspace_recovery') &&
     checkpoint.phase === 'executing_tool' &&
     checkpoint.pendingTurn.effect === 'uncertain' &&
     checkpoint.pendingTurn.nextCallIndex === 0
@@ -229,11 +210,7 @@ async function afterCheckpoint(checkpoint: Checkpoint): Promise<void> {
     await waitForParentContinue();
   }
 
-  if (
-    args.scenario === 'verifying' &&
-    checkpoint.phase === 'verifying' &&
-    verifierCalls > 0
-  ) {
+  if (args.scenario === 'verifying' && checkpoint.phase === 'verifying' && verifierCalls > 0) {
     await sendToParent({
       type: 'boundary',
       boundary: 'verifier_result_recorded',
@@ -324,12 +301,8 @@ function workerModel(): ModelDriver {
         serializedMessages.includes('Recovery did not replay') &&
         serializedMessages.includes('record_effect') &&
         serializedMessages.includes('uncertain');
-      const sawDeterministicFeedback = serializedMessages.includes(
-        'deterministic_finish_checks',
-      );
-      const sawVerifierCorrection = serializedMessages.includes(
-        'fixture_correction',
-      );
+      const sawDeterministicFeedback = serializedMessages.includes('deterministic_finish_checks');
+      const sawVerifierCorrection = serializedMessages.includes('fixture_correction');
       const responseKind = (() => {
         if (
           (args.scenario === 'pre_tool' ||
@@ -357,10 +330,7 @@ function workerModel(): ModelDriver {
         sawDeterministicFeedback,
         sawVerifierCorrection,
       });
-      if (
-        args.scenario === 'model_in_flight' &&
-        args.invocation === 'initial'
-      ) {
+      if (args.scenario === 'model_in_flight' && args.invocation === 'initial') {
         await sendToParent({ type: 'boundary', boundary: 'model_in_flight' });
         await hangUntilKilled();
       }
@@ -401,8 +371,7 @@ function verifierModel(): ModelDriver {
     async generate() {
       verifierCalls += 1;
       appendEvent({ type: 'model_call', role: 'verifier', verifierCalls });
-      const correction =
-        args.scenario === 'verifier_correction' && args.invocation === 'initial';
+      const correction = args.scenario === 'verifier_correction' && args.invocation === 'initial';
       return accepted([
         {
           type: 'tool_use',
@@ -426,9 +395,7 @@ function verifierModel(): ModelDriver {
   };
 }
 
-function accepted(
-  content: AcceptedModelResponse['response']['content'],
-): AcceptedModelResponse {
+function accepted(content: AcceptedModelResponse['response']['content']): AcceptedModelResponse {
   const usage = {
     input_tokens: 10,
     output_tokens: 4,

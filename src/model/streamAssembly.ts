@@ -80,7 +80,8 @@ export class TruncatedStreamError extends Error {
   readonly diagnosticsSummary?: string;
 
   constructor(message: string, diagnostics?: TruncatedStreamDiagnostics) {
-    const summary = diagnostics === undefined ? undefined : formatTruncationDiagnostics(diagnostics);
+    const summary =
+      diagnostics === undefined ? undefined : formatTruncationDiagnostics(diagnostics);
     super(summary === undefined ? message : `${message} (${summary})`);
     this.name = 'TruncatedStreamError';
     if (diagnostics !== undefined) {
@@ -94,7 +95,11 @@ export class TruncatedStreamError extends Error {
  * event. tool_use inputs accumulate as raw JSON text until the block stops. */
 type OpenBlock =
   | { kind: 'text'; block: { type: 'text'; text: string } }
-  | { kind: 'tool_use'; block: { type: 'tool_use'; id: string; name: string; input: unknown }; partialJson: string };
+  | {
+      kind: 'tool_use';
+      block: { type: 'tool_use'; id: string; name: string; input: unknown };
+      partialJson: string;
+    };
 
 /**
  * Assemble one complete ModelResponse from a response's stream of events.

@@ -2,8 +2,15 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { parseCsv } from '../../../grading/csv.js';
-import { exactColumnsAssertion, exactColumnsAssertionName } from '../../../grading/csvAssertions.js';
-import { findArtifactByExtension, readManifest, verifyManifestHashes } from '../../../grading/manifestVerification.js';
+import {
+  exactColumnsAssertion,
+  exactColumnsAssertionName,
+} from '../../../grading/csvAssertions.js';
+import {
+  findArtifactByExtension,
+  readManifest,
+  verifyManifestHashes,
+} from '../../../grading/manifestVerification.js';
 import type { AssertionResult, Grader } from '../../../types.js';
 import {
   MIN_MATCHING_HANDLES,
@@ -17,7 +24,8 @@ const REQUIRED_COLUMNS = ['github_handle', 'name', 'linkedin_url'] as const;
 const COLUMN_ASSERTION_NAME = exactColumnsAssertionName(REQUIRED_COLUMNS);
 const ROWS_ASSERTION_NAME = `CSV has ${REQUIRED_ROW_COUNT} data rows with distinct non-empty handles`;
 const HANDLES_ASSERTION_NAME = `at least ${MIN_MATCHING_HANDLES} of the ${REQUIRED_ROW_COUNT} handles are oracle top contributors`;
-const NAMES_ASSERTION_NAME = 'name cells agree with GitHub profile names wherever both sides have one';
+const NAMES_ASSERTION_NAME =
+  'name cells agree with GitHub profile names wherever both sides have one';
 const LINKEDIN_ASSERTION_NAME = 'linkedin_url cells are empty or well-formed linkedin.com URLs';
 
 /** Cell values that count as "no answer" rather than a wrong answer. */
@@ -59,21 +67,33 @@ export const grade: Grader = (runDirPath, oracleData) => {
       name: 'CSV artifact exists',
       passed: csvEntry !== undefined,
       detail:
-        csvEntry !== undefined ? `found ${csvEntry.filename}` : 'no .csv artifact found in the manifest',
+        csvEntry !== undefined
+          ? `found ${csvEntry.filename}`
+          : 'no .csv artifact found in the manifest',
     },
   ];
 
   if (csvEntry === undefined) {
-    return [...assertions, ...allContentAssertionsFailed('no CSV artifact to check'), verifyManifestHashes(runDirPath, manifest)];
+    return [
+      ...assertions,
+      ...allContentAssertionsFailed('no CSV artifact to check'),
+      verifyManifestHashes(runDirPath, manifest),
+    ];
   }
 
   let header: string[];
   let rawRows: string[][];
   try {
-    ({ header, rows: rawRows } = parseCsv(readFileSync(join(runDirPath, csvEntry.filename), 'utf8')));
+    ({ header, rows: rawRows } = parseCsv(
+      readFileSync(join(runDirPath, csvEntry.filename), 'utf8'),
+    ));
   } catch (err) {
     const detail = `${csvEntry.filename} could not be parsed as CSV: ${err instanceof Error ? err.message : String(err)}`;
-    return [...assertions, ...allContentAssertionsFailed(detail), verifyManifestHashes(runDirPath, manifest)];
+    return [
+      ...assertions,
+      ...allContentAssertionsFailed(detail),
+      verifyManifestHashes(runDirPath, manifest),
+    ];
   }
 
   const rows = resolveRows(header, rawRows);
@@ -107,17 +127,24 @@ function rowShapeAssertion(rows: ContributorRow[]): AssertionResult {
   const problems: string[] = [];
   if (rows.length !== REQUIRED_ROW_COUNT) problems.push(`found ${rows.length} data row(s)`);
   const nonEmpty = rows.filter((r) => r.handle !== '');
-  if (nonEmpty.length < rows.length) problems.push(`${rows.length - nonEmpty.length} row(s) have an empty handle`);
-  if (new Set(nonEmpty.map((r) => r.handle)).size !== nonEmpty.length) problems.push('duplicate handle(s)');
+  if (nonEmpty.length < rows.length)
+    problems.push(`${rows.length - nonEmpty.length} row(s) have an empty handle`);
+  if (new Set(nonEmpty.map((r) => r.handle)).size !== nonEmpty.length)
+    problems.push('duplicate handle(s)');
   return {
     name: ROWS_ASSERTION_NAME,
     passed: problems.length === 0,
     detail:
-      problems.length === 0 ? `${rows.length} rows, all handles non-empty and distinct` : problems.join('; '),
+      problems.length === 0
+        ? `${rows.length} rows, all handles non-empty and distinct`
+        : problems.join('; '),
   };
 }
 
-function handleMatchAssertion(rows: ContributorRow[], oracle: OpenClawContributorsOracle): AssertionResult {
+function handleMatchAssertion(
+  rows: ContributorRow[],
+  oracle: OpenClawContributorsOracle,
+): AssertionResult {
   const oracleLogins = new Set(oracle.contributors.map((c) => c.login.toLowerCase()));
   const matched = rows.filter((r) => r.handle !== '' && oracleLogins.has(r.handle));
   const unmatched = rows.filter((r) => r.handle !== '' && !oracleLogins.has(r.handle));
@@ -130,7 +157,10 @@ function handleMatchAssertion(rows: ContributorRow[], oracle: OpenClawContributo
   };
 }
 
-function nameMatchAssertion(rows: ContributorRow[], oracle: OpenClawContributorsOracle): AssertionResult {
+function nameMatchAssertion(
+  rows: ContributorRow[],
+  oracle: OpenClawContributorsOracle,
+): AssertionResult {
   const byLogin = new Map(oracle.contributors.map((c) => [c.login.toLowerCase(), c]));
   const comparable = rows.flatMap((row) => {
     const oracleName = byLogin.get(row.handle)?.name;
@@ -172,7 +202,10 @@ function linkedinShapeAssertion(rows: ContributorRow[]): AssertionResult {
   return {
     name: LINKEDIN_ASSERTION_NAME,
     passed: bad.length === 0,
-    detail: bad.length === 0 ? `${rows.length} cell(s) checked (shape only; content is Tier C)` : bad.join('; '),
+    detail:
+      bad.length === 0
+        ? `${rows.length} cell(s) checked (shape only; content is Tier C)`
+        : bad.join('; '),
   };
 }
 

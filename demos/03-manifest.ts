@@ -6,7 +6,12 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { finalizeManifest, initManifest, MANIFEST_FILENAME, writeArtifact } from '../src/run/artifacts.js';
+import {
+  finalizeManifest,
+  initManifest,
+  MANIFEST_FILENAME,
+  writeArtifact,
+} from '../src/run/artifacts.js';
 import { generateRunId } from '../src/run/runId.js';
 import { createRunDir } from '../src/run/runDir.js';
 

@@ -380,9 +380,7 @@ function checkpointForTransition(
     case 'verifying':
       return verifying(revision);
     case 'terminal':
-      return priorPhase === 'initializing'
-        ? initializerTerminal(revision)
-        : terminal(revision);
+      return priorPhase === 'initializing' ? initializerTerminal(revision) : terminal(revision);
   }
 }
 
@@ -487,32 +485,22 @@ describe('checkpoint schema', () => {
   });
 
   it('keeps strict phase boundaries and requires contract plus worker while active', () => {
-    expect(
-      checkpointSchema.safeParse({ ...initializing(), surprise: true }).success,
-    ).toBe(false);
-    expect(
-      checkpointSchema.safeParse({ ...ready(), contract: undefined }).success,
-    ).toBe(false);
-    expect(
-      checkpointSchema.safeParse({ ...ready(), worker: undefined }).success,
-    ).toBe(false);
-    expect(
-      checkpointSchema.safeParse({ ...ready(), pendingFinish: finish }).success,
-    ).toBe(false);
-    expect(
-      checkpointSchema.safeParse({ ...checking(), pendingCheck: undefined }).success,
-    ).toBe(false);
-    expect(
-      checkpointSchema.safeParse({ ...verifying(), pendingVerifier: undefined }).success,
-    ).toBe(false);
+    expect(checkpointSchema.safeParse({ ...initializing(), surprise: true }).success).toBe(false);
+    expect(checkpointSchema.safeParse({ ...ready(), contract: undefined }).success).toBe(false);
+    expect(checkpointSchema.safeParse({ ...ready(), worker: undefined }).success).toBe(false);
+    expect(checkpointSchema.safeParse({ ...ready(), pendingFinish: finish }).success).toBe(false);
+    expect(checkpointSchema.safeParse({ ...checking(), pendingCheck: undefined }).success).toBe(
+      false,
+    );
+    expect(checkpointSchema.safeParse({ ...verifying(), pendingVerifier: undefined }).success).toBe(
+      false,
+    );
     expect(
       checkpointSchema.safeParse({
         ...verifying(),
         pendingVerifier: {
           cycle: 1,
-          messages: [
-            { role: 'user', content: [{ type: 'text', text: 'synthetic state' }] },
-          ],
+          messages: [{ role: 'user', content: [{ type: 'text', text: 'synthetic state' }] }],
           attempts: 0,
         },
       }).success,
@@ -531,15 +519,13 @@ describe('checkpoint schema', () => {
       lastProblem: 'The first response had no contract call.',
     };
     expect(initializerProgressSchema.safeParse(initializer).success).toBe(true);
-    expect(
-      checkpointSchema.safeParse({ ...initializing(), initializer }).success,
-    ).toBe(true);
-    expect(
-      checkpointSchema.safeParse({ ...initializing(), initializer, contract }).success,
-    ).toBe(false);
-    expect(
-      initializerProgressSchema.safeParse({ ...initializer, attempts: 3 }).success,
-    ).toBe(false);
+    expect(checkpointSchema.safeParse({ ...initializing(), initializer }).success).toBe(true);
+    expect(checkpointSchema.safeParse({ ...initializing(), initializer, contract }).success).toBe(
+      false,
+    );
+    expect(initializerProgressSchema.safeParse({ ...initializer, attempts: 3 }).success).toBe(
+      false,
+    );
   });
 
   it('requires ordered completed tool results and exact assistant calls', () => {
@@ -556,9 +542,7 @@ describe('checkpoint schema', () => {
         { id: 'a', name: 'read_file', input: { path: 'scratch/a' } },
         { id: 'b', name: 'read_file', input: { path: 'scratch/b' } },
       ],
-      completedResults: [
-        { type: 'tool_result' as const, tool_use_id: 'a', content: 'A' },
-      ],
+      completedResults: [{ type: 'tool_result' as const, tool_use_id: 'a', content: 'A' }],
       nextCallIndex: 1,
       effect: 'not_started' as const,
     };
@@ -569,9 +553,7 @@ describe('checkpoint schema', () => {
         completedResults: [{ ...base.completedResults[0], tool_use_id: 'b' }],
       }).success,
     ).toBe(false);
-    expect(
-      pendingToolTurnSchema.safeParse({ ...base, nextCallIndex: 2 }).success,
-    ).toBe(false);
+    expect(pendingToolTurnSchema.safeParse({ ...base, nextCallIndex: 2 }).success).toBe(false);
     expect(
       pendingToolTurnSchema.safeParse({
         ...base,
@@ -583,9 +565,7 @@ describe('checkpoint schema', () => {
         ...base,
         assistant: {
           role: 'assistant',
-          content: [
-            { type: 'tool_use', id: 'finish-1', name: 'finish', input: finish.input },
-          ],
+          content: [{ type: 'tool_use', id: 'finish-1', name: 'finish', input: finish.input }],
         },
         calls: [{ id: 'finish-1', name: 'finish', input: finish.input }],
         completedResults: [],
@@ -600,9 +580,7 @@ describe('checkpoint schema', () => {
         ...ready(),
         worker: {
           ...worker,
-          messages: [
-            { role: 'user', content: [{ type: 'text', text: 'different task' }] },
-          ],
+          messages: [{ role: 'user', content: [{ type: 'text', text: 'different task' }] }],
         },
       }).success,
     ).toBe(false);
@@ -763,9 +741,9 @@ describe('checkpoint schema', () => {
     for (const outcome of outcomes) {
       expect(durableTerminalOutcomeSchema.safeParse(outcome).success).toBe(true);
     }
-    expect(
-      durableTerminalOutcomeSchema.safeParse({ status: 'failed', message: 'x' }).success,
-    ).toBe(false);
+    expect(durableTerminalOutcomeSchema.safeParse({ status: 'failed', message: 'x' }).success).toBe(
+      false,
+    );
     expect(
       durableTerminalOutcomeSchema.safeParse({
         status: 'incomplete',
@@ -966,16 +944,12 @@ describe('read-only checkpoint observation', () => {
 
   it('does not create a missing harness directory or checkpoint', () => {
     const harnessDir = join(runDir, HARNESS_DIR);
-    expect(() => readCheckpointConfiguration(runDir)).toThrow(
-      /harness directory does not exist/,
-    );
+    expect(() => readCheckpointConfiguration(runDir)).toThrow(/harness directory does not exist/);
     expect(existsSync(harnessDir)).toBe(false);
 
     mkdirSync(harnessDir, { mode: 0o700 });
     chmodSync(harnessDir, 0o700);
-    expect(() => readCheckpointConfiguration(runDir)).toThrow(
-      /checkpoint does not exist/,
-    );
+    expect(() => readCheckpointConfiguration(runDir)).toThrow(/checkpoint does not exist/);
     expect(readdirSync(harnessDir)).toEqual([]);
   });
 
@@ -998,9 +972,7 @@ describe('read-only checkpoint observation', () => {
       }),
       { mode: 0o600 },
     );
-    expect(() => readCheckpointConfiguration(runDir)).toThrow(
-      /configuration\.model/,
-    );
+    expect(() => readCheckpointConfiguration(runDir)).toThrow(/configuration\.model/);
   });
 
   it('refuses an oversized checkpoint before parsing it', () => {
@@ -1021,9 +993,7 @@ describe('read-only checkpoint observation', () => {
     chmodSync(harnessDir, 0o700);
     symlinkSync(target, pathInHarness(RUN_CHECKPOINT_FILENAME));
 
-    expect(() => readCheckpointConfiguration(runDir)).toThrow(
-      /symlinks are not followed/,
-    );
+    expect(() => readCheckpointConfiguration(runDir)).toThrow(/symlinks are not followed/);
     expect(readFileSync(target, 'utf8')).toBe(targetBytes);
   });
 });
@@ -1065,9 +1035,9 @@ describe('openCheckpointStore', () => {
   ] as const)('rejects the illegal %s -> %s phase transition', async (from, to) => {
     const store = await openCheckpointStore(runDir);
     await store.save(checkpointForTransition(from, 1));
-    await expect(
-      store.save(checkpointForTransition(to, 2, from)),
-    ).rejects.toThrow(new RegExp(`phase transition ${from} -> ${to}`));
+    await expect(store.save(checkpointForTransition(to, 2, from))).rejects.toThrow(
+      new RegExp(`phase transition ${from} -> ${to}`),
+    );
     expect(store.load()?.phase).toBe(from);
     await store.close();
   });
@@ -1115,9 +1085,9 @@ describe('openCheckpointStore', () => {
     await store.save(checkpoint);
 
     expect(store.load()).toEqual(checkpoint);
-    expect(
-      JSON.parse(readFileSync(pathInHarness(RUN_CHECKPOINT_FILENAME), 'utf8')),
-    ).toEqual(checkpoint);
+    expect(JSON.parse(readFileSync(pathInHarness(RUN_CHECKPOINT_FILENAME), 'utf8'))).toEqual(
+      checkpoint,
+    );
     expect(statSync(join(runDir, HARNESS_DIR)).mode & 0o777).toBe(0o700);
     expect(statSync(pathInHarness(RUN_LOCK_FILENAME)).mode & 0o777).toBe(0o600);
     expect(statSync(pathInHarness(RUN_CHECKPOINT_FILENAME)).mode & 0o777).toBe(0o600);
@@ -1314,11 +1284,9 @@ describe('openCheckpointStore', () => {
     await store.save(initializing(1));
     const lock = pathInHarness(RUN_LOCK_FILENAME);
     const value = JSON.parse(readFileSync(lock, 'utf8')) as Record<string, unknown>;
-    writeFileSync(
-      lock,
-      JSON.stringify({ ...value, harnessInstanceId: 'another-owner' }),
-      { mode: 0o600 },
-    );
+    writeFileSync(lock, JSON.stringify({ ...value, harnessInstanceId: 'another-owner' }), {
+      mode: 0o600,
+    });
 
     await expect(store.save(initializing(2))).rejects.toThrow(/owned by another/);
     await expect(store.save(initializing(3))).rejects.toThrow(/owned by another/);

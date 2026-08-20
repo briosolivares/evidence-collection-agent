@@ -2,7 +2,11 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import type { Manifest, ManifestEntry } from '../../../../src/run/artifacts.js';
-import { findRequestedOutputByName, readManifest, verifyManifestHashes } from '../../../grading/manifestVerification.js';
+import {
+  findRequestedOutputByName,
+  readManifest,
+  verifyManifestHashes,
+} from '../../../grading/manifestVerification.js';
 import type { AssertionResult, Grader } from '../../../types.js';
 import {
   acceptablePrsInWindow,
@@ -35,7 +39,8 @@ export const grade: Grader = (runDirPath, oracleData) => {
   const manifest = readManifest(runDirPath);
 
   const answerEntry = findRequestedOutputByName(manifest, ANSWER_FILENAME);
-  const answerExists = answerEntry !== undefined && existsSync(join(runDirPath, answerEntry.filename));
+  const answerExists =
+    answerEntry !== undefined && existsSync(join(runDirPath, answerEntry.filename));
   const existsAssertion: AssertionResult = {
     name: `${ANSWER_FILENAME} exists`,
     passed: answerExists,
@@ -68,7 +73,11 @@ function mentionsPrAssertion(
     return { name, passed: false, detail: 'run manifest has no finishedAt (not finalized)' };
   }
 
-  const acceptable = acceptablePrsInWindow(oracle.recentPrs, manifest.startedAt, manifest.finishedAt);
+  const acceptable = acceptablePrsInWindow(
+    oracle.recentPrs,
+    manifest.startedAt,
+    manifest.finishedAt,
+  );
   if (acceptable.length === 0) {
     return {
       name,

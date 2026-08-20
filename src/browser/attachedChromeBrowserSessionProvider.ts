@@ -21,10 +21,7 @@ import {
   type ChromiumTargetControl,
 } from './chromiumTargetControl.js';
 import { PlaywrightBrowserController } from './playwrightBrowserController.js';
-import type {
-  BrowserSessionDiagnostics,
-  BrowserSessionProvider,
-} from './sessionProvider.js';
+import type { BrowserSessionDiagnostics, BrowserSessionProvider } from './sessionProvider.js';
 
 const ATTACHED_SESSION_DIAGNOSTICS = Object.freeze({
   provider: 'local',
@@ -98,7 +95,7 @@ function createClientDisconnect(browser: Browser): () => Promise<void> {
       .then(() => browser.close())
       .catch(() => {
         throw new AttachedChromeSessionError(
-          'Could not disconnect Sherlock\'s Playwright client from attached Chrome.',
+          "Could not disconnect Sherlock's Playwright client from attached Chrome.",
         );
       });
     return disconnectPromise;
@@ -111,9 +108,7 @@ function safeSetupError(error: unknown, cleanupFailed: boolean): Error {
       ? error.message
       : 'Could not initialize Sherlock against the attached Chrome context.';
   return new AttachedChromeSessionError(
-    cleanupFailed
-      ? `${message} Playwright client cleanup also failed.`
-      : message,
+    cleanupFailed ? `${message} Playwright client cleanup also failed.` : message,
   );
 }
 

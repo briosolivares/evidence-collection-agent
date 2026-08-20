@@ -130,8 +130,7 @@ export async function ensureBrowserbaseContext(deps: {
 export async function runBrowserbaseLogin(deps: BrowserbaseLoginDeps): Promise<boolean> {
   const env = deps.env ?? process.env;
   const log = deps.log ?? ((message: string) => console.log(message));
-  const sleep =
-    deps.sleep ?? ((ms: number) => new Promise<void>((done) => setTimeout(done, ms)));
+  const sleep = deps.sleep ?? ((ms: number) => new Promise<void>((done) => setTimeout(done, ms)));
   const client = deps.client ?? createBrowserbaseClient(requireBrowserbaseApiKey(env));
   const openInBrowser = deps.openInBrowser ?? openUrlInSystemBrowser;
   const waitForOperator = deps.waitForOperator ?? promptOperator;

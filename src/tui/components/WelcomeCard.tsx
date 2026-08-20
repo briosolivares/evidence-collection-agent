@@ -66,8 +66,7 @@ export function WelcomeCard({
   const columns = stdout?.columns ?? 80;
   const cardWidth = Math.min(columns - 2, MAX_WIDTH);
   const contentWidth = cardWidth - CHROME;
-  const welcome =
-    identity === undefined ? 'Welcome back!' : `Welcome back ${identity.name}!`;
+  const welcome = identity === undefined ? 'Welcome back!' : `Welcome back ${identity.name}!`;
   return (
     <Box flexDirection="column" marginBottom={1}>
       <Text color={theme.primary}>{topBorderLine(cardWidth)}</Text>
@@ -88,11 +87,7 @@ export function WelcomeCard({
               {OWL_LINES.map((line, row) => (
                 <Text key={row}>
                   {owlLineSegments(line).map((segment, i) => (
-                    <Text
-                      key={i}
-                      bold={segment.role === 'pupil'}
-                      color={OWL_COLORS[segment.role]}
-                    >
+                    <Text key={i} bold={segment.role === 'pupil'} color={OWL_COLORS[segment.role]}>
                       {segment.text}
                     </Text>
                   ))}

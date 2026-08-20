@@ -31,11 +31,9 @@ const ORACLE = makeOracle();
 
 /** The oracle's top 30 as correct CSV rows: handle, name, linkedin_url. */
 function passingRows(): string[][] {
-  return ORACLE.contributors.slice(0, 30).map((c) => [
-    c.login,
-    c.name ?? '',
-    `https://www.linkedin.com/in/${c.login}`,
-  ]);
+  return ORACLE.contributors
+    .slice(0, 30)
+    .map((c) => [c.login, c.name ?? '', `https://www.linkedin.com/in/${c.login}`]);
 }
 
 function csvText(header: string[], rows: string[][]): string {

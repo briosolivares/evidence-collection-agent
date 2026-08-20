@@ -37,36 +37,37 @@ export const ARTIFACT_WRITE_MAX_JOURNAL_BYTES = 64 * 1024;
 /** Runtime-private location of pending artifact/manifest write intents. */
 export const ARTIFACT_WRITE_JOURNAL_PATH = `${HARNESS_DIR}/${JOURNAL_DIR}`;
 
-const manifestEntrySchema = z
-  .strictObject({
-    filename: z.string().min(1),
-    sha256: z.string().regex(SHA256_PATTERN),
-    sourceUrl: z.string().optional(),
-    roles: z.array(z.enum(['requested_output', 'evidence'])).min(1).optional(),
-    capturedAt: z.string().refine((value) => !Number.isNaN(Date.parse(value)), {
+const manifestEntrySchema = z.strictObject({
+  filename: z.string().min(1),
+  sha256: z.string().regex(SHA256_PATTERN),
+  sourceUrl: z.string().optional(),
+  roles: z
+    .array(z.enum(['requested_output', 'evidence']))
+    .min(1)
+    .optional(),
+  capturedAt: z.string().refine((value) => !Number.isNaN(Date.parse(value)), {
+    message: 'must be an ISO-compatible timestamp',
+  }),
+  completionStatus: z.enum(['complete', 'partial']).optional(),
+});
+
+const artifactWriteJournalSchema = z.strictObject({
+  version: z.literal(1),
+  owner: z.strictObject({
+    transactionId: z.string().regex(UUID_PATTERN),
+    processId: z.number().int().nonnegative(),
+    startedAt: z.string().refine((value) => !Number.isNaN(Date.parse(value)), {
       message: 'must be an ISO-compatible timestamp',
     }),
-    completionStatus: z.enum(['complete', 'partial']).optional(),
-  });
-
-const artifactWriteJournalSchema = z
-  .strictObject({
-    version: z.literal(1),
-    owner: z.strictObject({
-      transactionId: z.string().regex(UUID_PATTERN),
-      processId: z.number().int().nonnegative(),
-      startedAt: z.string().refine((value) => !Number.isNaN(Date.parse(value)), {
-        message: 'must be an ISO-compatible timestamp',
-      }),
-    }),
-    target: z.strictObject({
-      filename: z.string().min(1),
-      stagingFilename: z.string().min(1),
-      byteLength: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
-      sha256: z.string().regex(SHA256_PATTERN),
-    }),
-    entry: manifestEntrySchema,
-  });
+  }),
+  target: z.strictObject({
+    filename: z.string().min(1),
+    stagingFilename: z.string().min(1),
+    byteLength: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+    sha256: z.string().regex(SHA256_PATTERN),
+  }),
+  entry: manifestEntrySchema,
+});
 
 type ArtifactWriteJournal = z.infer<typeof artifactWriteJournalSchema>;
 
@@ -276,11 +277,7 @@ export function recoverPendingArtifactWrites(
     options.checkActive?.();
 
     if (matches) {
-      upsertManifestEntry(
-        runDir,
-        value.entry as ManifestEntry,
-        options.checkActive,
-      );
+      upsertManifestEntry(runDir, value.entry as ManifestEntry, options.checkActive);
       result.recoveredEntries += 1;
     } else {
       result.discardedIntents += 1;
@@ -313,19 +310,13 @@ function parseAndValidateEntry(runDir: string, entry: ManifestEntry): ManifestEn
 
 function validateJournal(runDir: string, journal: ArtifactWriteJournal): void {
   const entry = parseAndValidateEntry(runDir, journal.entry as ManifestEntry);
-  if (
-    journal.target.filename !== entry.filename ||
-    journal.target.sha256 !== entry.sha256
-  ) {
+  if (journal.target.filename !== entry.filename || journal.target.sha256 !== entry.sha256) {
     throw new Error(
       `artifact transaction ${journal.owner.transactionId} target disagrees with its manifest entry`,
     );
   }
   const targetPath = resolveRunPath(runDir, journal.target.filename);
-  const expectedStaging = atomicTempFilename(
-    targetPath,
-    `artifact-${journal.owner.transactionId}`,
-  );
+  const expectedStaging = atomicTempFilename(targetPath, `artifact-${journal.owner.transactionId}`);
   if (journal.target.stagingFilename !== expectedStaging) {
     throw new Error(
       `artifact transaction ${journal.owner.transactionId} has an invalid staging filename`,
@@ -347,35 +338,21 @@ function assertEntryPartition(entry: ManifestEntry): void {
   }
 }
 
-function upsertManifestEntry(
-  runDir: string,
-  entry: ManifestEntry,
-  checkActive?: () => void,
-): void {
+function upsertManifestEntry(runDir: string, entry: ManifestEntry, checkActive?: () => void): void {
   const manifest = loadManifestNoFollow(runDir, checkActive);
-  const index = manifest.artifacts.findIndex(
-    (candidate) => candidate.filename === entry.filename,
-  );
+  const index = manifest.artifacts.findIndex((candidate) => candidate.filename === entry.filename);
   if (index >= 0) manifest.artifacts[index] = entry;
   else manifest.artifacts.push(entry);
-  writeFileDurablyAtomic(
-    join(resolve(runDir), MANIFEST_FILENAME),
-    serialize(manifest),
-  );
+  writeFileDurablyAtomic(join(resolve(runDir), MANIFEST_FILENAME), serialize(manifest));
 }
 
-function loadManifestNoFollow(
-  runDir: string,
-  checkActive?: () => void,
-): Manifest {
+function loadManifestNoFollow(runDir: string, checkActive?: () => void): Manifest {
   const path = join(resolve(runDir), MANIFEST_FILENAME);
   let raw: string;
   try {
-    raw = readRegularFileNoFollow(
-      path,
-      ARTIFACT_WRITE_MAX_MANIFEST_BYTES,
-      checkActive,
-    ).toString('utf8');
+    raw = readRegularFileNoFollow(path, ARTIFACT_WRITE_MAX_MANIFEST_BYTES, checkActive).toString(
+      'utf8',
+    );
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
       throw new Error(`no manifest in ${runDir} — call initManifest at run start`);
@@ -484,9 +461,7 @@ function assertRegularFileOrAbsent(path: string, filename: string): void {
   try {
     const stat = lstatSync(path);
     if (!stat.isFile() || stat.isSymbolicLink()) {
-      throw new Error(
-        `${filename} must be absent or a regular file; symlinks are not followed`,
-      );
+      throw new Error(`${filename} must be absent or a regular file; symlinks are not followed`);
     }
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
@@ -510,9 +485,7 @@ function targetMatchesIntent(
   try {
     descriptor = openSync(
       path,
-      fsConstants.O_RDONLY |
-        (fsConstants.O_NOFOLLOW ?? 0) |
-        (fsConstants.O_NONBLOCK ?? 0),
+      fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0),
     );
   } catch (error) {
     const code = (error as NodeJS.ErrnoException).code;
@@ -558,9 +531,7 @@ function readRegularFileNoFollow(
     throw new Error(`${path} must be a regular file; symlinks are not followed`);
   }
   const flags =
-    fsConstants.O_RDONLY |
-    (fsConstants.O_NOFOLLOW ?? 0) |
-    (fsConstants.O_NONBLOCK ?? 0);
+    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
   const fd = openSync(path, flags);
   try {
     const stat = fstatSync(fd);
@@ -590,10 +561,7 @@ function readRegularFileNoFollow(
   }
 }
 
-function readJournal(
-  path: string,
-  checkActive?: () => void,
-): ArtifactWriteJournal {
+function readJournal(path: string, checkActive?: () => void): ArtifactWriteJournal {
   const stat = lstatSync(path);
   if (!stat.isFile() || stat.isSymbolicLink()) {
     throw new Error(`${path} must be a regular, non-symlink journal file`);
@@ -604,11 +572,9 @@ function readJournal(
       `${path} has mode 0${mode.toString(8)}, expected 0${PRIVATE_FILE_MODE.toString(8)}`,
     );
   }
-  const raw = readRegularFileNoFollow(
-    path,
-    ARTIFACT_WRITE_MAX_JOURNAL_BYTES,
-    checkActive,
-  ).toString('utf8');
+  const raw = readRegularFileNoFollow(path, ARTIFACT_WRITE_MAX_JOURNAL_BYTES, checkActive).toString(
+    'utf8',
+  );
   let value: unknown;
   try {
     value = JSON.parse(raw);
@@ -624,11 +590,7 @@ function readJournal(
   return parsed.data;
 }
 
-function fileSizeLimitError(
-  path: string,
-  observedBytes: number,
-  maximumBytes: number,
-): Error {
+function fileSizeLimitError(path: string, observedBytes: number, maximumBytes: number): Error {
   return new Error(
     `${path} is at least ${observedBytes} bytes, above the ` +
       `${maximumBytes}-byte artifact transaction recovery limit`,
@@ -647,10 +609,7 @@ function removeTransactionFiles(
       dirname(targetPath),
     );
   }
-  unlinkDurablyIfPresent(
-    join(journalDir, `${journal.owner.transactionId}.json`),
-    journalDir,
-  );
+  unlinkDurablyIfPresent(join(journalDir, `${journal.owner.transactionId}.json`), journalDir);
 }
 
 function unlinkDurably(path: string, parentDir: string): void {

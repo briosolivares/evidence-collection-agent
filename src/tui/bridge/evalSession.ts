@@ -6,11 +6,7 @@ import { join } from 'node:path';
 
 import { loadEvalTask } from '../../../evals/runners/loadTask.js';
 import { formatReport, writeResults } from '../../../evals/runners/report.js';
-import {
-  EvalRunCancelledError,
-  runEvals,
-  type EvalReport,
-} from '../../../evals/runners/runner.js';
+import { EvalRunCancelledError, runEvals, type EvalReport } from '../../../evals/runners/runner.js';
 import type { EvalRunOptions, EvalTask } from '../../../evals/types.js';
 import { usableStartUrl } from '../../agent/runTask.js';
 import { DEFAULT_MODEL } from '../../model/callModel.js';
@@ -182,8 +178,7 @@ export function startEvalBatch(
         },
       });
 
-      const finalReport: EvalReport =
-        assistedDialogs > 0 ? { ...report, assistedDialogs } : report;
+      const finalReport: EvalReport = assistedDialogs > 0 ? { ...report, assistedDialogs } : report;
       const resultsPath = writeResultsFn(finalReport, deps.resultsDir);
       emit({
         type: 'eval_report_ready',
@@ -193,7 +188,10 @@ export function startEvalBatch(
       return 'completed';
     } catch (error) {
       if (cancelled || error instanceof EvalRunCancelledError) {
-        emit({ type: 'notice', text: 'Evals interrupted — active trials cancelled and queued trials skipped.' });
+        emit({
+          type: 'notice',
+          text: 'Evals interrupted — active trials cancelled and queued trials skipped.',
+        });
         emit({ type: 'evals_finished' });
         return 'cancelled';
       }

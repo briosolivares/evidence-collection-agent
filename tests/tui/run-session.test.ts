@@ -6,15 +6,8 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { BrowserController } from '../../src/browser/controller.js';
 import type { CallModel, ModelResponse } from '../../src/model/messages.js';
 import type { ModelStreamEvent } from '../../src/model/streamAssembly.js';
-import {
-  startRun,
-  type RunSessionDeps,
-} from '../../src/tui/bridge/runSession.js';
-import {
-  createInitialState,
-  reduce,
-  type StoreAction,
-} from '../../src/tui/store/reducer.js';
+import { startRun, type RunSessionDeps } from '../../src/tui/bridge/runSession.js';
+import { createInitialState, reduce, type StoreAction } from '../../src/tui/store/reducer.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
 import { scriptedResponse, scriptedStreamFactory } from './streamFixtures.js';
 import { stubBrowser } from './stubBrowser.js';
@@ -90,9 +83,7 @@ function verifierVerified(): ModelResponse {
 function publishResponse(prose?: string): ModelStreamEvent[] {
   return scriptedResponse(
     [
-      ...(prose === undefined
-        ? []
-        : [{ type: 'text' as const, text: prose, chunk: 5 }]),
+      ...(prose === undefined ? [] : [{ type: 'text' as const, text: prose, chunk: 5 }]),
       {
         type: 'tool_use',
         id: 'publish-1',
@@ -147,10 +138,7 @@ interface StartOptions {
   observeEvent?: (event: UiEvent) => void;
 }
 
-function startWithStream(
-  createStream: StreamFactory,
-  options: StartOptions = {},
-) {
+function startWithStream(createStream: StreamFactory, options: StartOptions = {}) {
   const events: UiEvent[] = [];
   const handle = startRun(options.task ?? TASK, {
     browser: options.browser ?? stubBrowser(),
@@ -170,18 +158,12 @@ function startWithStream(
   return { events, handle };
 }
 
-function startScripted(
-  responses: ModelStreamEvent[][],
-  options: StartOptions = {},
-) {
+function startScripted(responses: ModelStreamEvent[][], options: StartOptions = {}) {
   const factory = scriptedStreamFactory(responses);
   return { ...startWithStream(factory.createStream, options), factory };
 }
 
-async function waitUntil(
-  predicate: () => boolean,
-  description: string,
-): Promise<void> {
+async function waitUntil(predicate: () => boolean, description: string): Promise<void> {
   const deadline = Date.now() + 3_000;
   while (!predicate()) {
     if (Date.now() >= deadline) {
@@ -205,9 +187,7 @@ describe('startRun public bridge', () => {
       finalText: 'Published report.csv.',
     });
     if (outcome.status !== 'verified') throw new Error('unreachable');
-    expect(readFileSync(join(outcome.runDir, 'artifacts/report.csv'), 'utf8')).toBe(
-      REPORT_CONTENT,
-    );
+    expect(readFileSync(join(outcome.runDir, 'artifacts/report.csv'), 'utf8')).toBe(REPORT_CONTENT);
 
     expect(events[0]).toMatchObject({ type: 'run_started', at: 42 });
     expect(events.find((event) => event.type === 'run_dir')).toMatchObject({
@@ -217,7 +197,10 @@ describe('startRun public bridge', () => {
       events.filter((event) => event.type === 'turn_start').map((event) => event.turn),
     ).toEqual([1, 2]);
     expect(
-      events.filter((event) => event.type === 'text_delta').map((event) => event.text).join(''),
+      events
+        .filter((event) => event.type === 'text_delta')
+        .map((event) => event.text)
+        .join(''),
     ).toBe('Publishing report.');
     expect(
       events.filter((event) => event.type === 'tool_pending').map((event) => event.name),
@@ -286,16 +269,14 @@ describe('startRun public bridge', () => {
     expect(outcome).toMatchObject({
       status: 'incomplete',
       reason: 'budget_exceeded',
-      finalText:
-        'The assistant stopped before it could prepare a final response.',
+      finalText: 'The assistant stopped before it could prepare a final response.',
       unresolved: [],
     });
     expect(events.at(-1)).toMatchObject({
       type: 'run_finished',
       outcome: 'incomplete',
       reason: 'budget_exceeded',
-      finalText:
-        'The assistant stopped before it could prepare a final response.',
+      finalText: 'The assistant stopped before it could prepare a final response.',
       unresolved: [],
     });
   });
@@ -311,8 +292,7 @@ describe('startRun public bridge', () => {
       status: 'incomplete',
       reason: 'worker_incomplete',
       detail: expect.stringContaining('api unreachable'),
-      finalText:
-        'The assistant stopped before it could prepare a final response.',
+      finalText: 'The assistant stopped before it could prepare a final response.',
       unresolved: [],
     });
     expect(events.at(-1)).toMatchObject({
@@ -320,8 +300,7 @@ describe('startRun public bridge', () => {
       outcome: 'incomplete',
       reason: 'worker_incomplete',
       detail: expect.stringContaining('api unreachable'),
-      finalText:
-        'The assistant stopped before it could prepare a final response.',
+      finalText: 'The assistant stopped before it could prepare a final response.',
       unresolved: [],
     });
   });
@@ -335,22 +314,19 @@ describe('startRun public bridge', () => {
     async function* hangingStream(
       signal: AbortSignal | undefined,
     ): AsyncGenerator<ModelStreamEvent> {
-      yield* scriptedResponse(
-        [{ type: 'text', text: 'Working on it.' }],
-        { input: 1, output: 1 },
-      ).slice(0, 3);
+      yield* scriptedResponse([{ type: 'text', text: 'Working on it.' }], {
+        input: 1,
+        output: 1,
+      }).slice(0, 3);
       sawDelta();
       await new Promise((_resolve, reject) => {
-        const abort = () =>
-          reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+        const abort = () => reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
         if (signal?.aborted === true) abort();
         else signal?.addEventListener('abort', abort, { once: true });
       });
     }
 
-    const { events, handle } = startWithStream((_params, signal) =>
-      hangingStream(signal),
-    );
+    const { events, handle } = startWithStream((_params, signal) => hangingStream(signal));
     await firstDelta;
     handle.cancel();
 
@@ -359,49 +335,41 @@ describe('startRun public bridge', () => {
     expect(events.some((event) => event.type === 'run_failed')).toBe(false);
   });
 
-  it(
-    'forwards cancellation into a running bash command',
-    async () => {
-      const response = scriptedResponse(
-        [
-          {
-            type: 'tool_use',
-            id: 'bash-1',
-            name: 'bash',
-            input: {
-              command: 'touch bridge-started && sleep 30',
-              timeout_ms: 60_000,
-            },
+  it('forwards cancellation into a running bash command', async () => {
+    const response = scriptedResponse(
+      [
+        {
+          type: 'tool_use',
+          id: 'bash-1',
+          name: 'bash',
+          input: {
+            command: 'touch bridge-started && sleep 30',
+            timeout_ms: 60_000,
           },
-        ],
-        { input: 100, output: 20 },
-        'tool_use',
-      );
-      let runDir: string | undefined;
-      const { events, handle } = startScripted([response], {
-        observeEvent: (event) => {
-          if (event.type === 'run_dir') runDir = event.runDir;
         },
-      });
+      ],
+      { input: 100, output: 20 },
+      'tool_use',
+    );
+    let runDir: string | undefined;
+    const { events, handle } = startScripted([response], {
+      observeEvent: (event) => {
+        if (event.type === 'run_dir') runDir = event.runDir;
+      },
+    });
 
-      await waitUntil(
-        () =>
-          runDir !== undefined &&
-          existsSync(join(runDir, 'scratch/workspace/bridge-started')),
-        'the bash child to start',
-      );
-      handle.cancel();
+    await waitUntil(
+      () => runDir !== undefined && existsSync(join(runDir, 'scratch/workspace/bridge-started')),
+      'the bash child to start',
+    );
+    handle.cancel();
 
-      await expect(handle.done).resolves.toEqual({ status: 'cancelled' });
-      expect(events.some((event) => event.type === 'run_failed')).toBe(false);
-      expect(
-        events.find(
-          (event) => event.type === 'tool_exec_start' && event.name === 'bash',
-        ),
-      ).toBeDefined();
-    },
-    10_000,
-  );
+    await expect(handle.done).resolves.toEqual({ status: 'cancelled' });
+    expect(events.some((event) => event.type === 'run_failed')).toBe(false);
+    expect(
+      events.find((event) => event.type === 'tool_exec_start' && event.name === 'bash'),
+    ).toBeDefined();
+  }, 10_000);
 });
 
 describe('startRun ask_user channel', () => {
@@ -436,9 +404,7 @@ describe('startRun ask_user channel', () => {
     expect(askStart).toBeDefined();
     if (askStart === undefined) throw new Error('ask_user did not execute');
     expect(
-      events.find(
-        (event) => event.type === 'tool_exec_end' && event.id === askStart.id,
-      ),
+      events.find((event) => event.type === 'tool_exec_end' && event.id === askStart.id),
     ).toMatchObject({ ok: true, result: 'User chose: "Yes".' });
     expect(JSON.stringify(factory.calls[2]?.params)).toContain('User chose: \\"Yes\\".');
   });
@@ -472,12 +438,8 @@ describe('startRun ask_user channel', () => {
     await expect(handle.done).resolves.toMatchObject({ status: 'verified' });
     expect(events.some((event) => event.type === 'permission_request')).toBe(false);
     expect(
-      events.some(
-        (event) => event.type === 'tool_exec_start' && event.name === 'ask_user',
-      ),
+      events.some((event) => event.type === 'tool_exec_start' && event.name === 'ask_user'),
     ).toBe(false);
-    expect(JSON.stringify(factory.calls[2]?.params)).toContain(
-      'environment does not support',
-    );
+    expect(JSON.stringify(factory.calls[2]?.params)).toContain('environment does not support');
   });
 });

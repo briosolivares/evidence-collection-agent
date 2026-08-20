@@ -44,18 +44,16 @@ function errorsOf(result: ReturnType<typeof validateOutputContract>): string[] {
 describe('outputContractSchema shape', () => {
   it('requires at least one output and at least one column per table', () => {
     expect(outputContractSchema.safeParse({ outputs: [] }).success).toBe(false);
-    expect(
-      outputContractSchema.safeParse(contract([tableOutput({ columns: [] })])).success,
-    ).toBe(false);
+    expect(outputContractSchema.safeParse(contract([tableOutput({ columns: [] })])).success).toBe(
+      false,
+    );
   });
 
   it('rejects unknown keys anywhere in the contract', () => {
     expect(
       outputContractSchema.safeParse({ outputs: [tableOutput()], surprise: true }).success,
     ).toBe(false);
-    expect(
-      validateOutputContract({ outputs: [tableOutput()], extra: 1 }).ok,
-    ).toBe(false);
+    expect(validateOutputContract({ outputs: [tableOutput()], extra: 1 }).ok).toBe(false);
   });
 
   it('normalizes empty optional constraint lists to absent instead of rejecting', () => {
@@ -74,9 +72,10 @@ describe('outputContractSchema shape', () => {
     );
     expect(result.ok).toBe(true);
     if (!result.ok) throw new Error('unreachable');
-    expect('requiredSections' in result.contract.outputs[0]!
-      ? (result.contract.outputs[0] as Extract<OutputSpec, { kind: 'document' }>).requiredSections
-      : undefined,
+    expect(
+      'requiredSections' in result.contract.outputs[0]!
+        ? (result.contract.outputs[0] as Extract<OutputSpec, { kind: 'document' }>).requiredSections
+        : undefined,
     ).toBeUndefined();
 
     const download = validate(
@@ -129,9 +128,7 @@ describe('validateOutputContract cross-field rules', () => {
   });
 
   it('rejects two outputs claiming the same file', () => {
-    const result = validate(
-      contract([tableOutput(), tableOutput({ id: 'second' })]),
-    );
+    const result = validate(contract([tableOutput(), tableOutput({ id: 'second' })]));
     expect(errorsOf(result).join('\n')).toMatch(/roster\.csv/);
   });
 
@@ -199,9 +196,7 @@ describe('validateOutputContract cross-field rules', () => {
 
   it('rejects a download constrained by nothing', () => {
     const result = validate(
-      contract([
-        { id: 'dl', kind: 'download', count: { minimum: 1 } } as OutputSpec,
-      ]),
+      contract([{ id: 'dl', kind: 'download', count: { minimum: 1 } } as OutputSpec]),
     );
     expect(errorsOf(result).join('\n')).toMatch(/download/i);
   });
@@ -299,9 +294,7 @@ describe('validateOutputContract external actions', () => {
   it('rejects a blank destination pattern at the schema layer', () => {
     expect(
       outputContractSchema.safeParse(
-        contract([
-          externalAction({ proof: { sourceUrlPattern: '   ' } }),
-        ]),
+        contract([externalAction({ proof: { sourceUrlPattern: '   ' } })]),
       ).success,
     ).toBe(false);
   });

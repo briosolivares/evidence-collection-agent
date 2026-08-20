@@ -99,9 +99,9 @@ describe('deriveSemanticLine', () => {
       line: 'Writing a private file',
       isEvidence: false,
     });
-    expect(
-      deriveSemanticLine('bash', { command: 'x'.repeat(100) }).line,
-    ).toBe(`Running \`${'x'.repeat(39)}…\``);
+    expect(deriveSemanticLine('bash', { command: 'x'.repeat(100) }).line).toBe(
+      `Running \`${'x'.repeat(39)}…\``,
+    );
     expect(deriveSemanticLine('future_tool')).toEqual({
       line: 'future_tool',
       isEvidence: false,

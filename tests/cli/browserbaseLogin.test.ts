@@ -240,7 +240,9 @@ describe('runBrowserbaseLogin', () => {
     const events: string[] = [];
     let openCalls = 0;
 
-    const openSession = async (options: OpenLoginProbeSessionOptions): Promise<LoginProbeSession> => {
+    const openSession = async (
+      options: OpenLoginProbeSessionOptions,
+    ): Promise<LoginProbeSession> => {
       openCalls += 1;
       if (options.persistContext === true) {
         events.push('open:persist');
@@ -295,14 +297,19 @@ describe('runBrowserbaseLogin', () => {
   });
 
   it('returns false when only the sign-in session looks logged in — the verdict comes from the reopened session, not the one the operator used', async () => {
-    const openSession = async (options: OpenLoginProbeSessionOptions): Promise<LoginProbeSession> =>
+    const openSession = async (
+      options: OpenLoginProbeSessionOptions,
+    ): Promise<LoginProbeSession> =>
       options.persistContext === true
         ? fakeSession({
             context: fakeContext('https://example.test/SIGNED_IN'),
             liveViewUrl: 'https://browserbase.example/live/1',
             close: async () => undefined,
           })
-        : fakeSession({ context: fakeContext('https://example.test/SIGNED_OUT'), close: async () => undefined });
+        : fakeSession({
+            context: fakeContext('https://example.test/SIGNED_OUT'),
+            close: async () => undefined,
+          });
 
     const result = await runBrowserbaseLogin({
       services: [VERDICT_SERVICE],
@@ -320,14 +327,19 @@ describe('runBrowserbaseLogin', () => {
   });
 
   it('returns true when the reopened session verifies the login, even though the sign-in session looked signed out', async () => {
-    const openSession = async (options: OpenLoginProbeSessionOptions): Promise<LoginProbeSession> =>
+    const openSession = async (
+      options: OpenLoginProbeSessionOptions,
+    ): Promise<LoginProbeSession> =>
       options.persistContext === true
         ? fakeSession({
             context: fakeContext('https://example.test/SIGNED_OUT'),
             liveViewUrl: 'https://browserbase.example/live/1',
             close: async () => undefined,
           })
-        : fakeSession({ context: fakeContext('https://example.test/SIGNED_IN'), close: async () => undefined });
+        : fakeSession({
+            context: fakeContext('https://example.test/SIGNED_IN'),
+            close: async () => undefined,
+          });
 
     const result = await runBrowserbaseLogin({
       services: [VERDICT_SERVICE],
@@ -349,10 +361,16 @@ describe('runBrowserbaseLogin', () => {
     const env: Record<string, string | undefined> = {};
     let envFileContentsAtFirstOpen: string | undefined;
 
-    const openSession = async (options: OpenLoginProbeSessionOptions): Promise<LoginProbeSession> => {
+    const openSession = async (
+      options: OpenLoginProbeSessionOptions,
+    ): Promise<LoginProbeSession> => {
       envFileContentsAtFirstOpen ??= readFileSync(envFilePath, 'utf8');
       return options.persistContext === true
-        ? fakeSession({ context: fakeContext(), liveViewUrl: 'https://live/1', close: async () => undefined })
+        ? fakeSession({
+            context: fakeContext(),
+            liveViewUrl: 'https://live/1',
+            close: async () => undefined,
+          })
         : fakeSession({ context: fakeContext(), close: async () => undefined });
     };
 
@@ -377,7 +395,9 @@ describe('runBrowserbaseLogin', () => {
     let waitForOperatorArg: string | undefined;
     let openInBrowserArg: string | undefined;
 
-    const openSession = async (options: OpenLoginProbeSessionOptions): Promise<LoginProbeSession> =>
+    const openSession = async (
+      options: OpenLoginProbeSessionOptions,
+    ): Promise<LoginProbeSession> =>
       options.persistContext === true
         ? fakeSession({ context: fakeContext(), liveViewUrl, close: async () => undefined })
         : fakeSession({ context: fakeContext(), close: async () => undefined });
@@ -406,7 +426,9 @@ describe('runBrowserbaseLogin', () => {
     let closed = false;
     let waitForOperatorCalled = false;
 
-    const openSession = async (options: OpenLoginProbeSessionOptions): Promise<LoginProbeSession> => {
+    const openSession = async (
+      options: OpenLoginProbeSessionOptions,
+    ): Promise<LoginProbeSession> => {
       if (options.persistContext === true) {
         // liveViewUrl omitted on purpose: nothing for a human to sign in through.
         return fakeSession({
@@ -452,7 +474,9 @@ describe('runBrowserbaseLogin', () => {
       }),
     } as unknown as BrowserContext;
 
-    const openSession = async (options: OpenLoginProbeSessionOptions): Promise<LoginProbeSession> =>
+    const openSession = async (
+      options: OpenLoginProbeSessionOptions,
+    ): Promise<LoginProbeSession> =>
       options.persistContext === true
         ? fakeSession({
             context: rejectingContext,
@@ -467,7 +491,14 @@ describe('runBrowserbaseLogin', () => {
     // `.catch(() => undefined)` around each `page.goto` in production), so
     // this run reaches the end normally rather than throwing.
     const result = await runBrowserbaseLogin({
-      services: [{ id: 'x', name: 'Test', probeUrl: 'https://example.test/probe', classify: () => 'logged-in' }],
+      services: [
+        {
+          id: 'x',
+          name: 'Test',
+          probeUrl: 'https://example.test/probe',
+          classify: () => 'logged-in',
+        },
+      ],
       envFilePath,
       env: { BROWSERBASE_CONTEXT_ID: 'ctx' },
       client: fakeClient(),
@@ -485,7 +516,9 @@ describe('runBrowserbaseLogin', () => {
   it('closes the sign-in session even when waitForOperator throws, and lets that error propagate — a leaked billable session is the worse failure', async () => {
     let closed = false;
 
-    const openSession = async (options: OpenLoginProbeSessionOptions): Promise<LoginProbeSession> =>
+    const openSession = async (
+      options: OpenLoginProbeSessionOptions,
+    ): Promise<LoginProbeSession> =>
       options.persistContext === true
         ? fakeSession({
             context: fakeContext(),
@@ -518,9 +551,15 @@ describe('runBrowserbaseLogin', () => {
   it('waits before reopening the Context, with a delay greater than zero, so Browserbase has time to persist it', async () => {
     let sleepMs: number | undefined;
 
-    const openSession = async (options: OpenLoginProbeSessionOptions): Promise<LoginProbeSession> =>
+    const openSession = async (
+      options: OpenLoginProbeSessionOptions,
+    ): Promise<LoginProbeSession> =>
       options.persistContext === true
-        ? fakeSession({ context: fakeContext(), liveViewUrl: 'https://live/1', close: async () => undefined })
+        ? fakeSession({
+            context: fakeContext(),
+            liveViewUrl: 'https://live/1',
+            close: async () => undefined,
+          })
         : fakeSession({ context: fakeContext(), close: async () => undefined });
 
     await runBrowserbaseLogin({

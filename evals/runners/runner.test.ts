@@ -148,7 +148,7 @@ describe('runEvals', () => {
     });
   });
 
-  it('awaits onTrialGraded after every trial with that trial\'s grade, in order', async () => {
+  it("awaits onTrialGraded after every trial with that trial's grade, in order", async () => {
     const seen: Array<{ taskName: string; trialIndex: number; runDir: string }> = [];
     const report = await runEvals([stubTask()], 3, {
       runTask: makeFakeRunTask(baseDir),
@@ -204,29 +204,25 @@ describe('runEvals', () => {
     let maxHeaded = 0;
     let maxTotal = 0;
 
-    const reportPromise = runEvals(
-      [passingTask('normal'), passingTask('headed', true)],
-      3,
-      {
-        concurrency: 3,
-        model: 'fake-model',
-        runTask: async (_taskText, opts) => {
-          started += 1;
-          if (opts.headed) headedActive += 1;
-          else normalActive += 1;
-          totalActive += 1;
-          maxNormal = Math.max(maxNormal, normalActive);
-          maxHeaded = Math.max(maxHeaded, headedActive);
-          maxTotal = Math.max(maxTotal, totalActive);
-          if (started === 4) fourStarted.resolve();
-          await release.promise;
-          if (opts.headed) headedActive -= 1;
-          else normalActive -= 1;
-          totalActive -= 1;
-          return { runDir: `/runs/${opts.taskName}-${opts.trialIndex}` };
-        },
+    const reportPromise = runEvals([passingTask('normal'), passingTask('headed', true)], 3, {
+      concurrency: 3,
+      model: 'fake-model',
+      runTask: async (_taskText, opts) => {
+        started += 1;
+        if (opts.headed) headedActive += 1;
+        else normalActive += 1;
+        totalActive += 1;
+        maxNormal = Math.max(maxNormal, normalActive);
+        maxHeaded = Math.max(maxHeaded, headedActive);
+        maxTotal = Math.max(maxTotal, totalActive);
+        if (started === 4) fourStarted.resolve();
+        await release.promise;
+        if (opts.headed) headedActive -= 1;
+        else normalActive -= 1;
+        totalActive -= 1;
+        return { runDir: `/runs/${opts.taskName}-${opts.trialIndex}` };
       },
-    );
+    });
 
     await fourStarted.promise;
     expect({ normalActive, headedActive, totalActive }).toEqual({
@@ -248,22 +244,18 @@ describe('runEvals', () => {
   it('keeps report slots ordered when concurrent trials finish in reverse order', async () => {
     const allStarted = deferred();
     const gates = new Map<string, ReturnType<typeof deferred>>();
-    const reportPromise = runEvals(
-      [passingTask('alpha'), passingTask('beta')],
-      2,
-      {
-        concurrency: 4,
-        model: 'fake-model',
-        runTask: async (_taskText, opts) => {
-          const key = `${opts.taskName}-${opts.trialIndex}`;
-          const gate = deferred();
-          gates.set(key, gate);
-          if (gates.size === 4) allStarted.resolve();
-          await gate.promise;
-          return { runDir: `/runs/${key}` };
-        },
+    const reportPromise = runEvals([passingTask('alpha'), passingTask('beta')], 2, {
+      concurrency: 4,
+      model: 'fake-model',
+      runTask: async (_taskText, opts) => {
+        const key = `${opts.taskName}-${opts.trialIndex}`;
+        const gate = deferred();
+        gates.set(key, gate);
+        if (gates.size === 4) allStarted.resolve();
+        await gate.promise;
+        return { runDir: `/runs/${key}` };
       },
-    );
+    });
 
     await allStarted.promise;
     for (const key of ['beta-1', 'beta-0', 'alpha-1', 'alpha-0']) {
@@ -326,13 +318,20 @@ describe('runEvals', () => {
       concurrency: 2,
       model: 'fake-model',
       onTrialGraded: (job, grade) => {
-        graded.push({ trialNumber: job.trialNumber, ...(grade.error === undefined ? {} : { error: grade.error }) });
+        graded.push({
+          trialNumber: job.trialNumber,
+          ...(grade.error === undefined ? {} : { error: grade.error }),
+        });
       },
     });
 
     const trials = report.tasks[0]!.trials;
     expect(trials).toHaveLength(3);
-    expect(trials[0]).toMatchObject({ error: 'first trial failed', completed: false, assertions: [] });
+    expect(trials[0]).toMatchObject({
+      error: 'first trial failed',
+      completed: false,
+      assertions: [],
+    });
     expect(trials[0]!.runDir).toBeUndefined();
     for (const trial of trials.slice(1)) {
       expect(trial.error).toBeUndefined();
@@ -341,7 +340,10 @@ describe('runEvals', () => {
     expect(report.tasks[0]!.taskPassed).toBe(false);
     expect(report.tasks[0]!.accuracy).toBeCloseTo(2 / 3);
     // The errored trial is persisted through the same serialized hook as grades.
-    expect(graded.find((g) => g.trialNumber === 1)).toEqual({ trialNumber: 1, error: 'first trial failed' });
+    expect(graded.find((g) => g.trialNumber === 1)).toEqual({
+      trialNumber: 1,
+      error: 'first trial failed',
+    });
   });
 
   it('a cancelled trial stops the batch as cancelled, never as a recorded failure', async () => {

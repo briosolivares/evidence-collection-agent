@@ -26,9 +26,7 @@ function maxLineWidth(frame: string): number {
 
 describe('sherlock shell', () => {
   it('renders the banner and the composer', async () => {
-    const { frames, lastFrame, unmount } = render(
-      <App config={config} apiKeyPresent={true} />,
-    );
+    const { frames, lastFrame, unmount } = render(<App config={config} apiKeyPresent={true} />);
     await tick();
     const frame = lastFrame() ?? '';
     expect(frame).toContain('›');
@@ -57,9 +55,7 @@ describe('sherlock shell', () => {
   });
 
   it('renders the generic card when no identity is injected', async () => {
-    const { frames, unmount } = render(
-      <App config={config} apiKeyPresent={true} />,
-    );
+    const { frames, unmount } = render(<App config={config} apiKeyPresent={true} />);
     await tick();
     const output = frames.join('\n');
     expect(output).toContain('╭─ Sherlock — evidence collection agent ─');
@@ -101,9 +97,7 @@ describe('sherlock shell', () => {
   });
 
   it('renders submitted text into the transcript', async () => {
-    const { frames, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} />,
-    );
+    const { frames, stdin, unmount } = render(<App config={config} apiKeyPresent={true} />);
     await tick();
     await typeText(stdin, 'find the filings');
     stdin.write(ENTER);
@@ -114,9 +108,7 @@ describe('sherlock shell', () => {
   });
 
   it('warns in the banner when the API key is missing', async () => {
-    const { frames, unmount } = render(
-      <App config={config} apiKeyPresent={false} />,
-    );
+    const { frames, unmount } = render(<App config={config} apiKeyPresent={false} />);
     await tick();
     expect(frames.join('\n')).toContain('ANTHROPIC_API_KEY is not set');
     unmount();

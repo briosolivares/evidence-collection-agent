@@ -313,9 +313,7 @@ export function createLocalEvalBrowserAdapter(
   ): LocalChromeBrowserSessionOptions => ({
     profileDir,
     headless,
-    ...(options.executablePath === undefined
-      ? {}
-      : { executablePath: options.executablePath }),
+    ...(options.executablePath === undefined ? {} : { executablePath: options.executablePath }),
   });
 
   return {
@@ -366,7 +364,9 @@ export function createLocalEvalBrowserAdapter(
         .createSession()
         .catch((error: unknown) => {
           const message = errorMessage(error);
-          if (/ProcessSingleton|user data directory is already in use|profile.*in use/i.test(message)) {
+          if (
+            /ProcessSingleton|user data directory is already in use|profile.*in use/i.test(message)
+          ) {
             throw new Error(
               `authenticated Chrome profile is already in use (${options.authenticatedProfileDir}); ` +
                 'close the other Sherlock or authenticated eval session and retry',

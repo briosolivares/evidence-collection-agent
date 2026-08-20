@@ -94,7 +94,11 @@ const toolUseTurn: ModelStreamEvent[] = [
   },
   // JSON.stringify(TOOL_INPUT) === {"file_path":"limerick.txt","content":"line one\nline \"two\""}
   // split mid-key, then between the backslash and the n of the \n escape.
-  { type: 'content_block_delta', index: 1, delta: { type: 'input_json_delta', partial_json: '{"file_p' } },
+  {
+    type: 'content_block_delta',
+    index: 1,
+    delta: { type: 'input_json_delta', partial_json: '{"file_p' },
+  },
   {
     type: 'content_block_delta',
     index: 1,
@@ -251,7 +255,11 @@ describe('assembleModelResponse', () => {
           caller: { type: 'direct' },
         },
       },
-      { type: 'content_block_delta', index: 0, delta: { type: 'input_json_delta', partial_json: '{"file_' } },
+      {
+        type: 'content_block_delta',
+        index: 0,
+        delta: { type: 'input_json_delta', partial_json: '{"file_' },
+      },
       // connection drops: no content_block_stop, no message_delta
     ];
 
@@ -288,7 +296,11 @@ describe('assembleModelResponse', () => {
           caller: { type: 'direct' },
         },
       },
-      { type: 'content_block_delta', index: 0, delta: { type: 'input_json_delta', partial_json: '{"filename"' } },
+      {
+        type: 'content_block_delta',
+        index: 0,
+        delta: { type: 'input_json_delta', partial_json: '{"filename"' },
+      },
       // The server ends the message deliberately without closing the block.
       {
         type: 'message_delta',

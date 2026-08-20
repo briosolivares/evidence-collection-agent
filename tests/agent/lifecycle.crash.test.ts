@@ -1,11 +1,5 @@
 import { fork, type ChildProcess } from 'node:child_process';
-import {
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-} from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -54,9 +48,7 @@ interface RunningHarness {
 }
 
 const TASK = 'Publish report.csv with exactly one name column and one row.';
-const CHILD_FIXTURE = fileURLToPath(
-  new URL('../fixtures/lifecycleCrashChild.ts', import.meta.url),
-);
+const CHILD_FIXTURE = fileURLToPath(new URL('../fixtures/lifecycleCrashChild.ts', import.meta.url));
 const PROCESS_TIMEOUT_MS = 15_000;
 
 let tempRoot: string;
@@ -70,12 +62,9 @@ beforeEach(() => {
   eventsPath = join(tempRoot, 'events.jsonl');
   mkdirSync(runDir);
   initManifest(runDir, TASK, 'local');
-  writeArtifact(
-    runDir,
-    'artifacts/report.csv',
-    Buffer.from('name\nAlice\n', 'utf8'),
-    { roles: ['requested_output'] },
-  );
+  writeArtifact(runDir, 'artifacts/report.csv', Buffer.from('name\nAlice\n', 'utf8'), {
+    roles: ['requested_output'],
+  });
   writeArtifact(
     runDir,
     'artifacts/evidence.png',
@@ -206,11 +195,7 @@ processDescribe('runAgent real process crash recovery', () => {
 
     const events = readEvents();
     expect(events.filter((event) => event.type === 'tool_effect')).toHaveLength(1);
-    expect(
-      modelEvents(events, 'worker').filter(
-        (event) => event.invocation === 'resume',
-      ),
-    ).toEqual([
+    expect(modelEvents(events, 'worker').filter((event) => event.invocation === 'resume')).toEqual([
       expect.objectContaining({
         responseKind: 'finish',
         sawUncertainRecovery: true,
@@ -260,25 +245,19 @@ processDescribe('runAgent real process crash recovery', () => {
       pendingTurn: { effect: 'uncertain', nextCallIndex: 0 },
     });
     const workspacePath = 'scratch/workspace/killed-command.txt';
-    expect(
-      readManifest(runDir).artifacts.some(
-        (entry) => entry.filename === workspacePath,
-      ),
-    ).toBe(false);
+    expect(readManifest(runDir).artifacts.some((entry) => entry.filename === workspacePath)).toBe(
+      false,
+    );
 
     const resumed = startHarness('cancelled_workspace_recovery', 'resume');
     const outcome = await expectOutcome(resumed);
     expect(outcome.status).toBe('cancelled');
     expect(readManifest(runDir)).toMatchObject({
       finishedAt: expect.any(String),
-      artifacts: expect.arrayContaining([
-        expect.objectContaining({ filename: workspacePath }),
-      ]),
+      artifacts: expect.arrayContaining([expect.objectContaining({ filename: workspacePath })]),
     });
     expect(
-      modelEvents(readEvents(), 'worker').filter(
-        (event) => event.invocation === 'resume',
-      ),
+      modelEvents(readEvents(), 'worker').filter((event) => event.invocation === 'resume'),
     ).toEqual([]);
   }, 20_000);
 
@@ -312,9 +291,10 @@ processDescribe('runAgent real process crash recovery', () => {
       expect.objectContaining({ responseKind: 'finish', invocation: 'initial' }),
     ]);
     expect(modelEvents(events, 'verifier')).toHaveLength(2);
-    expect(
-      modelEvents(events, 'verifier').map((event) => event.invocation),
-    ).toEqual(['initial', 'resume']);
+    expect(modelEvents(events, 'verifier').map((event) => event.invocation)).toEqual([
+      'initial',
+      'resume',
+    ]);
     expect(readCheckpoint()).toMatchObject({
       phase: 'terminal',
       finish: {
@@ -354,29 +334,20 @@ processDescribe('runAgent real process crash recovery', () => {
   }, 20_000);
 
   it('resumes from durable deterministic-check feedback without losing or duplicating it', async () => {
-    writeArtifact(
-      runDir,
-      'artifacts/report.csv',
-      Buffer.from('name\nAlice\nBob\n', 'utf8'),
-      { roles: ['requested_output'] },
-    );
+    writeArtifact(runDir, 'artifacts/report.csv', Buffer.from('name\nAlice\nBob\n', 'utf8'), {
+      roles: ['requested_output'],
+    });
     const first = startHarness('deterministic_feedback', 'initial');
     await expectBoundary(first, 'deterministic_feedback_recorded');
     await killHarness(first);
 
-    expect(JSON.stringify(readCheckpoint())).toContain(
-      'deterministic_finish_checks',
-    );
+    expect(JSON.stringify(readCheckpoint())).toContain('deterministic_finish_checks');
     const resumed = startHarness('deterministic_feedback', 'resume');
     const outcome = await expectOutcome(resumed);
     expect(outcome.status).toBe('verified');
 
     const workerEvents = modelEvents(readEvents(), 'worker');
-    expect(workerEvents.map((event) => event.responseKind)).toEqual([
-      'finish',
-      'repair',
-      'finish',
-    ]);
+    expect(workerEvents.map((event) => event.responseKind)).toEqual(['finish', 'repair', 'finish']);
     expect(workerEvents.filter((event) => event.sawDeterministicFeedback)).toHaveLength(2);
     expect(readCheckpoint()).toMatchObject({
       phase: 'terminal',
@@ -413,20 +384,13 @@ processDescribe('runAgent real process crash recovery', () => {
   }, 20_000);
 });
 
-function startHarness(
-  scenario: Scenario,
-  invocation: Invocation,
-): RunningHarness {
-  const child = fork(
-    CHILD_FIXTURE,
-    [scenario, invocation, runDir, eventsPath],
-    {
-      cwd: process.cwd(),
-      execArgv: ['--import', 'tsx'],
-      silent: true,
-      env: { ...process.env, FORCE_COLOR: '0', NO_COLOR: '1' },
-    },
-  );
+function startHarness(scenario: Scenario, invocation: Invocation): RunningHarness {
+  const child = fork(CHILD_FIXTURE, [scenario, invocation, runDir, eventsPath], {
+    cwd: process.cwd(),
+    execArgv: ['--import', 'tsx'],
+    silent: true,
+    env: { ...process.env, FORCE_COLOR: '0', NO_COLOR: '1' },
+  });
   const running: RunningHarness = { child, stderr: '', stdout: '' };
   child.stderr?.on('data', (chunk: Buffer | string) => {
     running.stderr += chunk.toString();
@@ -441,24 +405,17 @@ function startHarness(
   return running;
 }
 
-async function expectBoundary(
-  running: RunningHarness,
-  boundary: string,
-): Promise<HarnessMessage> {
+async function expectBoundary(running: RunningHarness, boundary: string): Promise<HarnessMessage> {
   return waitForMessage(
     running,
-    (message) =>
-      message.type === 'boundary' && message.boundary === boundary,
+    (message) => message.type === 'boundary' && message.boundary === boundary,
   );
 }
 
 async function expectOutcome(
   running: RunningHarness,
 ): Promise<NonNullable<HarnessMessage['outcome']>> {
-  const message = await waitForMessage(
-    running,
-    (candidate) => candidate.type === 'outcome',
-  );
+  const message = await waitForMessage(running, (candidate) => candidate.type === 'outcome');
   await waitForExit(running);
   activeChildren.delete(running);
   expect(existsSync(join(runDir, 'harness/run.lock'))).toBe(false);
@@ -486,7 +443,11 @@ function waitForMessage(
       if (!isHarnessMessage(candidate)) return;
       if (candidate.type === 'fixture_error') {
         cleanup();
-        reject(new Error(`fixture failed: ${candidate.message ?? 'unknown error'}${diagnostic(running)}`));
+        reject(
+          new Error(
+            `fixture failed: ${candidate.message ?? 'unknown error'}${diagnostic(running)}`,
+          ),
+        );
         return;
       }
       if (predicate(candidate)) {
@@ -513,10 +474,7 @@ function waitForMessage(
   });
 }
 
-function sendMessage(
-  running: RunningHarness,
-  message: HarnessMessage,
-): Promise<void> {
+function sendMessage(running: RunningHarness, message: HarnessMessage): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     running.child.send(message, (error) => {
       if (error === null) resolve();
@@ -582,9 +540,7 @@ function modelEvents(
   events: readonly FixtureEvent[],
   role: NonNullable<FixtureEvent['role']>,
 ): FixtureEvent[] {
-  return events.filter(
-    (event) => event.type === 'model_call' && event.role === role,
-  );
+  return events.filter((event) => event.type === 'model_call' && event.role === role);
 }
 
 function readCheckpoint(): Record<string, unknown> {
@@ -604,9 +560,7 @@ function readJsonLines(path: string): Array<Record<string, unknown>> {
 
 function diagnostic(running: RunningHarness): string {
   const details = [
-    running.spawnError === undefined
-      ? ''
-      : `spawn error: ${running.spawnError.message}`,
+    running.spawnError === undefined ? '' : `spawn error: ${running.spawnError.message}`,
     running.stderr.trim() === '' ? '' : `stderr:\n${running.stderr.trim()}`,
     running.stdout.trim() === '' ? '' : `stdout:\n${running.stdout.trim()}`,
   ].filter((value) => value !== '');
@@ -615,9 +569,6 @@ function diagnostic(running: RunningHarness): string {
 
 function isHarnessMessage(value: unknown): value is HarnessMessage {
   return (
-    typeof value === 'object' &&
-    value !== null &&
-    'type' in value &&
-    typeof value.type === 'string'
+    typeof value === 'object' && value !== null && 'type' in value && typeof value.type === 'string'
   );
 }

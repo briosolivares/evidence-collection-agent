@@ -49,7 +49,7 @@ export function ArtifactDetail({ artifact }: ArtifactDetailProps) {
       <Text color={theme.muted}>
         {`  ${sizeBytes === undefined ? '?' : formatBytes(sizeBytes)} on disk`}
       </Text>
-      <Text color={theme.muted}>  space preview · o open · r reveal · esc back</Text>
+      <Text color={theme.muted}>{'  space preview · o open · r reveal · esc back'}</Text>
     </Box>
   );
 }

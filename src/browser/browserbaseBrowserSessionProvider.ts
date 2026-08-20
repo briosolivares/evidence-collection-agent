@@ -35,18 +35,9 @@ import {
   createBrowserbaseDownloadReader,
   type BrowserbaseDownloadReaderHandle,
 } from './browserbaseDownloads.js';
-import {
-  withBrowserbaseRetry,
-  type BrowserbaseRetryOptions,
-} from './browserbaseRetry.js';
-import {
-  PlaywrightBrowserController,
-  prepareSessionPage,
-} from './playwrightBrowserController.js';
-import type {
-  BrowserSessionDiagnostics,
-  BrowserSessionProvider,
-} from './sessionProvider.js';
+import { withBrowserbaseRetry, type BrowserbaseRetryOptions } from './browserbaseRetry.js';
+import { PlaywrightBrowserController, prepareSessionPage } from './playwrightBrowserController.js';
+import type { BrowserSessionDiagnostics, BrowserSessionProvider } from './sessionProvider.js';
 import { remoteUploadEncoder } from './uploadEncoder.js';
 
 /**
@@ -230,10 +221,7 @@ export interface BrowserbaseRawSession {
 export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider {
   private readonly client: BrowserbaseClient;
   private readonly connect: (connectUrl: string) => Promise<Browser>;
-  private readonly startInterval: (
-    callback: () => void,
-    milliseconds: number,
-  ) => NodeJS.Timeout;
+  private readonly startInterval: (callback: () => void, milliseconds: number) => NodeJS.Timeout;
   private readonly stopInterval: (handle: NodeJS.Timeout) => void;
   private readonly warn: (message: string) => void;
   /** One retry policy for every Browserbase call this provider makes, so a
@@ -321,7 +309,9 @@ export class BrowserbaseBrowserSessionProvider implements BrowserSessionProvider
         // guarantee independent of the plan tier.
         await browser.close();
       } catch (error) {
-        this.warn(`warning: could not disconnect from Browserbase session ${session.id}: ${errorMessage(error)}`);
+        this.warn(
+          `warning: could not disconnect from Browserbase session ${session.id}: ${errorMessage(error)}`,
+        );
       }
       await this.releaseSession(session.id);
     };

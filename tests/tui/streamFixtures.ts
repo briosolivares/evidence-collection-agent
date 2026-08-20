@@ -12,7 +12,7 @@ export interface ScriptedUsage {
 
 /** One scripted content block. */
 export type ScriptedBlock =
-  | { type: 'text'; text: string; /** chunk size for deltas */ chunk?: number }
+  | { type: 'text'; text: string /** chunk size for deltas */; chunk?: number }
   | { type: 'tool_use'; id: string; name: string; input: unknown };
 
 /** Build the raw event sequence for one complete streamed response. */

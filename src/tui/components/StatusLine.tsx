@@ -15,8 +15,7 @@ export function pickWord(
   current: string | undefined,
   rng: () => number,
 ): string {
-  const pool =
-    current === undefined ? words : words.filter((word) => word !== current);
+  const pool = current === undefined ? words : words.filter((word) => word !== current);
   const source = pool.length > 0 ? pool : words;
   const index = Math.min(source.length - 1, Math.floor(rng() * source.length));
   return source[index] ?? '';
@@ -46,9 +45,7 @@ export function StatusLine({
   rng = Math.random,
 }: StatusLineProps) {
   const [frame, setFrame] = useState(0);
-  const [word, setWord] = useState(() =>
-    pickWord(config.workingWords, undefined, rng),
-  );
+  const [word, setWord] = useState(() => pickWord(config.workingWords, undefined, rng));
   const [, setClockTick] = useState(0);
 
   useEffect(() => {

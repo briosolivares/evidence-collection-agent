@@ -3,9 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 const PROTOCOL_VERSION = 1;
 const CONTROL_TIMEOUT_MS = 5_000;
-const WATCHDOG_MODULE = fileURLToPath(
-  new URL('./parentDeathWatchdog.mjs', import.meta.url),
-);
+const WATCHDOG_MODULE = fileURLToPath(new URL('./parentDeathWatchdog.mjs', import.meta.url));
 
 export class ParentDeathWatchdogError extends Error {
   constructor(message: string) {
@@ -64,9 +62,7 @@ export async function startParentDeathWatchdog(): Promise<ParentDeathWatchdog> {
 
 class WatchdogController implements ParentDeathWatchdog {
   private readonly child: ChildProcess;
-  private readonly listeners = new Set<
-    (error: ParentDeathWatchdogError) => void
-  >();
+  private readonly listeners = new Set<(error: ParentDeathWatchdogError) => void>();
   private expectedStop = false;
   private stopped = false;
   private armed = false;
@@ -94,9 +90,7 @@ class WatchdogController implements ParentDeathWatchdog {
 
   async arm(processGroupId: number): Promise<void> {
     if (!Number.isSafeInteger(processGroupId) || processGroupId <= 1) {
-      throw new ParentDeathWatchdogError(
-        'parent-death watchdog received an invalid process group',
-      );
+      throw new ParentDeathWatchdogError('parent-death watchdog received an invalid process group');
     }
     if (this.armed) {
       throw new ParentDeathWatchdogError('parent-death watchdog is already armed');
@@ -136,10 +130,7 @@ class WatchdogController implements ParentDeathWatchdog {
     }
     if (!this.stopped && this.child.connected) {
       try {
-        await this.exchange(
-          { version: PROTOCOL_VERSION, kind: 'disarm' },
-          'disarmed',
-        );
+        await this.exchange({ version: PROTOCOL_VERSION, kind: 'disarm' }, 'disarmed');
       } catch {
         // The target group is already terminated by contract. A failed
         // disarm must still reap the supervisor rather than leak a process.
@@ -245,18 +236,11 @@ class WatchdogController implements ParentDeathWatchdog {
 }
 
 function unexpectedStopError(): ParentDeathWatchdogError {
-  return new ParentDeathWatchdogError(
-    'parent-death watchdog stopped while its target was active',
-  );
+  return new ParentDeathWatchdogError('parent-death watchdog stopped while its target was active');
 }
 
-function stableWatchdogError(
-  error: unknown,
-  fallback: string,
-): ParentDeathWatchdogError {
-  return error instanceof ParentDeathWatchdogError
-    ? error
-    : new ParentDeathWatchdogError(fallback);
+function stableWatchdogError(error: unknown, fallback: string): ParentDeathWatchdogError {
+  return error instanceof ParentDeathWatchdogError ? error : new ParentDeathWatchdogError(fallback);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

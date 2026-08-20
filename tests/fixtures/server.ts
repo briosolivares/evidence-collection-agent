@@ -1,9 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import {
-  createServer,
-  type IncomingMessage,
-  type ServerResponse,
-} from 'node:http';
+import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { extname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -100,10 +96,7 @@ export async function startFixtureServer(): Promise<FixtureServer> {
   };
 }
 
-async function serveFixture(
-  request: IncomingMessage,
-  response: ServerResponse,
-): Promise<void> {
+async function serveFixture(request: IncomingMessage, response: ServerResponse): Promise<void> {
   const { method } = request;
   if (method === 'POST' && request.url === '/login') {
     await serveLoginFixture(request, response);
@@ -232,9 +225,7 @@ function serveBrowserOnlyFixture(
   response.writeHead(200, {
     'Content-Length': body.byteLength,
     'Content-Type': contentType,
-    ...(contentDisposition !== undefined
-      ? { 'Content-Disposition': contentDisposition }
-      : {}),
+    ...(contentDisposition !== undefined ? { 'Content-Disposition': contentDisposition } : {}),
   });
   response.end(method === 'HEAD' ? undefined : body);
 }

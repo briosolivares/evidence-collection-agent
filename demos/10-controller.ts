@@ -33,9 +33,9 @@ try {
     expression: 'document.title',
     returnByValue: true,
   })) as { result?: { value?: unknown } };
-  const accessibility = (await commandSession.send(
-    'Accessibility.getFullAXTree',
-  )) as { nodes?: unknown[] };
+  const accessibility = (await commandSession.send('Accessibility.getFullAXTree')) as {
+    nodes?: unknown[];
+  };
 
   console.log(`Title: ${String(title.result?.value ?? '')}`);
   console.log(`URL: ${browser.currentUrl()}`);

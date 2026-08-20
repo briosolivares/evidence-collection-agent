@@ -64,10 +64,7 @@ export function writeFileDurablyAtomic(
   if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,191}$/.test(tempFileId)) {
     throw new Error(`invalid durable-write temporary file id: ${JSON.stringify(tempFileId)}`);
   }
-  const tempPath = join(
-    parentDir,
-    `.${basename(filePath)}.${tempFileId}.tmp`,
-  );
+  const tempPath = join(parentDir, `.${basename(filePath)}.${tempFileId}.tmp`);
   const bytes = typeof data === 'string' ? Buffer.from(data) : Buffer.from(data);
 
   let fd: number | undefined;

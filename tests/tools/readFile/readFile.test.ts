@@ -1,11 +1,4 @@
-import {
-  mkdirSync,
-  mkdtempSync,
-  rmSync,
-  symlinkSync,
-  truncateSync,
-  writeFileSync,
-} from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, truncateSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -31,11 +24,7 @@ afterEach(() => {
 const registry = createRegistry([readFileTool]);
 
 function call(name: 'read_file', input: unknown, ctx: Partial<ToolCtx> = {}) {
-  return executeToolCall(
-    registry,
-    { id: `call-${name}`, name, input },
-    { runDir, ...ctx },
-  );
+  return executeToolCall(registry, { id: `call-${name}`, name, input }, { runDir, ...ctx });
 }
 
 function writeRaw(relativePath: string, bytes: string | Buffer): string {
@@ -47,12 +36,9 @@ function writeRaw(relativePath: string, bytes: string | Buffer): string {
 
 describe('read_file', () => {
   it('reads only artifacts/ and scratch/ with familiar line windows', async () => {
-    writeArtifact(
-      runDir,
-      'artifacts/report.txt',
-      Buffer.from('first\nsecond\nthird\n', 'utf8'),
-      { roles: ['requested_output'] },
-    );
+    writeArtifact(runDir, 'artifacts/report.txt', Buffer.from('first\nsecond\nthird\n', 'utf8'), {
+      roles: ['requested_output'],
+    });
     writeArtifact(runDir, 'scratch/workspace/notes.txt', Buffer.from('private\n'));
 
     const published = await call('read_file', {
@@ -96,15 +82,9 @@ describe('read_file', () => {
 
   it('refuses symlink components, directories, binary bytes, and invalid UTF-8', async () => {
     writeRaw('artifacts/real.txt', 'do not leak\n');
-    symlinkSync(
-      join(runDir, 'artifacts/real.txt'),
-      join(runDir, 'scratch/link.txt'),
-    );
+    symlinkSync(join(runDir, 'artifacts/real.txt'), join(runDir, 'scratch/link.txt'));
     mkdirSync(join(runDir, 'scratch/directory'));
-    writeRaw(
-      'scratch/image.bin',
-      Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-    );
+    writeRaw('scratch/image.bin', Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
     writeRaw('scratch/invalid.txt', Buffer.from([0x68, 0x69, 0xff]));
 
     for (const [filePath, message] of [

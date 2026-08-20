@@ -75,9 +75,7 @@ function fakeChromium(options: { browserContextId?: string } = {}) {
   const pageListeners = new Set<(page: Page) => void>();
   const detachCalls: Array<ReturnType<typeof vi.fn>> = [];
   let createSequence = 0;
-  let intercept:
-    | ((request: CdpRequest) => Promise<unknown> | undefined)
-    | undefined;
+  let intercept: ((request: CdpRequest) => Promise<unknown> | undefined) | undefined;
 
   const send = vi.fn(
     async (
@@ -93,9 +91,7 @@ function fakeChromium(options: { browserContextId?: string } = {}) {
       }
       if (method === 'Target.getTargetInfo') {
         const targetId =
-          typeof params?.targetId === 'string'
-            ? params.targetId
-            : pageTargetIds.get(attachedPage);
+          typeof params?.targetId === 'string' ? params.targetId : pageTargetIds.get(attachedPage);
         const info = targetId === undefined ? undefined : targets.get(targetId);
         if (info === undefined) throw new Error('No such fake target');
         return { targetInfo: info };
@@ -210,26 +206,20 @@ describe('Chromium target control', () => {
 
     const listed = await control.listPageTargets();
     expect(listed).toHaveLength(2);
-    expect(listed.map((target) => target.url)).toEqual([
-      'about:blank',
-      'about:blank',
-    ]);
+    expect(listed.map((target) => target.url)).toEqual(['about:blank', 'about:blank']);
 
     const created = await control.createPageTarget('about:blank#task-sentinel');
     expect(Object.keys(created)).toEqual([]);
     expect(JSON.stringify(created)).toBe('{}');
-    expect(fake.send).toHaveBeenCalledWith(
-      fake.anchorPage,
-      'Target.createTarget',
-      { url: 'about:blank#task-sentinel', browserContextId: 'context-a' },
-    );
+    expect(fake.send).toHaveBeenCalledWith(fake.anchorPage, 'Target.createTarget', {
+      url: 'about:blank#task-sentinel',
+      browserContextId: 'context-a',
+    });
 
     await control.closeTarget(created);
-    expect(fake.send).toHaveBeenCalledWith(
-      fake.anchorPage,
-      'Target.closeTarget',
-      { targetId: 'target-created-1' },
-    );
+    expect(fake.send).toHaveBeenCalledWith(fake.anchorPage, 'Target.closeTarget', {
+      targetId: 'target-created-1',
+    });
     expect(fake.targets.has('target-created-1')).toBe(false);
 
     await control.close();
@@ -245,11 +235,9 @@ describe('Chromium target control', () => {
     });
 
     await control.createPageTarget('about:blank');
-    expect(fake.send).toHaveBeenCalledWith(
-      fake.anchorPage,
-      'Target.createTarget',
-      { url: 'about:blank' },
-    );
+    expect(fake.send).toHaveBeenCalledWith(fake.anchorPage, 'Target.createTarget', {
+      url: 'about:blank',
+    });
     await control.close();
   });
 
@@ -287,9 +275,7 @@ describe('Chromium target control', () => {
     const foreign = (await firstControl.listPageTargets())[0]!.ref;
     const sendsBefore = second.send.mock.calls.length;
 
-    await expect(secondControl.closeTarget(foreign)).rejects.toThrow(
-      /not issued by this control/,
-    );
+    await expect(secondControl.closeTarget(foreign)).rejects.toThrow(/not issued by this control/);
     expect(second.send).toHaveBeenCalledTimes(sendsBefore);
 
     await Promise.all([firstControl.close(), secondControl.close()]);
@@ -386,11 +372,9 @@ describe('Chromium target control', () => {
     await containment;
     expect(drained).toBe(true);
     expect(fake.targets.has('target-created-late')).toBe(false);
-    expect(fake.send).toHaveBeenCalledWith(
-      fake.anchorPage,
-      'Target.closeTarget',
-      { targetId: 'target-created-late' },
-    );
+    expect(fake.send).toHaveBeenCalledWith(fake.anchorPage, 'Target.closeTarget', {
+      targetId: 'target-created-late',
+    });
     await control.close();
   });
 
@@ -463,9 +447,7 @@ describe('Chromium target control', () => {
       anchorPage: fake.anchorPage,
     });
 
-    await expect(control.createPageTarget('about:blank')).rejects.toThrow(
-      /invalid target record/,
-    );
+    await expect(control.createPageTarget('about:blank')).rejects.toThrow(/invalid target record/);
     await vi.waitFor(() => {
       expect(fake.targets.has('target-created-1')).toBe(false);
     });

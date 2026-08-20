@@ -14,10 +14,7 @@ import {
 
 const registry = createRegistry([askUserTool]);
 
-function call(
-  input: unknown,
-  requestPermission?: ToolCtx['requestPermission'],
-) {
+function call(input: unknown, requestPermission?: ToolCtx['requestPermission']) {
   return executeToolCall(
     registry,
     { id: 'ask-user-1', name: 'ask_user', input },
@@ -118,8 +115,7 @@ describe('ask_user tool', () => {
     expect(result).toEqual({
       toolCallId: 'ask-user-1',
       isError: false,
-      content:
-        'User chose: "Continue". User answered: "stop before submitting anything"',
+      content: 'User chose: "Continue". User answered: "stop before submitting anything"',
     });
     expect(requestPermission).toHaveBeenCalledWith({
       toolName: 'ask_user',
@@ -150,10 +146,10 @@ describe('ask_user tool', () => {
     ['denied', 'The user declined this action.'],
     ['cancelled', 'The run was cancelled while waiting for the user.'],
   ])('returns model-readable permission feedback when %s', async (_case, feedback) => {
-    const result = await call(
-      { question: 'Continue?' },
-      async () => ({ behavior: 'deny', feedback }),
-    );
+    const result = await call({ question: 'Continue?' }, async () => ({
+      behavior: 'deny',
+      feedback,
+    }));
 
     expect(result).toEqual({
       toolCallId: 'ask-user-1',
@@ -175,13 +171,10 @@ describe('ask_user tool', () => {
   });
 
   it('fails as an execution error if an allow decision omits answers', async () => {
-    const result = await call(
-      { question: 'Continue?' },
-      async (request) => ({
-        behavior: 'allow',
-        updatedInput: request.input,
-      }),
-    );
+    const result = await call({ question: 'Continue?' }, async (request) => ({
+      behavior: 'allow',
+      updatedInput: request.input,
+    }));
 
     expect(result).toMatchObject({
       isError: true,

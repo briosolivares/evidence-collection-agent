@@ -60,9 +60,7 @@ export function createTuiTracing(deps: TuiTracingDeps): RunTracing {
    * nothing. */
   const emitPublishedDiff = (runDir: string, toolExecId: number): void => {
     try {
-      const manifest = JSON.parse(
-        readFileSync(join(runDir, 'manifest.json'), 'utf8'),
-      ) as Manifest;
+      const manifest = JSON.parse(readFileSync(join(runDir, 'manifest.json'), 'utf8')) as Manifest;
       for (const entry of manifest.artifacts ?? []) {
         if (entry.roles === undefined) continue;
         if (announced.get(entry.filename) === entry.sha256) continue;
@@ -120,8 +118,7 @@ export function createTuiTracing(deps: TuiTracingDeps): RunTracing {
 
   return {
     announceRunDir,
-    wrapCallModel: (callModel, model, role) =>
-      delegate.wrapCallModel(callModel, model, role),
+    wrapCallModel: (callModel, model, role) => delegate.wrapCallModel(callModel, model, role),
     wrapRegistry,
     traceRun: (taskText, operation) => delegate.traceRun(taskText, operation),
     flush: () => delegate.flush(),

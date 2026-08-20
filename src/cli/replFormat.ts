@@ -36,12 +36,8 @@ export function formatProgressEvent(event: ProgressEvent): string {
         `in ${(event.delayMs / 1000).toFixed(1)}s — ${event.reason}\n`
       );
     case 'turn_end': {
-      const {
-        input_tokens,
-        output_tokens,
-        cache_read_input_tokens,
-        cache_creation_input_tokens,
-      } = event.usage;
+      const { input_tokens, output_tokens, cache_read_input_tokens, cache_creation_input_tokens } =
+        event.usage;
       return (
         `\n[turn ${event.turn}] usage: in=${input_tokens} out=${output_tokens} ` +
         `cache_read=${cache_read_input_tokens ?? 0} ` +
@@ -63,11 +59,7 @@ export function formatProgressEvent(event: ProgressEvent): string {
  *   directory. Internal reason codes and diagnostics stay out of this view.
  */
 export function formatRunSummary(result: RunTaskResult): string {
-  const lines = [
-    '',
-    result.status === 'verified' ? 'verified' : 'incomplete',
-    result.finalText,
-  ];
+  const lines = ['', result.status === 'verified' ? 'verified' : 'incomplete', result.finalText];
   if (result.status === 'incomplete' && result.unresolved.length > 0) {
     lines.push('unresolved:');
     for (const item of result.unresolved) {
@@ -86,8 +78,8 @@ export function formatRunSummary(result: RunTaskResult): string {
  * hide the run outcome itself, so presentation falls back to no rows. */
 function publishedArtifactPaths(runDir: string): string[] {
   try {
-    return readManifest(runDir).artifacts
-      .filter((entry) => entry.roles !== undefined)
+    return readManifest(runDir)
+      .artifacts.filter((entry) => entry.roles !== undefined)
       .map((entry) => entry.filename);
   } catch {
     return [];

@@ -1,26 +1,34 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { findRequestedOutputByName, readManifest, verifyManifestHashes } from '../../../grading/manifestVerification.js';
+import {
+  findRequestedOutputByName,
+  readManifest,
+  verifyManifestHashes,
+} from '../../../grading/manifestVerification.js';
 import type { AssertionResult, Grader } from '../../../types.js';
 import type { WikipediaReferenceOracle } from '../oracle/wikipediaClient.js';
 
 const ANSWER_FILENAME = 'answer.md';
 const SOURCE_ASSERTION_NAME = 'answer contains the complete source text reached from reference 275';
-const TRUNCATION_ASSERTION_NAME = 'answer has no truncation marker and is long enough for the full source';
+const TRUNCATION_ASSERTION_NAME =
+  'answer has no truncation marker and is long enough for the full source';
 
 export const grade: Grader = (runDirPath, oracleData) => {
   const oracle = asOracle(oracleData);
   const manifest = readManifest(runDirPath);
   const answerEntry = findRequestedOutputByName(manifest, ANSWER_FILENAME);
-  const answerExists = answerEntry !== undefined && existsSync(join(runDirPath, answerEntry.filename));
-  const assertions: AssertionResult[] = [{
-    name: `${ANSWER_FILENAME} exists with a manifest entry`,
-    passed: answerExists,
-    detail: answerExists
-      ? `${answerEntry!.filename} found and manifested`
-      : `${ANSWER_FILENAME} missing or not published as a requested output`,
-  }];
+  const answerExists =
+    answerEntry !== undefined && existsSync(join(runDirPath, answerEntry.filename));
+  const assertions: AssertionResult[] = [
+    {
+      name: `${ANSWER_FILENAME} exists with a manifest entry`,
+      passed: answerExists,
+      detail: answerExists
+        ? `${answerEntry!.filename} found and manifested`
+        : `${ANSWER_FILENAME} missing or not published as a requested output`,
+    },
+  ];
   if (!answerExists) {
     return [
       ...assertions,
@@ -33,7 +41,8 @@ export const grade: Grader = (runDirPath, oracleData) => {
   const answer = readFileSync(join(runDirPath, answerEntry!.filename), 'utf8');
   const answerNormalized = normalize(answer);
   const sourceNormalized = normalize(oracle.sourceText);
-  const containsFullSource = sourceNormalized.length > 0 && answerNormalized.includes(sourceNormalized);
+  const containsFullSource =
+    sourceNormalized.length > 0 && answerNormalized.includes(sourceNormalized);
   assertions.push({
     name: SOURCE_ASSERTION_NAME,
     passed: containsFullSource,
@@ -67,9 +76,16 @@ function normalize(value: string): string {
 
 function asOracle(data: unknown): WikipediaReferenceOracle {
   const value = data as Partial<WikipediaReferenceOracle> | null;
-  if (!value || value.referenceNumber !== 275 || typeof value.referenceId !== 'string' ||
-      typeof value.referenceText !== 'string' || typeof value.sourceId !== 'string' ||
-      !value.sourceId.startsWith('CITEREF') || typeof value.sourceText !== 'string' || value.sourceText.length < 20) {
+  if (
+    !value ||
+    value.referenceNumber !== 275 ||
+    typeof value.referenceId !== 'string' ||
+    typeof value.referenceText !== 'string' ||
+    typeof value.sourceId !== 'string' ||
+    !value.sourceId.startsWith('CITEREF') ||
+    typeof value.sourceText !== 'string' ||
+    value.sourceText.length < 20
+  ) {
     throw new Error('wikipedia_reference grader was handed malformed oracle data');
   }
   return value as WikipediaReferenceOracle;

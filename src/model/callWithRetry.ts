@@ -134,17 +134,12 @@ function transientReason(error: unknown): string | undefined {
   if (error instanceof APIError) {
     if (typeof error.status === 'number') {
       const retryable =
-        error.status === 408 ||
-        error.status === 409 ||
-        error.status === 429 ||
-        error.status >= 500;
+        error.status === 408 || error.status === 409 || error.status === 429 || error.status >= 500;
       return retryable ? `HTTP ${error.status}` : undefined;
     }
     // No status: the SDK throws these for mid-stream SSE `error` events,
     // with `type` carrying the event's error type.
-    return error.type === 'overloaded_error' || error.type === 'api_error'
-      ? error.type
-      : undefined;
+    return error.type === 'overloaded_error' || error.type === 'api_error' ? error.type : undefined;
   }
   return undefined;
 }
@@ -160,8 +155,7 @@ function isTruncatedStreamError(error: unknown): boolean {
  * conventional name (the TUI bridge throws Errors named AbortError). */
 function isAbortError(error: unknown): boolean {
   return (
-    error instanceof APIUserAbortError ||
-    (error instanceof Error && error.name === 'AbortError')
+    error instanceof APIUserAbortError || (error instanceof Error && error.name === 'AbortError')
   );
 }
 

@@ -14,9 +14,7 @@ import {
 export const writeFileInputSchema = z.strictObject({
   file_path: z
     .string()
-    .describe(
-      'Path under scratch/ for a private working file, relative to the run directory',
-    ),
+    .describe('Path under scratch/ for a private working file, relative to the run directory'),
   content: z.string().describe('UTF-8 text to write exactly as supplied'),
   append: z
     .boolean()
@@ -51,11 +49,7 @@ export const writeFileTool: ToolDef<WriteFileInput> = {
   execute(input, ctx): WriteFileResult {
     assertNotAborted(ctx.abortSignal, 'write_file');
     const target = resolveWorkerFile(ctx.runDir, input.file_path, 'write');
-    const existing = statOptionalRegularFile(
-      target.absolutePath,
-      input.file_path,
-      'write_file',
-    );
+    const existing = statOptionalRegularFile(target.absolutePath, input.file_path, 'write_file');
 
     const contentBytes = Buffer.from(input.content, 'utf8');
     let bytes = contentBytes;

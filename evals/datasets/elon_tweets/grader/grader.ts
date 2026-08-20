@@ -2,8 +2,15 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { parseCsv } from '../../../grading/csv.js';
-import { exactColumnsAssertion, exactColumnsAssertionName } from '../../../grading/csvAssertions.js';
-import { findArtifactByExtension, readManifest, verifyManifestHashes } from '../../../grading/manifestVerification.js';
+import {
+  exactColumnsAssertion,
+  exactColumnsAssertionName,
+} from '../../../grading/csvAssertions.js';
+import {
+  findArtifactByExtension,
+  readManifest,
+  verifyManifestHashes,
+} from '../../../grading/manifestVerification.js';
 import type { AssertionResult, Grader } from '../../../types.js';
 import type { ElonTweetsOracle } from '../oracle/oracle.js';
 
@@ -28,20 +35,28 @@ export const grade: Grader = (runDirPath, oracleData) => {
   const oracle = asOracle(oracleData);
   const manifest = readManifest(runDirPath);
   const csvEntry = findArtifactByExtension(manifest, '.csv');
-  const assertions: AssertionResult[] = [{
-    name: 'CSV artifact exists',
-    passed: csvEntry !== undefined,
-    detail: csvEntry ? `found ${csvEntry.filename}` : 'no .csv artifact found in the manifest',
-  }];
+  const assertions: AssertionResult[] = [
+    {
+      name: 'CSV artifact exists',
+      passed: csvEntry !== undefined,
+      detail: csvEntry ? `found ${csvEntry.filename}` : 'no .csv artifact found in the manifest',
+    },
+  ];
 
   if (!csvEntry) {
-    return [...assertions, ...failedContent('no CSV artifact to check'), verifyManifestHashes(runDirPath, manifest)];
+    return [
+      ...assertions,
+      ...failedContent('no CSV artifact to check'),
+      verifyManifestHashes(runDirPath, manifest),
+    ];
   }
 
   let header: string[];
   let rawRows: string[][];
   try {
-    ({ header, rows: rawRows } = parseCsv(readFileSync(join(runDirPath, csvEntry.filename), 'utf8')));
+    ({ header, rows: rawRows } = parseCsv(
+      readFileSync(join(runDirPath, csvEntry.filename), 'utf8'),
+    ));
   } catch (error) {
     const detail = `${csvEntry.filename} could not be parsed as CSV: ${error instanceof Error ? error.message : String(error)}`;
     return [...assertions, ...failedContent(detail), verifyManifestHashes(runDirPath, manifest)];
@@ -58,11 +73,12 @@ export const grade: Grader = (runDirPath, oracleData) => {
 };
 
 function resolveRows(header: string[], rawRows: string[][]): TweetRow[] {
-  const index = (name: string): number => header.findIndex((cell) => cell.trim().toLowerCase() === name);
+  const index = (name: string): number =>
+    header.findIndex((cell) => cell.trim().toLowerCase() === name);
   const textIndex = index('text');
   const likesIndex = index('likes');
   const timeIndex = index('time_posted');
-  const cell = (row: string[], i: number): string => i < 0 ? '' : (row[i] ?? '').trim();
+  const cell = (row: string[], i: number): string => (i < 0 ? '' : (row[i] ?? '').trim());
   return rawRows.map((row, i) => ({
     rowNumber: i + 1,
     text: cell(row, textIndex),
@@ -84,7 +100,9 @@ function rowCountAssertion(rows: TweetRow[], oracle: ElonTweetsOracle): Assertio
 
 function textAssertion(rows: TweetRow[]): AssertionResult {
   const empty = rows.filter((row) => row.text === '').map((row) => row.rowNumber);
-  const normalized = rows.filter((row) => row.text !== '').map((row) => row.text.replace(/\s+/g, ' ').toLowerCase());
+  const normalized = rows
+    .filter((row) => row.text !== '')
+    .map((row) => row.text.replace(/\s+/g, ' ').toLowerCase());
   const duplicateCount = normalized.length - new Set(normalized).size;
   const problems = [
     empty.length ? `empty text in row(s) ${empty.join(', ')}` : '',
@@ -93,12 +111,16 @@ function textAssertion(rows: TweetRow[]): AssertionResult {
   return {
     name: TEXT_ASSERTION_NAME,
     passed: problems.length === 0 && rows.length > 0,
-    detail: problems.length ? problems.join('; ') : `${rows.length} non-empty distinct text cell(s)`,
+    detail: problems.length
+      ? problems.join('; ')
+      : `${rows.length} non-empty distinct text cell(s)`,
   };
 }
 
 function likesAssertion(rows: TweetRow[]): AssertionResult {
-  const invalid = rows.filter((row) => !isLikeCount(row.likes)).map((row) => `row ${row.rowNumber}: "${row.likes}"`);
+  const invalid = rows
+    .filter((row) => !isLikeCount(row.likes))
+    .map((row) => `row ${row.rowNumber}: "${row.likes}"`);
   return {
     name: LIKES_ASSERTION_NAME,
     passed: invalid.length === 0 && rows.length > 0,
@@ -107,7 +129,10 @@ function likesAssertion(rows: TweetRow[]): AssertionResult {
 }
 
 function isLikeCount(value: string): boolean {
-  const compact = value.trim().replace(/\s+likes?$/i, '').replace(/\s/g, '');
+  const compact = value
+    .trim()
+    .replace(/\s+likes?$/i, '')
+    .replace(/\s/g, '');
   return /^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?[KMB]?$/.test(compact.toUpperCase());
 }
 
@@ -118,7 +143,9 @@ function timeAssertion(
   oracle: ElonTweetsOracle,
 ): AssertionResult {
   const acceptedDates = new Set<string>();
-  for (const iso of [startedAt, finishedAt].filter((value): value is string => value !== undefined)) {
+  for (const iso of [startedAt, finishedAt].filter(
+    (value): value is string => value !== undefined,
+  )) {
     const date = new Date(iso);
     for (const timeZone of oracle.acceptedTimeZones) acceptedDates.add(dateKey(date, timeZone));
   }
@@ -136,54 +163,101 @@ function timeAssertion(
 
 function isPlausibleTodayTime(value: string, acceptedDates: Set<string>): boolean {
   const text = value.trim();
-  if (/^(?:just now|now|\d+\s*(?:s|sec(?:ond)?s?|m|min(?:ute)?s?|h|hr|hour)s?\s*(?:ago)?)$/i.test(text)) return true;
-  if (/^(?:[01]?\d|2[0-3]):[0-5]\d(?::[0-5]\d)?(?:\s*(?:am|pm))?$|^(?:1[0-2]|0?[1-9]):[0-5]\d\s*(?:am|pm)$/i.test(text)) return true;
+  if (
+    /^(?:just now|now|\d+\s*(?:s|sec(?:ond)?s?|m|min(?:ute)?s?|h|hr|hour)s?\s*(?:ago)?)$/i.test(
+      text,
+    )
+  )
+    return true;
+  if (
+    /^(?:[01]?\d|2[0-3]):[0-5]\d(?::[0-5]\d)?(?:\s*(?:am|pm))?$|^(?:1[0-2]|0?[1-9]):[0-5]\d\s*(?:am|pm)$/i.test(
+      text,
+    )
+  )
+    return true;
   // X's own rendered timestamp ("8:41 AM · Aug 12, 2026", year omitted for the
   // current year) — the `·` separator defeats Date.parse, and an agent that
   // transcribes the page verbatim must not fail on rendering fidelity.
-  const xNative = /^(?:[01]?\d|2[0-3]):[0-5]\d\s*(?:am|pm)?\s*·\s*([A-Za-z]{3,9})\.?\s+(\d{1,2})(?:,\s*(\d{4}))?$/i.exec(text);
+  const xNative =
+    /^(?:[01]?\d|2[0-3]):[0-5]\d\s*(?:am|pm)?\s*·\s*([A-Za-z]{3,9})\.?\s+(\d{1,2})(?:,\s*(\d{4}))?$/i.exec(
+      text,
+    );
   if (xNative) {
     const month = monthNumber(xNative[1]!);
     const day = Number(xNative[2]);
     const year = xNative[3];
-    return month !== undefined && [...acceptedDates].some((key) => {
-      const [keyYear, keyMonth, keyDay] = key.split('-');
-      return Number(keyMonth) === month && Number(keyDay) === day &&
-        (year === undefined || year === keyYear);
-    });
+    return (
+      month !== undefined &&
+      [...acceptedDates].some((key) => {
+        const [keyYear, keyMonth, keyDay] = key.split('-');
+        return (
+          Number(keyMonth) === month &&
+          Number(keyDay) === day &&
+          (year === undefined || year === keyYear)
+        );
+      })
+    );
   }
   const datePrefix = /^(\d{4}-\d{2}-\d{2})/.exec(text)?.[1];
   if (datePrefix) return acceptedDates.has(datePrefix) && !Number.isNaN(Date.parse(text));
   const parsed = Date.parse(text);
   if (Number.isNaN(parsed)) return false;
   const date = new Date(parsed);
-  return [...acceptedDates].some((key) => key === dateKey(date, 'UTC') || key === dateKey(date, 'America/Los_Angeles'));
+  return [...acceptedDates].some(
+    (key) => key === dateKey(date, 'UTC') || key === dateKey(date, 'America/Los_Angeles'),
+  );
 }
 
 function monthNumber(name: string): number | undefined {
-  const index = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
-    .indexOf(name.slice(0, 3).toLowerCase());
+  const index = [
+    'jan',
+    'feb',
+    'mar',
+    'apr',
+    'may',
+    'jun',
+    'jul',
+    'aug',
+    'sep',
+    'oct',
+    'nov',
+    'dec',
+  ].indexOf(name.slice(0, 3).toLowerCase());
   return index === -1 ? undefined : index + 1;
 }
 
 function dateKey(date: Date, timeZone: string): string {
   const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone, year: 'numeric', month: '2-digit', day: '2-digit',
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
   }).formatToParts(date);
-  const value = (type: Intl.DateTimeFormatPartTypes): string => parts.find((part) => part.type === type)?.value ?? '';
+  const value = (type: Intl.DateTimeFormatPartTypes): string =>
+    parts.find((part) => part.type === type)?.value ?? '';
   return `${value('year')}-${value('month')}-${value('day')}`;
 }
 
 function failedContent(detail: string): AssertionResult[] {
-  return [COLUMN_ASSERTION_NAME, ROWS_ASSERTION_NAME, TEXT_ASSERTION_NAME, LIKES_ASSERTION_NAME, TIME_ASSERTION_NAME]
-    .map((name) => ({ name, passed: false, detail }));
+  return [
+    COLUMN_ASSERTION_NAME,
+    ROWS_ASSERTION_NAME,
+    TEXT_ASSERTION_NAME,
+    LIKES_ASSERTION_NAME,
+    TIME_ASSERTION_NAME,
+  ].map((name) => ({ name, passed: false, detail }));
 }
 
 function asOracle(data: unknown): ElonTweetsOracle {
   const value = data as Partial<ElonTweetsOracle> | null;
-  if (!value || value.accountHandle !== 'elonmusk' || typeof value.minRows !== 'number' ||
-      typeof value.maxRows !== 'number' || !Array.isArray(value.acceptedTimeZones) ||
-      !value.acceptedTimeZones.every((zone) => typeof zone === 'string')) {
+  if (
+    !value ||
+    value.accountHandle !== 'elonmusk' ||
+    typeof value.minRows !== 'number' ||
+    typeof value.maxRows !== 'number' ||
+    !Array.isArray(value.acceptedTimeZones) ||
+    !value.acceptedTimeZones.every((zone) => typeof zone === 'string')
+  ) {
     throw new Error('elon_tweets grader was handed malformed oracle data');
   }
   return value as ElonTweetsOracle;

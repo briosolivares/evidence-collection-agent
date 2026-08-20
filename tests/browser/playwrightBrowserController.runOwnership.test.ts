@@ -1,10 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { BrowserContext, Disposable, Frame, Page } from 'playwright';
 
-import {
-  createBusyResourceRegistry,
-  EXCLUSIVE_ACCESS,
-} from '../../src/tools/registry.js';
+import { createBusyResourceRegistry, EXCLUSIVE_ACCESS } from '../../src/tools/registry.js';
 import type {
   ChromiumPageTargetRef,
   ChromiumTargetControl,
@@ -97,11 +94,7 @@ function fakeContext(
   const pages = [...initialPages];
   const initScriptDisposals: Array<ReturnType<typeof vi.fn>> = [];
   const nextPages =
-    nextPage === undefined
-      ? []
-      : Array.isArray(nextPage)
-        ? [...nextPage]
-        : [nextPage];
+    nextPage === undefined ? [] : Array.isArray(nextPage) ? [...nextPage] : [nextPage];
   const addInitScript = vi.fn(async () => {
     await options.addInitScriptGate;
     const dispose = vi.fn(async () => {
@@ -200,11 +193,7 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
     const main = fakePage({ matches: true });
     const popup = fakePage({ matches: true });
     const unrelated = fakePage();
-    const { context, addInitScript } = fakeContext([
-      unrelated.page,
-      main.page,
-      popup.page,
-    ]);
+    const { context, addInitScript } = fakeContext([unrelated.page, main.page, popup.page]);
     const controller = new PlaywrightBrowserController({
       context,
       targetControl: fakeTargetControl(context),
@@ -217,9 +206,9 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
     expect(popup.close).toHaveBeenCalledOnce();
     expect(unrelated.close).not.toHaveBeenCalled();
     expect(addInitScript).toHaveBeenCalledOnce();
-    await expect(
-      controller.initializeRunPageOwnership('different-run-id'),
-    ).rejects.toThrow(/different durable run/i);
+    await expect(controller.initializeRunPageOwnership('different-run-id')).rejects.toThrow(
+      /different durable run/i,
+    );
   });
 
   it('rebinds a reused controller only after the prior run closes every owned page', async () => {
@@ -237,9 +226,9 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
     });
 
     await controller.prepareTaskPage({ ownershipId: 'first-run' });
-    await expect(
-      controller.initializeRunPageOwnership('second-run'),
-    ).rejects.toThrow(/different durable run/i);
+    await expect(controller.initializeRunPageOwnership('second-run')).rejects.toThrow(
+      /different durable run/i,
+    );
 
     await controller.closeTaskPages();
     await controller.prepareTaskPage({ ownershipId: 'second-run' });
@@ -264,15 +253,13 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
     });
 
     await controller.prepareTaskPage({ ownershipId: 'first-run' });
-    await expect(controller.closeTaskPages()).rejects.toThrow(
-      /could not close every task page/i,
+    await expect(controller.closeTaskPages()).rejects.toThrow(/could not close every task page/i);
+    await expect(controller.initializeRunPageOwnership('second-run')).rejects.toThrow(
+      /different durable run/i,
     );
-    await expect(
-      controller.initializeRunPageOwnership('second-run'),
-    ).rejects.toThrow(/different durable run/i);
-    await expect(
-      controller.initializeRunPageOwnership('first-run'),
-    ).rejects.toThrow(/cleanup|replace the controller/i);
+    await expect(controller.initializeRunPageOwnership('first-run')).rejects.toThrow(
+      /cleanup|replace the controller/i,
+    );
     expect(initScriptDisposals).toHaveLength(1);
     expect(initScriptDisposals[0]).not.toHaveBeenCalled();
   });
@@ -290,10 +277,7 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
     });
     firstPage = firstTask.page;
     const secondTask = fakePage();
-    const { context, addPage } = fakeContext(
-      [user.page],
-      [firstTask.page, secondTask.page],
-    );
+    const { context, addPage } = fakeContext([user.page], [firstTask.page, secondTask.page]);
     addLatePopup = addPage;
     const controller = new PlaywrightBrowserController({
       context,
@@ -415,9 +399,7 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
     abort.abort(reason);
 
     await expect(preparation).rejects.toBe(reason);
-    await expect(
-      busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 10),
-    ).resolves.toBe(false);
+    await expect(busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 10)).resolves.toBe(false);
     let cleanupSettled = false;
     void controller.closeTaskPages().then(() => {
       cleanupSettled = true;
@@ -458,10 +440,7 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
     });
     await Promise.resolve();
     expect(cleanupSettled).toBe(false);
-    const ownershipSettled = busyRegistry.waitUntilFree(
-      EXCLUSIVE_ACCESS,
-      1_000,
-    );
+    const ownershipSettled = busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 1_000);
     releaseInitialization();
     await expect(ownershipSettled).resolves.toBe(true);
     await expect(cleanup).resolves.toBeUndefined();
@@ -497,11 +476,9 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
       cleanupSettled = true;
     });
     let containmentSettled = false;
-    const containment = busyRegistry
-      .waitUntilFree(EXCLUSIVE_ACCESS, 1_000)
-      .then((free) => {
-        containmentSettled = free;
-      });
+    const containment = busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 1_000).then((free) => {
+      containmentSettled = free;
+    });
     await Promise.resolve();
     expect(cleanupSettled).toBe(false);
     expect(containmentSettled).toBe(false);
@@ -531,9 +508,7 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
       ownershipId: 'stable-run-id',
       signal: abort.signal,
     });
-    await vi.waitFor(() =>
-      expect(task.page.addInitScript).toHaveBeenCalledOnce(),
-    );
+    await vi.waitFor(() => expect(task.page.addInitScript).toHaveBeenCalledOnce());
 
     abort.abort(reason);
 
@@ -543,11 +518,9 @@ describe('PlaywrightBrowserController durable run page ownership', () => {
       cleanupSettled = true;
     });
     let containmentSettled = false;
-    const containment = busyRegistry
-      .waitUntilFree(EXCLUSIVE_ACCESS, 1_000)
-      .then((free) => {
-        containmentSettled = free;
-      });
+    const containment = busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 1_000).then((free) => {
+      containmentSettled = free;
+    });
     await Promise.resolve();
     expect(task.close).toHaveBeenCalled();
     expect(cleanupSettled).toBe(false);

@@ -196,7 +196,10 @@ describe('createBusyResourceRegistry', () => {
 
   it('does not block a non-conflicting access', async () => {
     const registry = createBusyResourceRegistry();
-    registry.markAbandoned({ reads: [], writes: [accessKey.page('p1')] }, new Promise(() => undefined));
+    registry.markAbandoned(
+      { reads: [], writes: [accessKey.page('p1')] },
+      new Promise(() => undefined),
+    );
     await expect(
       registry.waitUntilFree({ reads: [], writes: [accessKey.page('p2')] }, 50),
     ).resolves.toBe(true);
@@ -204,7 +207,10 @@ describe('createBusyResourceRegistry', () => {
 
   it('never blocks a conflicting READ — only a write conflicts with an abandoned read', () => {
     const registry = createBusyResourceRegistry();
-    registry.markAbandoned({ reads: [accessKey.page('p1')], writes: [] }, new Promise(() => undefined));
+    registry.markAbandoned(
+      { reads: [accessKey.page('p1')], writes: [] },
+      new Promise(() => undefined),
+    );
     return expect(
       registry.waitUntilFree({ reads: [accessKey.page('p1')], writes: [] }, 50),
     ).resolves.toBe(true);
@@ -243,10 +249,7 @@ describe('createBusyResourceRegistry', () => {
       const abandoned = new Promise<void>((resolve) => {
         resolveAbandoned = resolve;
       });
-      registry.markAbandoned(
-        { reads: [], writes: [accessKey.page('p1')] },
-        abandoned,
-      );
+      registry.markAbandoned({ reads: [], writes: [accessKey.page('p1')] }, abandoned);
 
       const waiting = registry.waitUntilFree(
         { reads: [], writes: [accessKey.page('p1')] },
@@ -288,7 +291,10 @@ describe('createBusyResourceRegistry', () => {
 
   it('times out and reports not-free when the abandoned call never settles in time', async () => {
     const registry = createBusyResourceRegistry();
-    registry.markAbandoned({ reads: [], writes: [accessKey.page('p1')] }, new Promise(() => undefined));
+    registry.markAbandoned(
+      { reads: [], writes: [accessKey.page('p1')] },
+      new Promise(() => undefined),
+    );
     await expect(
       registry.waitUntilFree({ reads: [], writes: [accessKey.page('p1')] }, 20),
     ).resolves.toBe(false);

@@ -1,11 +1,5 @@
 import { fork, type ChildProcess } from 'node:child_process';
-import {
-  existsSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -74,9 +68,7 @@ async function assertCrashContainment(scenario: Scenario): Promise<void> {
     // load the polling process can observe an empty file between open(2) and
     // the fixture's write. Wait for complete, parseable PIDs instead of only
     // directory-entry visibility.
-    await waitFor(
-      () => pidFileIsReady(targetPidPath) && pidFileIsReady(descendantPidPath),
-    );
+    await waitFor(() => pidFileIsReady(targetPidPath) && pidFileIsReady(descendantPidPath));
     const targetPid = readPid(targetPidPath);
     const descendantPid = readPid(descendantPidPath);
     containedProcesses.processGroupId = targetPid;
@@ -155,20 +147,14 @@ function isProcessAlive(pid: number): boolean {
     process.kill(pid, 0);
     return true;
   } catch (error) {
-    return !(
-      error instanceof Error &&
-      'code' in error &&
-      error.code === 'ESRCH'
-    );
+    return !(error instanceof Error && 'code' in error && error.code === 'ESRCH');
   }
 }
 
 function hardKillContainedProcesses(processes: ContainedProcesses): void {
   const { processGroupId, descendantPid } = processes;
-  const targetAlive =
-    processGroupId !== undefined && isProcessAlive(processGroupId);
-  const descendantAlive =
-    descendantPid !== undefined && isProcessAlive(descendantPid);
+  const targetAlive = processGroupId !== undefined && isProcessAlive(processGroupId);
+  const descendantAlive = descendantPid !== undefined && isProcessAlive(descendantPid);
 
   if (processGroupId !== undefined && (targetAlive || descendantAlive)) {
     try {
@@ -186,10 +172,7 @@ function hardKillContainedProcesses(processes: ContainedProcesses): void {
   }
 }
 
-async function waitFor(
-  predicate: () => boolean,
-  timeoutMs = READY_TIMEOUT_MS,
-): Promise<void> {
+async function waitFor(predicate: () => boolean, timeoutMs = READY_TIMEOUT_MS): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   while (!predicate()) {
     const exited = [...activeFixtures].find(

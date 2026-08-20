@@ -1,10 +1,6 @@
 import { isValid as isValidDate, parse as parseDate } from 'date-fns';
 
-import type {
-  OutputColumn,
-  OutputSpec,
-  TableRule,
-} from '../initializer/outputContract.schema.js';
+import type { OutputColumn, OutputSpec, TableRule } from '../initializer/outputContract.schema.js';
 import type { FinishDefect, TableFact } from './finishFacts.schema.js';
 
 interface ParsedCell {
@@ -66,9 +62,7 @@ export function inspectTable(
     output,
     artifactPath,
     limits: resolveTableInspectionLimits(options.limits),
-    ...(options.checkActive === undefined
-      ? {}
-      : { checkActive: options.checkActive }),
+    ...(options.checkActive === undefined ? {} : { checkActive: options.checkActive }),
     defects: [],
     halted: false,
   };
@@ -206,11 +200,13 @@ function parseDeclaredTable(
         const cells = parsed.records[index + 1]!;
         if (cells.length !== columns.length) {
           hasShapeDefects = true;
-          if (!recordDefect(
-            context,
-            'row_shape_mismatch',
-            `${artifactPath} CSV row ${index + 1} has ${cells.length} cell(s), but its header has ${columns.length}.`,
-          )) {
+          if (
+            !recordDefect(
+              context,
+              'row_shape_mismatch',
+              `${artifactPath} CSV row ${index + 1} has ${cells.length} cell(s), but its header has ${columns.length}.`,
+            )
+          ) {
             return undefined;
           }
         }
@@ -256,11 +252,13 @@ function parseDeclaredTable(
         const row = value[index];
         if (typeof row !== 'object' || row === null || Array.isArray(row)) {
           hasShapeDefects = true;
-          if (!recordDefect(
-            context,
-            'row_shape_mismatch',
-            `${artifactPath} JSON row ${index + 1} must be an object with exactly the declared columns.`,
-          )) {
+          if (
+            !recordDefect(
+              context,
+              'row_shape_mismatch',
+              `${artifactPath} JSON row ${index + 1} must be an object with exactly the declared columns.`,
+            )
+          ) {
             return undefined;
           }
           rows.push(emptyJsonRow(expected, context));
@@ -276,11 +274,13 @@ function parseDeclaredTable(
         }
         if (!sameOrderedStrings(keys, expected, context)) {
           hasShapeDefects = true;
-          if (!recordDefect(
-            context,
-            'row_shape_mismatch',
-            `${artifactPath} JSON row ${index + 1} has keys [${keys.join(', ')}], but the contract requires exactly [${expected.join(', ')}] in that order.`,
-          )) {
+          if (
+            !recordDefect(
+              context,
+              'row_shape_mismatch',
+              `${artifactPath} JSON row ${index + 1} has keys [${keys.join(', ')}], but the contract requires exactly [${expected.join(', ')}] in that order.`,
+            )
+          ) {
             return undefined;
           }
         }
@@ -321,11 +321,13 @@ function parseDeclaredTable(
         const cells = parsed.rows[index]!;
         if (cells.length !== parsed.columns.length) {
           hasShapeDefects = true;
-          if (!recordDefect(
-            context,
-            'row_shape_mismatch',
-            `${artifactPath} Markdown row ${index + 1} has ${cells.length} cell(s), but its header has ${parsed.columns.length}.`,
-          )) {
+          if (
+            !recordDefect(
+              context,
+              'row_shape_mismatch',
+              `${artifactPath} Markdown row ${index + 1} has ${cells.length} cell(s), but its header has ${parsed.columns.length}.`,
+            )
+          ) {
             return undefined;
           }
         }
@@ -362,21 +364,27 @@ function validateCells(
         (typeof cell.raw === 'string' && cell.raw.trim() === '');
       if (blank) {
         if (column.required) {
-          if (!recordDefect(
-            context,
-            'missing_required_value',
-            `${artifactPath} row ${rowIndex + 1} has no value for required column ${JSON.stringify(column.name)}.`,
-          )) return;
+          if (
+            !recordDefect(
+              context,
+              'missing_required_value',
+              `${artifactPath} row ${rowIndex + 1} has no value for required column ${JSON.stringify(column.name)}.`,
+            )
+          )
+            return;
         }
         continue;
       }
       const message = invalidCellMessage(column, cell);
       if (message !== undefined) {
-        if (!recordDefect(
-          context,
-          'invalid_column_value',
-          `${artifactPath} row ${rowIndex + 1}, column ${JSON.stringify(column.name)} ${message}.`,
-        )) return;
+        if (
+          !recordDefect(
+            context,
+            'invalid_column_value',
+            `${artifactPath} row ${rowIndex + 1}, column ${JSON.stringify(column.name)} ${message}.`,
+          )
+        )
+          return;
       }
     }
   }
@@ -412,9 +420,7 @@ function invalidCellMessage(column: OutputColumn, cell: ParsedCell): string | un
       if (cell.representation === 'json') {
         return typeof cell.raw === 'boolean' ? undefined : 'must be a boolean';
       }
-      return /^(?:true|false)$/i.test(cell.text.trim())
-        ? undefined
-        : 'must be true or false';
+      return /^(?:true|false)$/i.test(cell.text.trim()) ? undefined : 'must be true or false';
     case 'url':
       if (typeof cell.raw !== 'string') return 'must be an HTTP(S) URL string';
       try {
@@ -438,8 +444,7 @@ function invalidCellMessage(column: OutputColumn, cell: ParsedCell): string | un
         case 'iso_date':
           return isIsoDate(cell.raw) ? undefined : 'must use a valid YYYY-MM-DD date';
         case 'iso_datetime':
-          return /^\d{4}-\d{2}-\d{2}T/.test(cell.raw) &&
-            !Number.isNaN(Date.parse(cell.raw))
+          return /^\d{4}-\d{2}-\d{2}T/.test(cell.raw) && !Number.isNaN(Date.parse(cell.raw))
             ? undefined
             : 'must use a valid ISO datetime';
         case 'unicode_pattern':
@@ -460,20 +465,26 @@ function validateRules(
     switch (rule.type) {
       case 'exact_row_count':
         if (rows.length !== rule.value) {
-          if (!recordDefect(
-            context,
-            'row_count_mismatch',
-            `${artifactPath} has ${rows.length} data row(s); the contract requires exactly ${rule.value}.`,
-          )) return;
+          if (
+            !recordDefect(
+              context,
+              'row_count_mismatch',
+              `${artifactPath} has ${rows.length} data row(s); the contract requires exactly ${rule.value}.`,
+            )
+          )
+            return;
         }
         break;
       case 'minimum_row_count':
         if (rows.length < rule.value) {
-          if (!recordDefect(
-            context,
-            'row_count_below_minimum',
-            `${artifactPath} has ${rows.length} data row(s); the contract requires at least ${rule.value}.`,
-          )) return;
+          if (
+            !recordDefect(
+              context,
+              'row_count_below_minimum',
+              `${artifactPath} has ${rows.length} data row(s); the contract requires at least ${rule.value}.`,
+            )
+          )
+            return;
         }
         break;
       case 'unique': {
@@ -488,11 +499,14 @@ function validateRules(
           const key = JSON.stringify(values);
           const first = seen.get(key);
           if (first !== undefined) {
-            if (!recordDefect(
-              context,
-              'duplicate_rows',
-              `${artifactPath} rows ${first + 1} and ${index + 1} repeat the same [${rule.columns.join(', ')}] values, which must be unique.`,
-            )) return;
+            if (
+              !recordDefect(
+                context,
+                'duplicate_rows',
+                `${artifactPath} rows ${first + 1} and ${index + 1} repeat the same [${rule.columns.join(', ')}] values, which must be unique.`,
+              )
+            )
+              return;
             break;
           }
           seen.set(key, index);
@@ -528,11 +542,14 @@ function validateExpectedValues(
     if (!present.has(value)) missing.push(value);
   }
   if (missing.length > 0) {
-    if (!recordDefect(
-      context,
-      'missing_expected_values',
-      `${artifactPath} column ${JSON.stringify(rule.column)} is missing explicitly required value(s): ${formatValues(missing, context)}.`,
-    )) return;
+    if (
+      !recordDefect(
+        context,
+        'missing_expected_values',
+        `${artifactPath} column ${JSON.stringify(rule.column)} is missing explicitly required value(s): ${formatValues(missing, context)}.`,
+      )
+    )
+      return;
   }
   if (rule.exhaustive === true) {
     const allowed = new Set(rule.expected);
@@ -621,10 +638,7 @@ function parseCsvRecords(
     }
   }
   if (inQuotes) return { error: 'unterminated quoted field' };
-  if (
-    (field.length > 0 || record.length > 0 || closedQuote) &&
-    !finishRecord()
-  ) return undefined;
+  if ((field.length > 0 || record.length > 0 || closedQuote) && !finishRecord()) return undefined;
   return { records };
 }
 
@@ -704,10 +718,7 @@ function readMarkdownLine(text: string, offset: number): MarkdownLine | undefine
   };
 }
 
-function splitMarkdownRow(
-  line: string,
-  context: TableInspectionContext,
-): string[] | undefined {
+function splitMarkdownRow(line: string, context: TableInspectionContext): string[] | undefined {
   const trimmed = line.trim();
   if (!trimmed.includes('|')) return undefined;
   const body = trimmed.startsWith('|') ? trimmed.slice(1) : trimmed;
@@ -743,10 +754,7 @@ function splitMarkdownRow(
   return cells;
 }
 
-function isMarkdownSeparator(
-  cells: readonly string[],
-  context: TableInspectionContext,
-): boolean {
+function isMarkdownSeparator(cells: readonly string[], context: TableInspectionContext): boolean {
   for (let index = 0; index < cells.length; index += 1) {
     pollEvery(context, index);
     if (!/^:?-{3,}:?$/.test(cells[index]!.trim())) return false;
@@ -790,9 +798,7 @@ function isIsoDate(value: string): boolean {
   const day = Number(match[3]);
   const date = new Date(Date.UTC(year, month - 1, day));
   return (
-    date.getUTCFullYear() === year &&
-    date.getUTCMonth() === month - 1 &&
-    date.getUTCDate() === day
+    date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day
   );
 }
 
@@ -837,20 +843,14 @@ function tableRuleTypes(
   for (let index = 0; index < rules.length; index += 1) {
     pollEvery(context, index);
     const rule = rules[index]!;
-    if (
-      rule.type !== 'matches_expected_values' ||
-      rule.source.kind === 'original_task'
-    ) {
+    if (rule.type !== 'matches_expected_values' || rule.source.kind === 'original_task') {
       types.push(rule.type);
     }
   }
   return types;
 }
 
-function formatValues(
-  values: readonly string[],
-  context: TableInspectionContext,
-): string {
+function formatValues(values: readonly string[], context: TableInspectionContext): string {
   const rendered: string[] = [];
   for (let index = 0; index < values.length; index += 1) {
     pollEvery(context, index);
@@ -884,9 +884,7 @@ function resolveTableInspectionLimits(
     if (!Number.isSafeInteger(value) || value <= 0) {
       throw new Error(`${name} must be a positive safe integer, got ${value}`);
     }
-    const hardMaximum = DEFAULT_TABLE_INSPECTION_LIMITS[
-      name as keyof TableInspectionLimits
-    ];
+    const hardMaximum = DEFAULT_TABLE_INSPECTION_LIMITS[name as keyof TableInspectionLimits];
     if (value > hardMaximum) {
       throw new Error(`${name} cannot exceed the hard maximum ${hardMaximum}, got ${value}`);
     }
@@ -900,21 +898,14 @@ function normalizedCellsExceed(
   context: TableInspectionContext,
 ): boolean {
   const rowAndHeaderCount = safeAdd(rowCount, 1);
-  if (
-    columnCount > 0 &&
-    rowAndHeaderCount > Math.floor(context.limits.maxCells / columnCount)
-  ) {
+  if (columnCount > 0 && rowAndHeaderCount > Math.floor(context.limits.maxCells / columnCount)) {
     stopForCellLimit(context, context.limits.maxCells + 1);
     return true;
   }
   return false;
 }
 
-function recordDefect(
-  context: TableInspectionContext,
-  code: string,
-  message: string,
-): boolean {
+function recordDefect(context: TableInspectionContext, code: string, message: string): boolean {
   const next = defect(context.output, context.artifactPath, code, message);
   if (context.defects.length < context.limits.maxDefects) {
     context.defects.push(next);
@@ -933,11 +924,7 @@ function recordDefect(
   return false;
 }
 
-function stopForLimit(
-  context: TableInspectionContext,
-  code: string,
-  message: string,
-): void {
+function stopForLimit(context: TableInspectionContext, code: string, message: string): void {
   const limitDefect = defect(context.output, context.artifactPath, code, message);
   if (context.defects.length < context.limits.maxDefects) {
     context.defects.push(limitDefect);
@@ -947,10 +934,7 @@ function stopForLimit(
   context.halted = true;
 }
 
-function stopForRowLimit(
-  context: TableInspectionContext,
-  observedRows: number,
-): void {
+function stopForRowLimit(context: TableInspectionContext, observedRows: number): void {
   stopForLimit(
     context,
     'table_row_limit_exceeded',
@@ -960,10 +944,7 @@ function stopForRowLimit(
   );
 }
 
-function stopForCellLimit(
-  context: TableInspectionContext,
-  observedCells: number,
-): void {
+function stopForCellLimit(context: TableInspectionContext, observedCells: number): void {
   stopForLimit(
     context,
     'table_cell_limit_exceeded',
@@ -982,9 +963,7 @@ function pollEvery(context: TableInspectionContext, index: number): void {
 }
 
 function safeAdd(left: number, right: number): number {
-  return left > Number.MAX_SAFE_INTEGER - right
-    ? Number.MAX_SAFE_INTEGER
-    : left + right;
+  return left > Number.MAX_SAFE_INTEGER - right ? Number.MAX_SAFE_INTEGER : left + right;
 }
 
 function errorMessage(error: unknown): string {

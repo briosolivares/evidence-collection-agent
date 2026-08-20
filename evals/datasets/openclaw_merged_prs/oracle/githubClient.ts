@@ -97,7 +97,8 @@ function parseOneMergedPull(item: unknown, index: number): MergedPr {
   };
   if (typeof obj.number !== 'number') throw new Error(`pulls[${index}]: missing numeric "number"`);
   if (typeof obj.title !== 'string') throw new Error(`pulls[${index}]: missing string "title"`);
-  if (typeof obj.html_url !== 'string') throw new Error(`pulls[${index}]: missing string "html_url"`);
+  if (typeof obj.html_url !== 'string')
+    throw new Error(`pulls[${index}]: missing string "html_url"`);
   if (typeof obj.merged_at !== 'string' || Number.isNaN(Date.parse(obj.merged_at))) {
     throw new Error(`pulls[${index}]: missing or unparseable "merged_at"`);
   }

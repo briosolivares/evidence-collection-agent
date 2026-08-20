@@ -8,24 +8,17 @@ import {
 } from 'node:fs';
 import { join } from 'node:path';
 
-import {
-  outputContractSchema,
-  type OutputContract,
-} from './outputContract.schema.js';
+import { outputContractSchema, type OutputContract } from './outputContract.schema.js';
 import { writeFileDurablyAtomic } from '../../run/atomicFile.js';
 import { HARNESS_DIR } from '../checkpoint.js';
 
 export const OUTPUT_CONTRACT_FILENAME = 'output-contract.json';
-export const OUTPUT_CONTRACT_PATH =
-  `${HARNESS_DIR}/${OUTPUT_CONTRACT_FILENAME}`;
+export const OUTPUT_CONTRACT_PATH = `${HARNESS_DIR}/${OUTPUT_CONTRACT_FILENAME}`;
 
 /** Publish the initializer's one immutable contract into harness-private
  * state. Repeated resume calls accept byte-equivalent content but never
  * replace, repair, or revise an existing file. */
-export function ensureOutputContractFile(
-  runDir: string,
-  contract: OutputContract,
-): void {
+export function ensureOutputContractFile(runDir: string, contract: OutputContract): void {
   const parsed = outputContractSchema.parse(contract);
   const path = join(runDir, OUTPUT_CONTRACT_PATH);
   const bytes = `${JSON.stringify(parsed, null, 2)}\n`;
@@ -51,10 +44,7 @@ export function readOutputContractFile(runDir: string): OutputContract {
   if (!stat.isFile() || stat.isSymbolicLink()) {
     throw new Error(`${OUTPUT_CONTRACT_PATH} must be a regular file`);
   }
-  const fd = openSync(
-    path,
-    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0),
-  );
+  const fd = openSync(path, fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0));
   try {
     if (!fstatSync(fd).isFile()) {
       throw new Error(`${OUTPUT_CONTRACT_PATH} must be a regular file`);
@@ -63,9 +53,7 @@ export function readOutputContractFile(runDir: string): OutputContract {
     try {
       value = JSON.parse(readFileSync(fd, 'utf8'));
     } catch (error) {
-      throw new Error(
-        `${OUTPUT_CONTRACT_PATH} is not valid JSON: ${errorMessage(error)}`,
-      );
+      throw new Error(`${OUTPUT_CONTRACT_PATH} is not valid JSON: ${errorMessage(error)}`);
     }
     const parsed = outputContractSchema.safeParse(value);
     if (!parsed.success) {

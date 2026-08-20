@@ -7,21 +7,10 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import type { BrowserController } from '../../src/browser/controller.js';
 import { LocalChromeBrowserSessionProvider } from '../../src/browser/playwrightBrowserController.js';
-import type {
-  CallModel,
-  Message,
-  ModelResponse,
-  Usage,
-} from '../../src/model/messages.js';
-import {
-  MANIFEST_FILENAME,
-  type Manifest,
-} from '../../src/run/artifacts.js';
+import type { CallModel, Message, ModelResponse, Usage } from '../../src/model/messages.js';
+import { MANIFEST_FILENAME, type Manifest } from '../../src/run/artifacts.js';
 import { TRANSCRIPT_FILENAME } from '../../src/run/transcript.js';
-import {
-  startFixtureServer,
-  type FixtureServer,
-} from '../fixtures/server.js';
+import { startFixtureServer, type FixtureServer } from '../fixtures/server.js';
 import { runTask } from '../../src/agent/runTask.js';
 
 const TEST_TIMEOUT_MS = 30_000;
@@ -32,11 +21,7 @@ interface TranscriptEvent {
   call?: unknown;
 }
 
-function toolResponse(
-  id: string,
-  name: string,
-  input: unknown,
-): ModelResponse {
+function toolResponse(id: string, name: string, input: unknown): ModelResponse {
   return {
     content: [{ type: 'tool_use', id, name, input }],
     stop_reason: 'tool_use',
@@ -74,11 +59,7 @@ async function readTranscript(runDir: string): Promise<TranscriptEvent[]> {
     .map((line) => JSON.parse(line) as TranscriptEvent);
 }
 
-async function filesContaining(
-  root: string,
-  needle: string,
-  relativeDir = '',
-): Promise<string[]> {
+async function filesContaining(root: string, needle: string, relativeDir = ''): Promise<string[]> {
   const hits: string[] = [];
   for (const entry of await readdir(join(root, relativeDir), {
     withFileTypes: true,
@@ -208,13 +189,9 @@ describe('runTask browser acceptance', () => {
       expect(await readFile(join(result.runDir, 'artifacts/stories.csv'), 'utf8')).toBe(csv);
       expect(JSON.stringify(worker.requests[1])).toContain('Browser Controller Fixture');
       expect(JSON.stringify(worker.requests[1])).toContain(fixtureUrl);
-      expect(JSON.stringify(worker.requests[1])).toContain(
-        '\\"leakedSecret\\":null',
-      );
+      expect(JSON.stringify(worker.requests[1])).toContain('\\"leakedSecret\\":null');
 
-      const manifest = await readJson<Manifest>(
-        join(result.runDir, MANIFEST_FILENAME),
-      );
+      const manifest = await readJson<Manifest>(join(result.runDir, MANIFEST_FILENAME));
       expect(manifest.finishedAt).toBeDefined();
       expect(manifest.artifacts).toEqual([
         expect.objectContaining({
@@ -223,32 +200,28 @@ describe('runTask browser acceptance', () => {
         }),
       ]);
       const bytes = await readFile(join(result.runDir, 'artifacts/stories.csv'));
-      expect(manifest.artifacts[0]?.sha256).toBe(
-        createHash('sha256').update(bytes).digest('hex'),
-      );
+      expect(manifest.artifacts[0]?.sha256).toBe(createHash('sha256').update(bytes).digest('hex'));
       await expect(
-        readJson<{ status: string; turns: number }>(
-          join(result.runDir, 'metrics.json'),
-        ),
+        readJson<{ status: string; turns: number }>(join(result.runDir, 'metrics.json')),
       ).resolves.toMatchObject({ status: 'verified', turns: 3 });
-      await expect(
-        readJson(join(result.runDir, 'harness/checkpoint.json')),
-      ).resolves.toMatchObject({
-        version: 3,
-        phase: 'terminal',
-        outcome: { status: 'verified' },
-      });
+      await expect(readJson(join(result.runDir, 'harness/checkpoint.json'))).resolves.toMatchObject(
+        {
+          version: 3,
+          phase: 'terminal',
+          outcome: { status: 'verified' },
+        },
+      );
       await expect(
         readJson(join(result.runDir, 'harness/output-contract.json')),
       ).resolves.toMatchObject({
         outputs: [{ id: 'stories', filename: 'stories.csv' }],
       });
-      await expect(
-        readdir(join(result.runDir, 'harness/artifact-write-journal')),
-      ).resolves.toEqual([]);
-      await expect(
-        access(join(result.runDir, 'harness/run.lock')),
-      ).rejects.toMatchObject({ code: 'ENOENT' });
+      await expect(readdir(join(result.runDir, 'harness/artifact-write-journal'))).resolves.toEqual(
+        [],
+      );
+      await expect(access(join(result.runDir, 'harness/run.lock'))).rejects.toMatchObject({
+        code: 'ENOENT',
+      });
 
       const events = await readTranscript(result.runDir);
       expect(

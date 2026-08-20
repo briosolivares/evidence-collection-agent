@@ -54,8 +54,12 @@ describe('verifyManifestHashes', () => {
   });
 
   it('passes when every listed artifact still hashes to its recorded value', () => {
-    writeArtifact(runDir, 'artifacts/a.csv', Buffer.from('title\nFoo'), { roles: ['requested_output'] });
-    writeArtifact(runDir, 'artifacts/b.png', Buffer.from([0x89, 0x50, 0x4e, 0x47]), { roles: ['evidence'] });
+    writeArtifact(runDir, 'artifacts/a.csv', Buffer.from('title\nFoo'), {
+      roles: ['requested_output'],
+    });
+    writeArtifact(runDir, 'artifacts/b.png', Buffer.from([0x89, 0x50, 0x4e, 0x47]), {
+      roles: ['evidence'],
+    });
 
     const result = verifyManifestHashes(runDir, readManifest(runDir));
     expect(result.passed).toBe(true);
@@ -63,7 +67,9 @@ describe('verifyManifestHashes', () => {
   });
 
   it('fails and names the file when bytes were changed after capture', () => {
-    writeArtifact(runDir, 'artifacts/a.csv', Buffer.from('original'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/a.csv', Buffer.from('original'), {
+      roles: ['requested_output'],
+    });
     writeFileSync(join(runDir, 'artifacts/a.csv'), 'tampered');
 
     const result = verifyManifestHashes(runDir, readManifest(runDir));
@@ -72,7 +78,9 @@ describe('verifyManifestHashes', () => {
   });
 
   it('fails when a listed artifact was deleted from disk', () => {
-    writeArtifact(runDir, 'artifacts/a.csv', Buffer.from('original'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/a.csv', Buffer.from('original'), {
+      roles: ['requested_output'],
+    });
     unlinkSync(join(runDir, 'artifacts/a.csv'));
 
     const result = verifyManifestHashes(runDir, readManifest(runDir));
@@ -92,7 +100,9 @@ describe('verifyManifestHashes', () => {
 
 describe('requestedOutputs', () => {
   it('returns only entries whose roles include requested_output', () => {
-    writeArtifact(runDir, 'artifacts/answer.csv', Buffer.from('a'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/answer.csv', Buffer.from('a'), {
+      roles: ['requested_output'],
+    });
     writeArtifact(runDir, 'artifacts/both.png', Buffer.from('b'), {
       roles: ['requested_output', 'evidence'],
     });
@@ -106,15 +116,21 @@ describe('requestedOutputs', () => {
 
 describe('findArtifactByExtension', () => {
   it('finds the requested-output entry with a matching extension, case-insensitively', () => {
-    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from('hi'), { roles: ['requested_output'] });
-    writeArtifact(runDir, 'artifacts/data.CSV', Buffer.from('a,b\n1,2'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from('hi'), {
+      roles: ['requested_output'],
+    });
+    writeArtifact(runDir, 'artifacts/data.CSV', Buffer.from('a,b\n1,2'), {
+      roles: ['requested_output'],
+    });
 
     const found = findArtifactByExtension(readManifest(runDir), '.csv');
     expect(found?.filename).toBe('artifacts/data.CSV');
   });
 
   it('returns undefined when no artifact matches', () => {
-    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from('hi'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from('hi'), {
+      roles: ['requested_output'],
+    });
     expect(findArtifactByExtension(readManifest(runDir), '.csv')).toBeUndefined();
   });
 
@@ -130,7 +146,9 @@ describe('findArtifactByExtension', () => {
     // The motivating bug: an intermediate scrape CSV sorted alphabetically
     // before the deliverable and got graded in its place.
     writeArtifact(runDir, 'scratch/contributors_raw.csv', Buffer.from('rank,handle\n1,x'));
-    writeArtifact(runDir, 'artifacts/aa_evidence_dump.csv', Buffer.from('col\nv'), { roles: ['evidence'] });
+    writeArtifact(runDir, 'artifacts/aa_evidence_dump.csv', Buffer.from('col\nv'), {
+      roles: ['evidence'],
+    });
     writeArtifact(runDir, 'artifacts/top_30_contributors.csv', Buffer.from('github_handle\na'), {
       roles: ['requested_output'],
     });
@@ -143,7 +161,9 @@ describe('findArtifactByExtension', () => {
 describe('findArtifactBySha256', () => {
   it('finds the requested-output entry whose recorded hash matches', () => {
     const bytes = Buffer.from('needle');
-    writeArtifact(runDir, 'artifacts/haystack.txt', Buffer.from('unrelated'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/haystack.txt', Buffer.from('unrelated'), {
+      roles: ['requested_output'],
+    });
     writeArtifact(runDir, 'artifacts/needle.txt', bytes, { roles: ['requested_output'] });
 
     const found = findArtifactBySha256(readManifest(runDir), sha256Hex(bytes));
@@ -152,7 +172,9 @@ describe('findArtifactBySha256', () => {
 
   it('returns undefined when no artifact has that hash', () => {
     writeArtifact(runDir, 'artifacts/a.txt', Buffer.from('a'), { roles: ['requested_output'] });
-    expect(findArtifactBySha256(readManifest(runDir), sha256Hex(Buffer.from('nope')))).toBeUndefined();
+    expect(
+      findArtifactBySha256(readManifest(runDir), sha256Hex(Buffer.from('nope'))),
+    ).toBeUndefined();
   });
 
   it('ignores a hash match that is not a requested output', () => {
@@ -165,7 +187,9 @@ describe('findArtifactBySha256', () => {
 
 describe('findRequestedOutputByName', () => {
   it('matches on the base filename anywhere under artifacts/, case-insensitively', () => {
-    writeArtifact(runDir, 'artifacts/reports/Answer.MD', Buffer.from('hi'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/reports/Answer.MD', Buffer.from('hi'), {
+      roles: ['requested_output'],
+    });
 
     const found = findRequestedOutputByName(readManifest(runDir), 'answer.md');
     expect(found?.filename).toBe('artifacts/reports/Answer.MD');
@@ -173,7 +197,9 @@ describe('findRequestedOutputByName', () => {
 
   it('ignores same-named files that are not requested outputs', () => {
     writeArtifact(runDir, 'scratch/answer.md', Buffer.from('draft'));
-    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from('final'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from('final'), {
+      roles: ['requested_output'],
+    });
 
     const found = findRequestedOutputByName(readManifest(runDir), 'answer.md');
     expect(found?.filename).toBe('artifacts/answer.md');
@@ -187,8 +213,12 @@ describe('findRequestedOutputByName', () => {
   });
 
   it('breaks ties between multiple matches by lexicographic filename', () => {
-    writeArtifact(runDir, 'artifacts/b/answer.md', Buffer.from('b'), { roles: ['requested_output'] });
-    writeArtifact(runDir, 'artifacts/a/answer.md', Buffer.from('a'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/b/answer.md', Buffer.from('b'), {
+      roles: ['requested_output'],
+    });
+    writeArtifact(runDir, 'artifacts/a/answer.md', Buffer.from('a'), {
+      roles: ['requested_output'],
+    });
 
     const found = findRequestedOutputByName(readManifest(runDir), 'answer.md');
     expect(found?.filename).toBe('artifacts/a/answer.md');

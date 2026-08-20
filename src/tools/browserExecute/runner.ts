@@ -166,10 +166,7 @@ function structuredError(thrown: unknown): BrowserProgramError {
       ),
       ...(typeof thrown.stack === 'string'
         ? {
-            stack: truncateUtf8(
-              redactCapabilities(thrown.stack),
-              MAX_ERROR_STACK_BYTES,
-            ),
+            stack: truncateUtf8(redactCapabilities(thrown.stack), MAX_ERROR_STACK_BYTES),
           }
         : {}),
     };
@@ -185,8 +182,7 @@ function protocolError(message: string): BrowserProgramError {
 }
 
 function watchdogError(error: unknown, fallback: string): BrowserProgramError {
-  const message =
-    error instanceof ParentDeathWatchdogError ? error.message : fallback;
+  const message = error instanceof ParentDeathWatchdogError ? error.message : fallback;
   return {
     name: 'ParentDeathWatchdogError',
     message: truncateUtf8(redactCapabilities(message), MAX_ERROR_MESSAGE_BYTES),
@@ -235,10 +231,11 @@ function decodeRetainedBytes(chunks: Buffer[]): string {
   while (start >= 0 && (bytes[start]! & 0b1100_0000) === 0b1000_0000) start -= 1;
   if (start < 0) return '';
   const lead = bytes[start]!;
-  const expected =
-    lead >= 0b1111_0000 ? 4 : lead >= 0b1110_0000 ? 3 : lead >= 0b1100_0000 ? 2 : 1;
+  const expected = lead >= 0b1111_0000 ? 4 : lead >= 0b1110_0000 ? 3 : lead >= 0b1100_0000 ? 2 : 1;
   const actual = bytes.length - start;
-  return bytes.subarray(0, expected > 1 && actual < expected ? start : bytes.length).toString('utf8');
+  return bytes
+    .subarray(0, expected > 1 && actual < expected ? start : bytes.length)
+    .toString('utf8');
 }
 
 function validateOptions(options: BrowserProgramOptions): void {
@@ -286,10 +283,7 @@ function validateOptions(options: BrowserProgramOptions): void {
   }
 }
 
-function immediateResult(
-  startedAt: number,
-  outcome: TerminalOutcome,
-): BrowserProgramResult {
+function immediateResult(startedAt: number, outcome: TerminalOutcome): BrowserProgramResult {
   return {
     status: outcome.status,
     durationMs: Math.max(0, Math.round(performance.now() - startedAt)),
@@ -466,10 +460,10 @@ export async function runBrowserProgram(
       child.removeAllListeners();
       const finalOutcome: TerminalOutcome = watchdogFailure
         ? { status: 'failed', error: watchdogFailure }
-        : outcome ?? {
+        : (outcome ?? {
             status: 'failed',
             error: protocolError('browser-program child ended without a result'),
-          };
+          });
       const result: BrowserProgramResult = {
         status: finalOutcome.status,
         durationMs: Math.max(0, Math.round(performance.now() - startedAt)),
@@ -784,9 +778,7 @@ export async function runBrowserProgram(
         params.workspacePath.length > 0 &&
         Buffer.byteLength(params.workspacePath, 'utf8') <=
           BROWSER_PROGRAM_LIMITS.maxWorkspacePathBytes &&
-        !Object.keys(params).some(
-          (key) => key !== 'backendDOMNodeId' && key !== 'workspacePath',
-        );
+        !Object.keys(params).some((key) => key !== 'backendDOMNodeId' && key !== 'workspacePath');
       const validNavigation =
         operation === 'navigate' &&
         isRecord(params) &&
@@ -800,10 +792,7 @@ export async function runBrowserProgram(
         !Object.keys(params).some(
           (key) => key !== 'url' && key !== 'timeoutMs' && key !== 'waitUntil',
         );
-      if (
-        !validEnvelope ||
-        (!validUpload && !validNavigation)
-      ) {
+      if (!validEnvelope || (!validUpload && !validNavigation)) {
         beginTermination({
           status: 'protocol_error',
           error: protocolError('child sent a malformed browser host request'),
@@ -833,10 +822,7 @@ export async function runBrowserProgram(
       const effect = validUpload
         ? () =>
             options
-              .upload(
-                params.backendDOMNodeId as number,
-                params.workspacePath as string,
-              )
+              .upload(params.backendDOMNodeId as number, params.workspacePath as string)
               .then(() => null)
         : () =>
             options.navigate(params.url as string, {
@@ -922,17 +908,11 @@ export async function runBrowserProgram(
             : 'Error',
         message:
           typeof message.error.message === 'string'
-            ? truncateUtf8(
-                redactCapabilities(message.error.message),
-                MAX_ERROR_MESSAGE_BYTES,
-              )
+            ? truncateUtf8(redactCapabilities(message.error.message), MAX_ERROR_MESSAGE_BYTES)
             : 'browser program failed',
         ...(typeof message.error.stack === 'string'
           ? {
-              stack: truncateUtf8(
-                redactCapabilities(message.error.stack),
-                MAX_ERROR_STACK_BYTES,
-              ),
+              stack: truncateUtf8(redactCapabilities(message.error.stack), MAX_ERROR_STACK_BYTES),
             }
           : {}),
       };

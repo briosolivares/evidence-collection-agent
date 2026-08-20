@@ -24,12 +24,7 @@ interface QuestionDialogProps {
  * (deny). While it is open the run sits inside an awaited tool call, so time
  * costs nothing.
  */
-export function QuestionDialog({
-  toolName,
-  input,
-  onSubmit,
-  onDismiss,
-}: QuestionDialogProps) {
+export function QuestionDialog({ toolName, input, onSubmit, onDismiss }: QuestionDialogProps) {
   const view = input as Partial<AskUserInput>;
   const question = view.question ?? `Tool "${toolName}" needs your input.`;
   const context = view.context;
@@ -55,10 +50,7 @@ export function QuestionDialog({
     const freeText = raw.trim();
     // The highlighted choice is submitted unless the user typed their own
     // answer, which takes precedence.
-    const chosen =
-      freeText === '' && options.length > 0
-        ? [options[highlighted]!.label]
-        : [];
+    const chosen = freeText === '' && options.length > 0 ? [options[highlighted]!.label] : [];
     if (freeText === '' && chosen.length === 0) return;
     onSubmit({ chosen, ...(freeText === '' ? {} : { freeText }) });
   };

@@ -1,11 +1,7 @@
 import { render } from 'ink-testing-library';
 import { describe, expect, it, vi } from 'vitest';
 
-import {
-  EvalsMenu,
-  validateConcurrency,
-  validateK,
-} from '../../src/tui/components/EvalsMenu.js';
+import { EvalsMenu, validateConcurrency, validateK } from '../../src/tui/components/EvalsMenu.js';
 import { ESC, tick } from './helpers.js';
 
 // Interaction-heavy suites type through a fake stdin tick by tick and

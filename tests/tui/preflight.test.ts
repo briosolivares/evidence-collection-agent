@@ -18,9 +18,7 @@ const CTRL_C = '\u0003';
 
 describe('preflight and exit paths', () => {
   it('renders the missing-key banner when no API key is present', async () => {
-    const { frames, unmount } = render(
-      createElement(App, { config, apiKeyPresent: false }),
-    );
+    const { frames, unmount } = render(createElement(App, { config, apiKeyPresent: false }));
     await tick();
     expect(frames.join('\n')).toContain('ANTHROPIC_API_KEY is not set');
     unmount();

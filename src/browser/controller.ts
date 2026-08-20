@@ -69,10 +69,7 @@ export interface BrowserCommandSession {
   send(method: string, params?: Record<string, unknown>): Promise<unknown>;
   /** Navigate the pinned page and return only after the requested lifecycle
    * state, or after containing a bounded timeout/failure. */
-  navigate(
-    url: string,
-    options: BrowserNavigationOptions,
-  ): Promise<BrowserNavigationResult>;
+  navigate(url: string, options: BrowserNavigationOptions): Promise<BrowserNavigationResult>;
   /** Attach one confined local file to an exact accessibility backend node. */
   upload(backendDOMNodeId: number, absolutePath: string): Promise<void>;
   close(): Promise<void>;

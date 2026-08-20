@@ -4,10 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { LangfuseOtelSpanAttributes } from '@langfuse/tracing';
-import {
-  InMemorySpanExporter,
-  SimpleSpanProcessor,
-} from '@opentelemetry/sdk-trace-base';
+import { InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type {
@@ -19,20 +16,10 @@ import type {
   BrowserTaskPagePreparation,
 } from '../../src/browser/controller.js';
 import { runTask } from '../../src/agent/runTask.js';
-import {
-  CallModel,
-  ModelResponse,
-  Usage,
-} from '../../src/model/messages.js';
-import {
-  MANIFEST_FILENAME,
-  type Manifest,
-} from '../../src/run/artifacts.js';
+import { CallModel, ModelResponse, Usage } from '../../src/model/messages.js';
+import { MANIFEST_FILENAME, type Manifest } from '../../src/run/artifacts.js';
 import { TRANSCRIPT_FILENAME } from '../../src/run/transcript.js';
-import {
-  METRICS_FILENAME,
-  type WorkerMetrics,
-} from '../../src/agent/worker/worker.js';
+import { METRICS_FILENAME, type WorkerMetrics } from '../../src/agent/worker/worker.js';
 import { INITIALIZER_MODEL } from '../../src/agent/initializer/initializer.js';
 import { VERIFIER_MODEL } from '../../src/agent/verifier/verifier.js';
 import { createRunTracing } from '../../src/tracing/runTracing.js';
@@ -52,18 +39,14 @@ class FakeBrowser implements BrowserController {
   activeTab = false;
   sessionClosed = false;
 
-  async prepareTaskPage(
-    _request: BrowserTaskPagePreparation,
-  ): Promise<void> {
+  async prepareTaskPage(_request: BrowserTaskPagePreparation): Promise<void> {
     if (this.sessionClosed || this.activeTab) {
       throw new Error('Cannot open a task tab.');
     }
     this.activeTab = true;
   }
 
-  async screenshot(
-    _options?: BrowserScreenshotOptions,
-  ): Promise<Uint8Array> {
+  async screenshot(_options?: BrowserScreenshotOptions): Promise<Uint8Array> {
     throw new Error('Unexpected browser screenshot.');
   }
 
@@ -234,8 +217,7 @@ describe('createRunTracing with runTask', () => {
     vi.stubEnv('LANGFUSE_SECRET_KEY', '');
     vi.stubEnv('LANGFUSE_BASE_URL', '');
     const browser = new FakeBrowser();
-    const taskText =
-      'Complete without tracing configuration. Do not take screenshots.';
+    const taskText = 'Complete without tracing configuration. Do not take screenshots.';
     const publishUsage: Usage = {
       input_tokens: 7,
       output_tokens: 2,
@@ -250,10 +232,7 @@ describe('createRunTracing with runTask', () => {
     const result = await runTask(taskText, {
       browser,
       runsBaseDir,
-      callModel: scriptModel([
-        publishResponse(publishUsage),
-        finishResponse(finishUsage),
-      ]),
+      callModel: scriptModel([publishResponse(publishUsage), finishResponse(finishUsage)]),
       harness: {
         initializerCallModel: scriptModel([contractResponse('trace.txt', initializerUsage)]),
         verifierCallModel: scriptModel([verifiedResponse()]),
@@ -277,32 +256,27 @@ describe('createRunTracing with runTask', () => {
       ['v3_run_terminal', undefined],
     ]);
 
-    const metrics = await readJson<WorkerMetrics>(
-      join(result.runDir, METRICS_FILENAME),
-    );
+    const metrics = await readJson<WorkerMetrics>(join(result.runDir, METRICS_FILENAME));
     expect(metrics).toMatchObject({
       status: 'verified',
       turns: 2,
       protocolCorrections: 0,
       inputTokens:
-        publishUsage.input_tokens
-        + finishUsage.input_tokens
-        + initializerUsage.input_tokens
-        + VERIFIED_USAGE.input_tokens,
+        publishUsage.input_tokens +
+        finishUsage.input_tokens +
+        initializerUsage.input_tokens +
+        VERIFIED_USAGE.input_tokens,
       outputTokens:
-        publishUsage.output_tokens
-        + finishUsage.output_tokens
-        + initializerUsage.output_tokens
-        + VERIFIED_USAGE.output_tokens,
+        publishUsage.output_tokens +
+        finishUsage.output_tokens +
+        initializerUsage.output_tokens +
+        VERIFIED_USAGE.output_tokens,
       cacheReadInputTokens:
-        (publishUsage.cache_read_input_tokens ?? 0)
-        + (finishUsage.cache_read_input_tokens ?? 0),
+        (publishUsage.cache_read_input_tokens ?? 0) + (finishUsage.cache_read_input_tokens ?? 0),
     });
     expect(metrics.wallClockMs).toBeGreaterThanOrEqual(0);
 
-    const manifest = await readJson<Manifest>(
-      join(result.runDir, MANIFEST_FILENAME),
-    );
+    const manifest = await readJson<Manifest>(join(result.runDir, MANIFEST_FILENAME));
     expect(manifest.task).toBe(taskText);
     expect(manifest.artifacts).toEqual([
       expect.objectContaining({
@@ -320,53 +294,36 @@ describe('createRunTracing with runTask', () => {
       spanProcessor: new SimpleSpanProcessor(exporter),
     });
     const browser = new FakeBrowser();
-    const result = await runTask(
-      'Write a traced deliverable. Do not take screenshots.',
-      {
-        browser,
-        runsBaseDir,
-        model: 'test-model',
-        callModel: scriptModel([
-          publishResponse(FIRST_USAGE),
-          finishResponse(SECOND_USAGE),
+    const result = await runTask('Write a traced deliverable. Do not take screenshots.', {
+      browser,
+      runsBaseDir,
+      model: 'test-model',
+      callModel: scriptModel([publishResponse(FIRST_USAGE), finishResponse(SECOND_USAGE)]),
+      tracing,
+      harness: {
+        initializerCallModel: scriptModel([
+          contractResponse('trace.txt', { input_tokens: 3, output_tokens: 1 }),
         ]),
-        tracing,
-        harness: {
-          initializerCallModel: scriptModel([
-            contractResponse('trace.txt', { input_tokens: 3, output_tokens: 1 }),
-          ]),
-          verifierCallModel: scriptModel([verifiedResponse()]),
-        },
+        verifierCallModel: scriptModel([verifiedResponse()]),
       },
-    );
+    });
 
     expect(result.status).toBe('verified');
-    expect(await readFile(join(result.runDir, 'artifacts/trace.txt'), 'utf8')).toBe(
-      TRACED_CSV,
-    );
+    expect(await readFile(join(result.runDir, 'artifacts/trace.txt'), 'utf8')).toBe(TRACED_CSV);
 
-    const manifest = await readJson<Manifest>(
-      join(result.runDir, MANIFEST_FILENAME),
-    );
-    const artifact = manifest.artifacts.find(
-      (entry) => entry.filename === 'artifacts/trace.txt',
-    );
+    const manifest = await readJson<Manifest>(join(result.runDir, MANIFEST_FILENAME));
+    const artifact = manifest.artifacts.find((entry) => entry.filename === 'artifacts/trace.txt');
     expect(artifact).toBeDefined();
     if (artifact === undefined) {
       throw new Error('Expected trace.txt in the finalized manifest.');
     }
     const artifactBytes = await readFile(join(result.runDir, artifact.filename));
-    expect(artifact.sha256).toBe(
-      createHash('sha256').update(artifactBytes).digest('hex'),
-    );
+    expect(artifact.sha256).toBe(createHash('sha256').update(artifactBytes).digest('hex'));
 
     const spans = exporter.getFinishedSpans();
     expect(spans).toHaveLength(6);
     const spansOfType = (type: string) =>
-      spans.filter(
-        (span) =>
-          span.attributes[LangfuseOtelSpanAttributes.OBSERVATION_TYPE] === type,
-      );
+      spans.filter((span) => span.attributes[LangfuseOtelSpanAttributes.OBSERVATION_TYPE] === type);
     const agentSpans = spansOfType('agent');
     const generationSpans = spansOfType('generation');
     const toolSpans = spansOfType('tool');
@@ -385,14 +342,11 @@ describe('createRunTracing with runTask', () => {
     }
 
     const usageDetails = generationSpans
-      .map((span) =>
-        JSON.parse(
-          String(
-            span.attributes[
-              LangfuseOtelSpanAttributes.OBSERVATION_USAGE_DETAILS
-            ],
-          ),
-        ) as Record<string, number>,
+      .map(
+        (span) =>
+          JSON.parse(
+            String(span.attributes[LangfuseOtelSpanAttributes.OBSERVATION_USAGE_DETAILS]),
+          ) as Record<string, number>,
       )
       .sort((left, right) => left.input - right.input);
     expect(usageDetails).toEqual([
@@ -401,10 +355,12 @@ describe('createRunTracing with runTask', () => {
       { input: 11, output: 3, cache_read_input_tokens: 2, cache_creation_input_tokens: 0 },
       { input: 13, output: 5, cache_read_input_tokens: 4, cache_creation_input_tokens: 0 },
     ]);
-    const rolesAndModels = generationSpans.map((span) => [
-      span.attributes[`${LangfuseOtelSpanAttributes.OBSERVATION_METADATA}.role`],
-      span.attributes[LangfuseOtelSpanAttributes.OBSERVATION_MODEL],
-    ]).sort((left, right) => String(left[0]).localeCompare(String(right[0])));
+    const rolesAndModels = generationSpans
+      .map((span) => [
+        span.attributes[`${LangfuseOtelSpanAttributes.OBSERVATION_METADATA}.role`],
+        span.attributes[LangfuseOtelSpanAttributes.OBSERVATION_MODEL],
+      ])
+      .sort((left, right) => String(left[0]).localeCompare(String(right[0])));
     expect(rolesAndModels).toEqual([
       ['initializer', INITIALIZER_MODEL],
       ['verifier', VERIFIER_MODEL],
@@ -413,49 +369,34 @@ describe('createRunTracing with runTask', () => {
     ]);
     for (const generation of generationSpans) {
       expect(generation.name).toBe('call-model');
-      expect(
-        generation.attributes[LangfuseOtelSpanAttributes.OBSERVATION_INPUT],
-      ).toBeDefined();
-      expect(
-        generation.attributes[LangfuseOtelSpanAttributes.OBSERVATION_OUTPUT],
-      ).toBeDefined();
+      expect(generation.attributes[LangfuseOtelSpanAttributes.OBSERVATION_INPUT]).toBeDefined();
+      expect(generation.attributes[LangfuseOtelSpanAttributes.OBSERVATION_OUTPUT]).toBeDefined();
     }
 
     const toolSpan = toolSpans[0];
     if (toolSpan === undefined) {
       throw new Error('Expected one tool span.');
     }
-    const toolOutput =
-      toolSpan.attributes[LangfuseOtelSpanAttributes.OBSERVATION_OUTPUT];
+    const toolOutput = toolSpan.attributes[LangfuseOtelSpanAttributes.OBSERVATION_OUTPUT];
     expect(JSON.parse(String(toolOutput))).toMatchObject({
       filename: 'artifacts/trace.txt',
       sha256: artifact.sha256,
       roles: ['requested_output'],
     });
     expect(
-      toolSpan.attributes[
-        `${LangfuseOtelSpanAttributes.OBSERVATION_METADATA}.resultBytes`
-      ],
+      toolSpan.attributes[`${LangfuseOtelSpanAttributes.OBSERVATION_METADATA}.resultBytes`],
     ).toBe(String(Buffer.byteLength(JSON.stringify(artifact), 'utf8')));
 
-    expect(
-      root.attributes[
-        `${LangfuseOtelSpanAttributes.OBSERVATION_METADATA}.turnCount`
-      ],
-    ).toBe('2');
+    expect(root.attributes[`${LangfuseOtelSpanAttributes.OBSERVATION_METADATA}.turnCount`]).toBe(
+      '2',
+    );
     expect(
       JSON.parse(
-        String(
-          root.attributes[
-            `${LangfuseOtelSpanAttributes.OBSERVATION_METADATA}.toolsUsed`
-          ],
-        ),
+        String(root.attributes[`${LangfuseOtelSpanAttributes.OBSERVATION_METADATA}.toolsUsed`]),
       ),
     ).toEqual(['publish_artifact']);
     const latencyMs = Number(
-      root.attributes[
-        `${LangfuseOtelSpanAttributes.OBSERVATION_METADATA}.latencyMs`
-      ],
+      root.attributes[`${LangfuseOtelSpanAttributes.OBSERVATION_METADATA}.latencyMs`],
     );
     expect(latencyMs).toBeGreaterThanOrEqual(0);
   });

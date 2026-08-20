@@ -16,10 +16,7 @@ const AMBIENT_URL = 'about:blank#ambient-authority-attached';
 const AMBIENT_TITLE = 'Ambient authority secret attached';
 const OWNED_URL = 'about:blank#owned-authority-attached';
 
-async function targetIdForPage(
-  context: BrowserContext,
-  page: Page,
-): Promise<string> {
+async function targetIdForPage(context: BrowserContext, page: Page): Promise<string> {
   const session = await context.newCDPSession(page);
   try {
     const response = await session.send('Target.getTargetInfo');
@@ -47,9 +44,7 @@ describe('attached browser target authority', () => {
         }, AMBIENT_TITLE);
         const ambientTargetId = await targetIdForPage(ownerContext, ambientPage);
         const port = Number(
-          (await readFile(join(profileDir, 'DevToolsActivePort'), 'utf8'))
-            .split('\n')[0]
-            ?.trim(),
+          (await readFile(join(profileDir, 'DevToolsActivePort'), 'utf8')).split('\n')[0]?.trim(),
         );
         expect(Number.isInteger(port) && port > 0).toBe(true);
         controller = await new AttachedChromeBrowserSessionProvider({
@@ -122,9 +117,7 @@ describe('attached browser target authority', () => {
           afterClose: Array<{ targetId: string }>;
           refused: Record<string, string>;
         };
-        expect(value.before).toEqual([
-          expect.objectContaining({ targetId: command.targetId }),
-        ]);
+        expect(value.before).toEqual([expect.objectContaining({ targetId: command.targetId })]);
         expect(value.pinned.targetInfo.targetId).toBe(command.targetId);
         expect(value.created).toEqual(expect.objectContaining({ url: OWNED_URL }));
         expect(value.ownedInfo.targetInfo).toEqual(
@@ -140,9 +133,7 @@ describe('attached browser target authority', () => {
             expect.objectContaining({ targetId: value.created.targetId, url: OWNED_URL }),
           ]),
         );
-        expect(value.afterClose).toEqual([
-          expect.objectContaining({ targetId: command.targetId }),
-        ]);
+        expect(value.afterClose).toEqual([expect.objectContaining({ targetId: command.targetId })]);
         expect(Object.values(value.refused)).toHaveLength(7);
         for (const message of Object.values(value.refused)) {
           expect(message).not.toBe('UNEXPECTED_SUCCESS');

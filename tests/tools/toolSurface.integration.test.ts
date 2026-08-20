@@ -1,20 +1,12 @@
 import { createHash } from 'node:crypto';
-import {
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-} from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { BrowserController } from '../../src/browser/controller.js';
-import {
-  initManifest,
-  readManifest,
-  verifyManifestFiles,
-} from '../../src/run/artifacts.js';
+import { initManifest, readManifest, verifyManifestFiles } from '../../src/run/artifacts.js';
 import { executeToolCall } from '../../src/tools/pipeline.js';
 import { createRegistry } from '../../src/tools/registry.js';
 import { editFileTool } from '../../src/tools/editFile/editFile.js';
@@ -33,12 +25,7 @@ afterEach(() => {
   rmSync(runDir, { recursive: true, force: true });
 });
 
-const registry = createRegistry([
-  publishArtifactTool,
-  readFileTool,
-  writeFileTool,
-  editFileTool,
-]);
+const registry = createRegistry([publishArtifactTool, readFileTool, writeFileTool, editFileTool]);
 
 async function call(
   name: 'publish_artifact' | 'read_file' | 'write_file' | 'edit_file',
@@ -113,10 +100,7 @@ describe('generic artifact surface', () => {
     );
 
     const expected = new Map<string, { bytes: Buffer; roles?: string[]; sourceUrl?: string }>([
-      [
-        'scratch/workspace/rows.csv',
-        { bytes: Buffer.from(csv) },
-      ],
+      ['scratch/workspace/rows.csv', { bytes: Buffer.from(csv) }],
       [
         'artifacts/rows.csv',
         {
@@ -125,10 +109,7 @@ describe('generic artifact surface', () => {
           sourceUrl: 'https://source.example.test/table',
         },
       ],
-      [
-        'artifacts/findings.md',
-        { bytes: Buffer.from(markdown), roles: ['requested_output'] },
-      ],
+      ['artifacts/findings.md', { bytes: Buffer.from(markdown), roles: ['requested_output'] }],
       [
         'artifacts/report.png',
         {

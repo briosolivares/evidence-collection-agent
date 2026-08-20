@@ -48,7 +48,16 @@ beforeEach(() => {
   // so startedAt/finishedAt survive every later write untouched.
   writeFileSync(
     join(runDir, 'manifest.json'),
-    JSON.stringify({ task: 'openclaw_pr grader test', startedAt: RUN_STARTED_AT, finishedAt: RUN_FINISHED_AT, artifacts: [] }, null, 2),
+    JSON.stringify(
+      {
+        task: 'openclaw_pr grader test',
+        startedAt: RUN_STARTED_AT,
+        finishedAt: RUN_FINISHED_AT,
+        artifacts: [],
+      },
+      null,
+      2,
+    ),
   );
 });
 
@@ -68,7 +77,9 @@ function mentionText(pr: GithubPullRequest): string {
 
 describe('openclaw_pr grader', () => {
   it('passes every assertion when answer.md names the PR created during the run', async () => {
-    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_CREATED_MID_RUN)), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_CREATED_MID_RUN)), {
+      roles: ['requested_output'],
+    });
 
     const results = await grade(runDir, ORACLE);
 
@@ -77,43 +88,56 @@ describe('openclaw_pr grader', () => {
   });
 
   it('churn tolerance: accepts the PR that was most recent at run start too', async () => {
-    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_MOST_RECENT_AT_START)), { roles: ['requested_output'] });
+    writeArtifact(
+      runDir,
+      'artifacts/answer.md',
+      Buffer.from(mentionText(PR_MOST_RECENT_AT_START)),
+      { roles: ['requested_output'] },
+    );
 
     const results = await grade(runDir, ORACLE);
 
-    expect(byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR').passed).toBe(
-      true,
-    );
+    expect(
+      byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR')
+        .passed,
+    ).toBe(true);
   });
 
   it('churn tolerance: rejects a PR that only became most recent after the run finished', async () => {
-    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_CREATED_AFTER_RUN)), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_CREATED_AFTER_RUN)), {
+      roles: ['requested_output'],
+    });
 
     const results = await grade(runDir, ORACLE);
 
-    expect(byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR').passed).toBe(
-      false,
-    );
+    expect(
+      byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR')
+        .passed,
+    ).toBe(false);
     expect(byName(results, 'answer.md exists').passed).toBe(true);
   });
 
   it('fails when answer.md names a PR that was never most-recent', async () => {
-    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_LONG_STALE)), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_LONG_STALE)), {
+      roles: ['requested_output'],
+    });
 
     const results = await grade(runDir, ORACLE);
 
-    expect(byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR').passed).toBe(
-      false,
-    );
+    expect(
+      byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR')
+        .passed,
+    ).toBe(false);
   });
 
   it('fails both content assertions, with detail, when answer.md is missing', async () => {
     const results = await grade(runDir, ORACLE);
 
     expect(byName(results, 'answer.md exists').passed).toBe(false);
-    expect(byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR').passed).toBe(
-      false,
-    );
+    expect(
+      byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR')
+        .passed,
+    ).toBe(false);
     for (const r of results) {
       if (r.name === 'manifest hashes verify') continue;
       expect(r.detail).not.toBe('');
@@ -121,7 +145,9 @@ describe('openclaw_pr grader', () => {
   });
 
   it('fails only the manifest-hash assertion when answer.md is tampered with after capture', async () => {
-    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_CREATED_MID_RUN)), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/answer.md', Buffer.from(mentionText(PR_CREATED_MID_RUN)), {
+      roles: ['requested_output'],
+    });
     // Tamper behind the manifest's back: append text after capture. The
     // original correct mention is still present, so the content assertion
     // still passes; only the standing re-hash-from-disk assertion catches it.
@@ -132,9 +158,10 @@ describe('openclaw_pr grader', () => {
 
     expect(byName(results, 'manifest hashes verify').passed).toBe(false);
     expect(byName(results, 'answer.md exists').passed).toBe(true);
-    expect(byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR').passed).toBe(
-      true,
-    );
+    expect(
+      byName(results, 'answer.md mentions the number and title of a most-recent-in-window PR')
+        .passed,
+    ).toBe(true);
   });
 
   it('throws on malformed oracle data — a harness bug, not a failed trial', async () => {

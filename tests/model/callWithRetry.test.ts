@@ -14,7 +14,10 @@ import { TruncatedStreamError } from '../../src/model/streamAssembly.js';
 // random is pinned to 0.5 so jittered backoff equals the base delay.
 
 /** An attempt that fails with each scripted error, then succeeds. */
-function flakyAttempt<T>(failures: unknown[], value: T): { attempt: () => Promise<T>; calls: () => number } {
+function flakyAttempt<T>(
+  failures: unknown[],
+  value: T,
+): { attempt: () => Promise<T>; calls: () => number } {
   let calls = 0;
   return {
     attempt: () => {
@@ -28,7 +31,11 @@ function flakyAttempt<T>(failures: unknown[], value: T): { attempt: () => Promis
 
 /** Options with a recording sleep and pinned jitter. */
 function recordingOpts(): {
-  opts: { sleep: (ms: number) => Promise<void>; random: () => number; onRetry: (info: RetryInfo) => void };
+  opts: {
+    sleep: (ms: number) => Promise<void>;
+    random: () => number;
+    onRetry: (info: RetryInfo) => void;
+  };
   sleeps: number[];
   retries: RetryInfo[];
 } {
@@ -110,9 +117,18 @@ describe('callWithRetry', () => {
   });
 
   it('passes a non-retryable 4xx through on attempt 1', async () => {
-    const badRequest = new APIError(400, undefined, 'invalid request', undefined, 'invalid_request_error');
+    const badRequest = new APIError(
+      400,
+      undefined,
+      'invalid request',
+      undefined,
+      'invalid_request_error',
+    );
     const { opts, sleeps } = recordingOpts();
-    const { attempt, calls } = flakyAttempt([badRequest, badRequest, badRequest, badRequest], 'never');
+    const { attempt, calls } = flakyAttempt(
+      [badRequest, badRequest, badRequest, badRequest],
+      'never',
+    );
     await expect(callWithRetry(attempt, opts)).rejects.toBe(badRequest);
     expect(calls()).toBe(1);
     expect(sleeps).toEqual([]);

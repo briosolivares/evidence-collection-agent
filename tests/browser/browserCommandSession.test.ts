@@ -12,15 +12,11 @@ import {
 import type { BrowserController } from '../../src/browser/controller.js';
 import { LocalChromeBrowserSessionProvider } from '../../src/browser/playwrightBrowserController.js';
 import type { BrowserUploadEncoder, UploadPayload } from '../../src/browser/uploadEncoder.js';
-import {
-  createBusyResourceRegistry,
-  EXCLUSIVE_ACCESS,
-} from '../../src/tools/registry.js';
+import { createBusyResourceRegistry, EXCLUSIVE_ACCESS } from '../../src/tools/registry.js';
 import { runBrowserProgram } from '../../src/tools/browserExecute/runner.js';
 
 const TEST_TIMEOUT_MS = 15_000;
-const PRIVATE_CONNECT_URL =
-  'wss://connect.browserbase.com/v1/session?apiKey=definitely-secret';
+const PRIVATE_CONNECT_URL = 'wss://connect.browserbase.com/v1/session?apiKey=definitely-secret';
 
 async function waitForPages(
   controller: BrowserController,
@@ -238,9 +234,7 @@ describe('PlaywrightBrowserController command sessions', () => {
 });
 
 describe('command-session transport boundary', () => {
-  function fakeTarget(options: {
-    commandError?: Error;
-  } = {}): {
+  function fakeTarget(options: { commandError?: Error } = {}): {
     context: BrowserContext;
     page: Page;
     goto: ReturnType<typeof vi.fn>;
@@ -293,10 +287,10 @@ describe('command-session transport boundary', () => {
       url: 'https://example.test/settled',
       title: 'Settled title',
     });
-    expect(goto).toHaveBeenCalledExactlyOnceWith(
-      'https://example.test/settled',
-      { timeout: 2_500, waitUntil: 'load' },
-    );
+    expect(goto).toHaveBeenCalledExactlyOnceWith('https://example.test/settled', {
+      timeout: 2_500,
+      waitUntil: 'load',
+    });
 
     await session.close();
     await session.close();
@@ -325,37 +319,26 @@ describe('command-session transport boundary', () => {
         url: 'https://ambient.example.test/private',
       },
     ];
-    const send = vi.fn(
-      async (method: string, params: Record<string, unknown> = {}) => {
-        if (method === 'Target.getTargets') return { targetInfos };
-        if (method === 'Target.getTargetInfo') {
-          const requested =
-            typeof params.targetId === 'string' ? params.targetId : 'target-exact';
-          return {
-            targetInfo: targetInfos.find((target) => target.targetId === requested),
-          };
-        }
-        if (method === 'Target.activateTarget') return {};
-        if (method === 'Target.closeTarget') return { success: true };
-        throw new Error(`unexpected raw command ${method}`);
-      },
-    );
+    const send = vi.fn(async (method: string, params: Record<string, unknown> = {}) => {
+      if (method === 'Target.getTargets') return { targetInfos };
+      if (method === 'Target.getTargetInfo') {
+        const requested = typeof params.targetId === 'string' ? params.targetId : 'target-exact';
+        return {
+          targetInfo: targetInfos.find((target) => target.targetId === requested),
+        };
+      }
+      if (method === 'Target.activateTarget') return {};
+      if (method === 'Target.closeTarget') return { success: true };
+      throw new Error(`unexpected raw command ${method}`);
+    });
     const detach = vi.fn(async () => undefined);
     const page = { isClosed: () => false } as unknown as Page;
     const context = {
       newCDPSession: vi.fn(async () => ({ send, detach })),
     } as unknown as BrowserContext;
-    const session = await openPlaywrightCommandSession(
-      context,
-      page,
-      'page-exact',
-      {
-        targetPolicy: allowOwnedTargets(
-          'target-exact',
-          'target-owned-popup',
-        ),
-      },
-    );
+    const session = await openPlaywrightCommandSession(context, page, 'page-exact', {
+      targetPolicy: allowOwnedTargets('target-exact', 'target-owned-popup'),
+    });
 
     expect(await session.send('Target.getTargets')).toEqual({
       targetInfos: targetInfos.slice(0, 2),
@@ -456,15 +439,10 @@ describe('command-session transport boundary', () => {
     const uploadEncoder: BrowserUploadEncoder = {
       encode: vi.fn(async () => [payload]),
     };
-    const session = await openPlaywrightCommandSession(
-      context,
-      page,
-      'page-exact',
-      {
-        targetPolicy: allowOwnedTargets('target-exact'),
-        uploadEncoder,
-      },
-    );
+    const session = await openPlaywrightCommandSession(context, page, 'page-exact', {
+      targetPolicy: allowOwnedTargets('target-exact'),
+      uploadEncoder,
+    });
 
     await session.upload(73, '/confined/workspace/evidence.csv');
 
@@ -472,13 +450,10 @@ describe('command-session transport boundary', () => {
       '/confined/workspace/evidence.csv',
     ]);
     expect(send).toHaveBeenCalledWith('DOM.resolveNode', { backendNodeId: 73 });
-    expect(setInputFiles).toHaveBeenCalledExactlyOnceWith(
-      [payload],
-      { timeout: 5_000 },
+    expect(setInputFiles).toHaveBeenCalledExactlyOnceWith([payload], { timeout: 5_000 });
+    expect(send.mock.calls.filter(([method]) => method === 'Runtime.callFunctionOn')).toHaveLength(
+      2,
     );
-    expect(
-      send.mock.calls.filter(([method]) => method === 'Runtime.callFunctionOn'),
-    ).toHaveLength(2);
     expect(send).toHaveBeenCalledWith('Runtime.releaseObject', {
       objectId: 'upload-object',
     });
@@ -528,17 +503,11 @@ describe('command-session transport boundary', () => {
       newCDPSession: vi.fn(async () => ({ send, detach })),
     } as unknown as BrowserContext;
     const busyRegistry = createBusyResourceRegistry();
-    const session = await openPlaywrightCommandSession(
-      context,
-      page,
-      'page-late',
-      {
-        targetPolicy: allowOwnedTargets('target-late'),
-        uploadEncoder,
-        trackUploadEffect: (effect) =>
-          busyRegistry.markAbandoned(EXCLUSIVE_ACCESS, effect),
-      },
-    );
+    const session = await openPlaywrightCommandSession(context, page, 'page-late', {
+      targetPolicy: allowOwnedTargets('target-late'),
+      uploadEncoder,
+      trackUploadEffect: (effect) => busyRegistry.markAbandoned(EXCLUSIVE_ACCESS, effect),
+    });
 
     const program = runBrowserProgram({
       code: `await browser.upload(91, 'late.csv');`,
@@ -556,12 +525,8 @@ describe('command-session transport boundary', () => {
     const result = await program;
 
     expect(result.status).toBe('timed_out');
-    expect(uploadEncoder.encode).toHaveBeenCalledExactlyOnceWith([
-      '/confined/late.csv',
-    ]);
-    await expect(
-      busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 10),
-    ).resolves.toBe(false);
+    expect(uploadEncoder.encode).toHaveBeenCalledExactlyOnceWith(['/confined/late.csv']);
+    await expect(busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 10)).resolves.toBe(false);
 
     let closeSettled = false;
     const close = session.close().then(() => {
@@ -574,31 +539,23 @@ describe('command-session transport boundary', () => {
     releaseEncoding();
     await close;
 
-    expect(setInputFiles).toHaveBeenCalledExactlyOnceWith(
-      [payload],
-      { timeout: 5_000 },
-    );
+    expect(setInputFiles).toHaveBeenCalledExactlyOnceWith([payload], { timeout: 5_000 });
     expect(detach).toHaveBeenCalledOnce();
-    await expect(
-      busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 100),
-    ).resolves.toBe(true);
+    await expect(busyRegistry.waitUntilFree(EXCLUSIVE_ACCESS, 100)).resolves.toBe(true);
   });
 
   it('reports only an exact successful Target.createTarget result to the ownership hook', async () => {
     const { context, page, send } = fakeTarget();
     const targetPolicy = allowOwnedTargets('target-exact');
     const createTarget = vi.spyOn(targetPolicy, 'createTarget');
-    const session = await openPlaywrightCommandSession(
-      context,
-      page,
-      'page-safe',
-      { targetPolicy },
-    );
+    const session = await openPlaywrightCommandSession(context, page, 'page-safe', {
+      targetPolicy,
+    });
     send.mockResolvedValueOnce({ targetId: 'target-created-by-run' });
 
-    expect(
-      await session.send('Target.createTarget', { url: 'about:blank' }),
-    ).toEqual({ targetId: 'target-created-by-run' });
+    expect(await session.send('Target.createTarget', { url: 'about:blank' })).toEqual({
+      targetId: 'target-created-by-run',
+    });
     await session.send('Runtime.evaluate', { expression: '1' });
 
     expect(createTarget).toHaveBeenCalledOnce();
@@ -609,21 +566,16 @@ describe('command-session transport boundary', () => {
   it('routes dialog decisions through controller-owned pending state', async () => {
     const { context, page, send } = fakeTarget();
     const handleDialogCommand = vi.fn(async () => ({ handled: true }));
-    const session = await openPlaywrightCommandSession(
-      context,
-      page,
-      'page-safe',
-      {
-        targetPolicy: allowOwnedTargets('target-exact'),
-        handleDialogCommand,
-      },
-    );
+    const session = await openPlaywrightCommandSession(context, page, 'page-safe', {
+      targetPolicy: allowOwnedTargets('target-exact'),
+      handleDialogCommand,
+    });
 
     await session.send('Runtime.evaluate', { expression: '1' });
     expect(handleDialogCommand).not.toHaveBeenCalled();
-    await expect(
-      session.send('Page.handleJavaScriptDialog', { accept: false }),
-    ).resolves.toEqual({ handled: true });
+    await expect(session.send('Page.handleJavaScriptDialog', { accept: false })).resolves.toEqual({
+      handled: true,
+    });
     expect(handleDialogCommand).toHaveBeenCalledExactlyOnceWith({ accept: false });
     expect(send).not.toHaveBeenCalledWith('Page.handleJavaScriptDialog', {
       accept: false,
@@ -637,15 +589,10 @@ describe('command-session transport boundary', () => {
     const release = vi.fn(async (detachSession: () => Promise<void>) => {
       transferred = detachSession;
     });
-    const session = await openPlaywrightCommandSession(
-      context,
-      page,
-      'page-safe',
-      {
-        targetPolicy: allowOwnedTargets('target-exact'),
-        release,
-      },
-    );
+    const session = await openPlaywrightCommandSession(context, page, 'page-safe', {
+      targetPolicy: allowOwnedTargets('target-exact'),
+      release,
+    });
 
     await session.close();
     await session.close();
@@ -666,27 +613,21 @@ describe('command-session transport boundary', () => {
       await new Promise<never>(() => undefined);
     });
     const release = vi.fn(
-      async (
-        detachSession: () => Promise<void>,
-        hadPendingCommands: boolean,
-      ) => {
+      async (detachSession: () => Promise<void>, hadPendingCommands: boolean) => {
         expect(hadPendingCommands).toBe(true);
         await detachSession();
       },
     );
-    const session = await openPlaywrightCommandSession(
-      context,
-      page,
-      'page-busy',
-      {
-        targetPolicy: allowOwnedTargets('target-exact'),
-        release,
-      },
-    );
+    const session = await openPlaywrightCommandSession(context, page, 'page-busy', {
+      targetPolicy: allowOwnedTargets('target-exact'),
+      release,
+    });
 
-    void session.send('Runtime.evaluate', {
-      expression: 'while (true) {}',
-    }).catch(() => undefined);
+    void session
+      .send('Runtime.evaluate', {
+        expression: 'while (true) {}',
+      })
+      .catch(() => undefined);
     await vi.waitFor(() =>
       expect(send).toHaveBeenCalledWith('Runtime.evaluate', {
         expression: 'while (true) {}',
@@ -695,10 +636,7 @@ describe('command-session transport boundary', () => {
 
     await session.close();
 
-    expect(release).toHaveBeenCalledExactlyOnceWith(
-      expect.any(Function),
-      true,
-    );
+    expect(release).toHaveBeenCalledExactlyOnceWith(expect.any(Function), true);
     expect(detach).toHaveBeenCalledOnce();
   });
 });

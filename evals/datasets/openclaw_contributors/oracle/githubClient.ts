@@ -72,7 +72,8 @@ export function parseContributorsResponse(json: unknown): Contributor[] {
   }
   const contributors = json.map((item, i) => {
     const obj = item as { login?: unknown; contributions?: unknown };
-    if (typeof obj.login !== 'string') throw new Error(`contributors[${i}]: missing string "login"`);
+    if (typeof obj.login !== 'string')
+      throw new Error(`contributors[${i}]: missing string "login"`);
     if (typeof obj.contributions !== 'number') {
       throw new Error(`contributors[${i}]: missing numeric "contributions"`);
     }

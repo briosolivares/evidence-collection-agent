@@ -3,8 +3,16 @@ import { join } from 'node:path';
 
 import type { Manifest } from '../../../../src/run/artifacts.js';
 import { parseCsv } from '../../../grading/csv.js';
-import { exactColumnsAssertion, exactColumnsAssertionName } from '../../../grading/csvAssertions.js';
-import { findArtifactByExtension, readManifest, requestedOutputs, verifyManifestHashes } from '../../../grading/manifestVerification.js';
+import {
+  exactColumnsAssertion,
+  exactColumnsAssertionName,
+} from '../../../grading/csvAssertions.js';
+import {
+  findArtifactByExtension,
+  readManifest,
+  requestedOutputs,
+  verifyManifestHashes,
+} from '../../../grading/manifestVerification.js';
 import type { AssertionResult, Grader } from '../../../types.js';
 import {
   REPO_NAME,
@@ -24,8 +32,10 @@ const COLUMN_ASSERTION_NAME = exactColumnsAssertionName(REQUIRED_COLUMNS);
 const ROWS_ASSERTION_NAME = `CSV has ${REQUIRED_ROW_COUNT} data rows with distinct valid PR numbers`;
 const MEMBERSHIP_ASSERTION_NAME = "every CSV PR is in the oracle's recently-merged window";
 const PEOPLE_ASSERTION_NAME = 'committer and merger match the oracle for every detail-checked row';
-const REVIEWER_ASSERTION_NAME = 'reviewer cells name an actual reviewer for detail-checked rows with reviews';
-const SCREENSHOT_ASSERTION_NAME = 'a valid PNG screenshot of each CSV PR page exists with its URL as provenance';
+const REVIEWER_ASSERTION_NAME =
+  'reviewer cells name an actual reviewer for detail-checked rows with reviews';
+const SCREENSHOT_ASSERTION_NAME =
+  'a valid PNG screenshot of each CSV PR page exists with its URL as provenance';
 
 /** One CSV data row, resolved to its parsed PR number (when valid). */
 interface CsvPrRow {
@@ -66,21 +76,33 @@ export const grade: Grader = (runDirPath, oracleData) => {
       name: 'CSV artifact exists',
       passed: csvEntry !== undefined,
       detail:
-        csvEntry !== undefined ? `found ${csvEntry.filename}` : 'no .csv artifact found in the manifest',
+        csvEntry !== undefined
+          ? `found ${csvEntry.filename}`
+          : 'no .csv artifact found in the manifest',
     },
   ];
 
   if (csvEntry === undefined) {
-    return [...assertions, ...allContentAssertionsFailed('no CSV artifact to check'), verifyManifestHashes(runDirPath, manifest)];
+    return [
+      ...assertions,
+      ...allContentAssertionsFailed('no CSV artifact to check'),
+      verifyManifestHashes(runDirPath, manifest),
+    ];
   }
 
   let header: string[];
   let rawRows: string[][];
   try {
-    ({ header, rows: rawRows } = parseCsv(readFileSync(join(runDirPath, csvEntry.filename), 'utf8')));
+    ({ header, rows: rawRows } = parseCsv(
+      readFileSync(join(runDirPath, csvEntry.filename), 'utf8'),
+    ));
   } catch (err) {
     const detail = `${csvEntry.filename} could not be parsed as CSV: ${err instanceof Error ? err.message : String(err)}`;
-    return [...assertions, ...allContentAssertionsFailed(detail), verifyManifestHashes(runDirPath, manifest)];
+    return [
+      ...assertions,
+      ...allContentAssertionsFailed(detail),
+      verifyManifestHashes(runDirPath, manifest),
+    ];
   }
 
   const rows = resolveRows(header, rawRows);
@@ -129,15 +151,25 @@ function rowShapeAssertion(rows: CsvPrRow[], validNumbers: number[]): AssertionR
   return {
     name: ROWS_ASSERTION_NAME,
     passed: problems.length === 0,
-    detail: problems.length === 0 ? `${rows.length} rows, all PR numbers valid and distinct` : problems.join('; '),
+    detail:
+      problems.length === 0
+        ? `${rows.length} rows, all PR numbers valid and distinct`
+        : problems.join('; '),
   };
 }
 
-function membershipAssertion(validNumbers: number[], oracle: OpenClawMergedPrsOracle): AssertionResult {
+function membershipAssertion(
+  validNumbers: number[],
+  oracle: OpenClawMergedPrsOracle,
+): AssertionResult {
   const windowNumbers = new Set(oracle.mergedWindow.map((pr) => pr.number));
   const unknown = validNumbers.filter((n) => !windowNumbers.has(n));
   if (validNumbers.length === 0) {
-    return { name: MEMBERSHIP_ASSERTION_NAME, passed: false, detail: 'no valid PR numbers to check' };
+    return {
+      name: MEMBERSHIP_ASSERTION_NAME,
+      passed: false,
+      detail: 'no valid PR numbers to check',
+    };
   }
   return {
     name: MEMBERSHIP_ASSERTION_NAME,
@@ -150,7 +182,10 @@ function membershipAssertion(validNumbers: number[], oracle: OpenClawMergedPrsOr
 }
 
 /** Rows whose PR the oracle carries detail for (mergedBy/reviewers fetched). */
-function detailCheckedRows(rows: CsvPrRow[], oracle: OpenClawMergedPrsOracle): Array<{ row: CsvPrRow; pr: MergedPr }> {
+function detailCheckedRows(
+  rows: CsvPrRow[],
+  oracle: OpenClawMergedPrsOracle,
+): Array<{ row: CsvPrRow; pr: MergedPr }> {
   const detailed = new Map(
     oracle.mergedWindow.filter((pr) => pr.reviewers !== undefined).map((pr) => [pr.number, pr]),
   );
@@ -188,7 +223,10 @@ function peopleAssertion(rows: CsvPrRow[], oracle: OpenClawMergedPrsOracle): Ass
   return {
     name: PEOPLE_ASSERTION_NAME,
     passed: problems.length === 0,
-    detail: problems.length === 0 ? `${checked.length} row(s) checked against PR details` : problems.join('; '),
+    detail:
+      problems.length === 0
+        ? `${checked.length} row(s) checked against PR details`
+        : problems.join('; '),
   };
 }
 
@@ -196,7 +234,9 @@ function reviewerAssertion(rows: CsvPrRow[], oracle: OpenClawMergedPrsOracle): A
   // Only rows whose PR has at least one submitted review are checkable: a PR
   // page's sidebar also shows *requested* reviewers who never reviewed, so an
   // agent naming one of those on a review-less PR cannot be called wrong.
-  const checked = detailCheckedRows(rows, oracle).filter(({ pr }) => (pr.reviewers ?? []).length > 0);
+  const checked = detailCheckedRows(rows, oracle).filter(
+    ({ pr }) => (pr.reviewers ?? []).length > 0,
+  );
   if (checked.length === 0) {
     return {
       name: REVIEWER_ASSERTION_NAME,
@@ -206,17 +246,31 @@ function reviewerAssertion(rows: CsvPrRow[], oracle: OpenClawMergedPrsOracle): A
   }
   const problems = checked
     .filter(({ row, pr }) => !pr.reviewers!.some((login) => mentionsLogin(row.reviewer, login)))
-    .map(({ row, pr }) => `#${pr.number}: reviewer "${row.reviewer}" names none of ${pr.reviewers!.join(', ')}`);
+    .map(
+      ({ row, pr }) =>
+        `#${pr.number}: reviewer "${row.reviewer}" names none of ${pr.reviewers!.join(', ')}`,
+    );
   return {
     name: REVIEWER_ASSERTION_NAME,
     passed: problems.length === 0,
-    detail: problems.length === 0 ? `${checked.length} row(s) checked against submitted reviews` : problems.join('; '),
+    detail:
+      problems.length === 0
+        ? `${checked.length} row(s) checked against submitted reviews`
+        : problems.join('; '),
   };
 }
 
-function screenshotAssertion(runDirPath: string, manifest: Manifest, validNumbers: number[]): AssertionResult {
+function screenshotAssertion(
+  runDirPath: string,
+  manifest: Manifest,
+  validNumbers: number[],
+): AssertionResult {
   if (validNumbers.length === 0) {
-    return { name: SCREENSHOT_ASSERTION_NAME, passed: false, detail: 'no valid PR numbers to check' };
+    return {
+      name: SCREENSHOT_ASSERTION_NAME,
+      passed: false,
+      detail: 'no valid PR numbers to check',
+    };
   }
   // Screenshots the task asks for are requested outputs (typically published
   // with both roles); evidence-only captures do not satisfy the request.

@@ -19,8 +19,7 @@ const HARNESS_DIR_SEGMENT = 'harness';
  *   <baseDir>/<runId>
  */
 export function createRunDir(baseDir: string, runId: string): string {
-  const isSingleSegment =
-    runId !== '' && runId !== '.' && runId !== '..' && !/[/\\]/.test(runId);
+  const isSingleSegment = runId !== '' && runId !== '.' && runId !== '..' && !/[/\\]/.test(runId);
   if (!isSingleSegment) {
     throw new Error(`invalid run id (must be a single path segment): ${JSON.stringify(runId)}`);
   }

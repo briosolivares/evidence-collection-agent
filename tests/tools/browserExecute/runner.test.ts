@@ -1,10 +1,4 @@
-import {
-  existsSync,
-  mkdtempSync,
-  rmSync,
-  symlinkSync,
-  writeFileSync,
-} from 'node:fs';
+import { existsSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -135,10 +129,7 @@ describe('runBrowserProgram', () => {
     const upload = vi.fn(async () => undefined);
 
     const result = await runBrowserProgram(
-      options(
-        `await browser.upload(73, 'evidence.csv'); return 'attached';`,
-        { upload },
-      ),
+      options(`await browser.upload(73, 'evidence.csv'); return 'attached';`, { upload }),
     );
 
     expect(result).toMatchObject({ status: 'exited', value: 'attached' });
@@ -412,10 +403,10 @@ describe('runBrowserProgram', () => {
       method: 'Target.closeTarget',
       params: { targetId: 'new-target' },
     });
-    expect(navigate).toHaveBeenCalledExactlyOnceWith(
-      'https://example.test/destination',
-      { timeoutMs: 1234, waitUntil: 'load' },
-    );
+    expect(navigate).toHaveBeenCalledExactlyOnceWith('https://example.test/destination', {
+      timeoutMs: 1234,
+      waitUntil: 'load',
+    });
   });
 
   it('rejects unsupported goto options instead of silently ignoring them', async () => {
@@ -604,28 +595,24 @@ describe('runBrowserProgram', () => {
     expect(result.error?.stack).toContain('sherlock-browser-program.js');
   });
 
-  it(
-    'times out and terminates both the browser child and a descendant it spawned',
-    async () => {
-      const marker = join(cwd, 'timeout-descendant-marker.txt');
-      const descendant = `setTimeout(() => require('node:fs').writeFileSync(${JSON.stringify(marker)}, 'survived'), 400)`;
-      const result = await runBrowserProgram(
-        options(
-          `
+  it('times out and terminates both the browser child and a descendant it spawned', async () => {
+    const marker = join(cwd, 'timeout-descendant-marker.txt');
+    const descendant = `setTimeout(() => require('node:fs').writeFileSync(${JSON.stringify(marker)}, 'survived'), 400)`;
+    const result = await runBrowserProgram(
+      options(
+        `
             const { spawn } = await import('node:child_process');
             spawn(process.execPath, ['-e', ${JSON.stringify(descendant)}], { stdio: 'ignore' });
             await new Promise(() => {});
           `,
-          { timeoutMs: 100 },
-        ),
-      );
+        { timeoutMs: 100 },
+      ),
+    );
 
-      expect(result.status).toBe('timed_out');
-      await wait(650);
-      expect(existsSync(marker)).toBe(false);
-    },
-    10_000,
-  );
+    expect(result.status).toBe('timed_out');
+    await wait(650);
+    expect(existsSync(marker)).toBe(false);
+  }, 10_000);
 
   it('returns cancelled when aborted and removes the abort listener', async () => {
     const controller = new AbortController();
@@ -642,59 +629,54 @@ describe('runBrowserProgram', () => {
     expect(removeSpy).toHaveBeenCalledWith('abort', expect.any(Function));
   });
 
-  it(
-    'hard-kills immediately and forces watchdog failure over cancellation',
-    async () => {
-      const readyPath = join(cwd, 'watchdog-failure-ready.txt');
-      const controller = new AbortController();
-      const controlledWatchdog = createControlledWatchdog();
-      vi.spyOn(
-        parentDeathWatchdogModule,
-        'startParentDeathWatchdog',
-      ).mockResolvedValue(controlledWatchdog.watchdog);
-      const killSpy = vi.spyOn(process, 'kill');
-      const promise = runBrowserProgram(
-        options(
-          `
+  it('hard-kills immediately and forces watchdog failure over cancellation', async () => {
+    const readyPath = join(cwd, 'watchdog-failure-ready.txt');
+    const controller = new AbortController();
+    const controlledWatchdog = createControlledWatchdog();
+    vi.spyOn(parentDeathWatchdogModule, 'startParentDeathWatchdog').mockResolvedValue(
+      controlledWatchdog.watchdog,
+    );
+    const killSpy = vi.spyOn(process, 'kill');
+    const promise = runBrowserProgram(
+      options(
+        `
             const fs = await import('node:fs');
             process.on('SIGTERM', () => {});
             fs.writeFileSync(${JSON.stringify(readyPath)}, 'ready');
             await new Promise(() => {});
           `,
-          { abortSignal: controller.signal },
-        ),
-      );
+        { abortSignal: controller.signal },
+      ),
+    );
 
+    try {
+      await waitForPath(readyPath);
+      controller.abort();
+      const callsBeforeFailure = killSpy.mock.calls.length;
+
+      controlledWatchdog.fail();
+
+      expect(killSpy.mock.calls.slice(callsBeforeFailure)).toContainEqual([
+        -controlledWatchdog.processGroupId(),
+        'SIGKILL',
+      ]);
+      await expect(promise).resolves.toMatchObject({
+        status: 'failed',
+        error: {
+          name: 'ParentDeathWatchdogError',
+          message: 'parent-death watchdog stopped while its target was active',
+        },
+      });
+    } finally {
+      controller.abort();
       try {
-        await waitForPath(readyPath);
-        controller.abort();
-        const callsBeforeFailure = killSpy.mock.calls.length;
-
-        controlledWatchdog.fail();
-
-        expect(killSpy.mock.calls.slice(callsBeforeFailure)).toContainEqual([
-          -controlledWatchdog.processGroupId(),
-          'SIGKILL',
-        ]);
-        await expect(promise).resolves.toMatchObject({
-          status: 'failed',
-          error: {
-            name: 'ParentDeathWatchdogError',
-            message: 'parent-death watchdog stopped while its target was active',
-          },
-        });
-      } finally {
-        controller.abort();
-        try {
-          process.kill(-controlledWatchdog.processGroupId(), 'SIGKILL');
-        } catch {
-          // Production should already have removed the complete group.
-        }
-        await promise.catch(() => undefined);
+        process.kill(-controlledWatchdog.processGroupId(), 'SIGKILL');
+      } catch {
+        // Production should already have removed the complete group.
       }
-    },
-    10_000,
-  );
+      await promise.catch(() => undefined);
+    }
+  }, 10_000);
 
   it('does not spawn at all for an already-aborted call', async () => {
     const controller = new AbortController();
@@ -858,23 +840,19 @@ describe('runBrowserProgram', () => {
     expect(JSON.stringify(result)).not.toContain('session-control');
   });
 
-  it(
-    'cleans up background descendants even after a normal return',
-    async () => {
-      const marker = join(cwd, 'normal-descendant-marker.txt');
-      const descendant = `setTimeout(() => require('node:fs').writeFileSync(${JSON.stringify(marker)}, 'survived'), 400)`;
-      const result = await runBrowserProgram(
-        options(`
+  it('cleans up background descendants even after a normal return', async () => {
+    const marker = join(cwd, 'normal-descendant-marker.txt');
+    const descendant = `setTimeout(() => require('node:fs').writeFileSync(${JSON.stringify(marker)}, 'survived'), 400)`;
+    const result = await runBrowserProgram(
+      options(`
           const { spawn } = await import('node:child_process');
           spawn(process.execPath, ['-e', ${JSON.stringify(descendant)}], { stdio: 'ignore' });
           return 'complete';
         `),
-      );
+    );
 
-      expect(result).toMatchObject({ status: 'exited', value: 'complete' });
-      await wait(650);
-      expect(existsSync(marker)).toBe(false);
-    },
-    10_000,
-  );
+    expect(result).toMatchObject({ status: 'exited', value: 'complete' });
+    await wait(650);
+    expect(existsSync(marker)).toBe(false);
+  }, 10_000);
 });

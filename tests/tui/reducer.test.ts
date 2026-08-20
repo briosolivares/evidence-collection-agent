@@ -36,10 +36,10 @@ describe('orderArtifactsForSummary', () => {
       },
       sizeBytes: 1,
     });
-    const proposal = artifact(
-      'artifacts/helper-proposals/helper.patch',
-      ['requested_output', 'evidence'],
-    );
+    const proposal = artifact('artifacts/helper-proposals/helper.patch', [
+      'requested_output',
+      'evidence',
+    ]);
     const evidence = artifact('artifacts/source.png', ['evidence']);
     const output = artifact('artifacts/result.csv', ['requested_output']);
 
@@ -183,9 +183,7 @@ const started: StoreAction[] = [
 ];
 
 /** A published manifest entry, verbatim shape (roles present ⟺ published). */
-function publishedEntry(
-  overrides: Partial<ManifestEntry> & { filename: string },
-): ManifestEntry {
+function publishedEntry(overrides: Partial<ManifestEntry> & { filename: string }): ManifestEntry {
   return {
     sha256: 'a'.repeat(64),
     roles: ['evidence'],
@@ -359,9 +357,7 @@ describe('reduce (run lifecycle events)', () => {
     ]);
 
     expect(
-      state.transcript.filter(
-        (item) => item.kind === 'activity' && item.status === 'retried',
-      ),
+      state.transcript.filter((item) => item.kind === 'activity' && item.status === 'retried'),
     ).toEqual([]);
     expect(state.transcript.at(-2)).toMatchObject({
       kind: 'activity',
@@ -537,7 +533,11 @@ describe('reduce (semantic activity + evidence)', () => {
         name: 'publish_artifact',
         input: { kind: 'text', artifact_path: 'artifacts/top5.csv', content: 'a,b' },
       },
-      published(1, publishedEntry({ filename: 'artifacts/top5.csv', roles: ['requested_output'] }), 3),
+      published(
+        1,
+        publishedEntry({ filename: 'artifacts/top5.csv', roles: ['requested_output'] }),
+        3,
+      ),
       { type: 'tool_exec_end', id: 1, ok: true, result: 'Created top5.csv' },
     ]);
     const item = state.transcript.at(-1);
@@ -620,7 +620,15 @@ describe('reduce (published artifacts)', () => {
         name: 'publish_artifact',
         input: { kind: 'text', artifact_path: 'artifacts/top5.csv', content: 'v1' },
       },
-      published(2, publishedEntry({ filename: 'artifacts/top5.csv', sha256: '1'.repeat(64), roles: ['requested_output'] }), 2),
+      published(
+        2,
+        publishedEntry({
+          filename: 'artifacts/top5.csv',
+          sha256: '1'.repeat(64),
+          roles: ['requested_output'],
+        }),
+        2,
+      ),
       { type: 'tool_exec_end', id: 2, ok: true },
       {
         type: 'tool_exec_start',
@@ -628,7 +636,15 @@ describe('reduce (published artifacts)', () => {
         name: 'publish_artifact',
         input: { kind: 'text', artifact_path: 'artifacts/top5.csv', content: 'v2!' },
       },
-      published(3, publishedEntry({ filename: 'artifacts/top5.csv', sha256: '2'.repeat(64), roles: ['requested_output'] }), 3),
+      published(
+        3,
+        publishedEntry({
+          filename: 'artifacts/top5.csv',
+          sha256: '2'.repeat(64),
+          roles: ['requested_output'],
+        }),
+        3,
+      ),
       { type: 'tool_exec_end', id: 3, ok: true },
     ]);
     expect(state.artifacts.map((artifact) => artifact.entry.filename)).toEqual([
@@ -650,7 +666,10 @@ describe('reduce (published artifacts)', () => {
     expect(finished.live).toBeUndefined();
     expect(finished.artifacts).toEqual([
       {
-        entry: publishedEntry({ filename: 'artifacts/page.png', sourceUrl: 'https://sec.gov/filings' }),
+        entry: publishedEntry({
+          filename: 'artifacts/page.png',
+          sourceUrl: 'https://sec.gov/filings',
+        }),
         sizeBytes: 10,
       },
     ]);
@@ -677,7 +696,12 @@ describe('reduce (published artifacts)', () => {
         name: 'write_file',
         input: { file_path: 'scratch/notes.md', content: 'wip' },
       },
-      { type: 'tool_exec_end', id: 1, ok: true, result: 'File created successfully at: scratch/notes.md' },
+      {
+        type: 'tool_exec_end',
+        id: 1,
+        ok: true,
+        result: 'File created successfully at: scratch/notes.md',
+      },
     ]);
     expect(state.transcript.at(-1)).toMatchObject({
       kind: 'activity',
@@ -697,8 +721,14 @@ describe('reduce (published artifacts)', () => {
         name: 'publish_artifact',
         input: { kind: 'text', artifact_path: 'artifacts/notes.csv' },
       },
-      published(4, publishedEntry({ filename: 'artifacts/notes.csv', roles: ['requested_output'] })),
-      published(4, publishedEntry({ filename: 'artifacts/shot.png', sourceUrl: 'https://x.test/b' })),
+      published(
+        4,
+        publishedEntry({ filename: 'artifacts/notes.csv', roles: ['requested_output'] }),
+      ),
+      published(
+        4,
+        publishedEntry({ filename: 'artifacts/shot.png', sourceUrl: 'https://x.test/b' }),
+      ),
       { type: 'tool_exec_end', id: 4, ok: true },
     ]);
     expect(state.transcript.at(-1)).toMatchObject({
@@ -717,10 +747,7 @@ describe('reduce (published artifacts)', () => {
       artifacts: [],
       artifactUi: { cursor: 5, view: 'rows' },
     };
-    const next = reduce(
-      stale,
-      published(9, publishedEntry({ filename: 'artifacts/late.png' })),
-    );
+    const next = reduce(stale, published(9, publishedEntry({ filename: 'artifacts/late.png' })));
     expect(next.artifacts).toHaveLength(1);
     expect(next.artifactUi.cursor).toBe(0);
   });
@@ -735,7 +762,10 @@ describe('reduce (published artifacts)', () => {
         name: 'publish_artifact',
         input: { kind: 'screenshot', artifact_path: 'artifacts/partial.png' },
       },
-      published(5, publishedEntry({ filename: 'artifacts/partial.png', sourceUrl: 'https://x.test/a' })),
+      published(
+        5,
+        publishedEntry({ filename: 'artifacts/partial.png', sourceUrl: 'https://x.test/a' }),
+      ),
       { type: 'tool_exec_end', id: 5, ok: false, error: 'step 2 failed' },
     ]);
     expect(state.transcript.at(-1)).toMatchObject({ kind: 'activity', status: 'error' });
@@ -960,9 +990,7 @@ describe('reduce (artifacts focus mode)', () => {
       published(1, publishedEntry({ filename: 'artifacts/a.png' })),
     ]);
     expect(reduce(running, { type: 'artifacts_focus' })).toEqual(running);
-    const evals = fold([
-      { type: 'evals_started', tasks: ['stub'], k: 1, concurrency: 1 },
-    ]);
+    const evals = fold([{ type: 'evals_started', tasks: ['stub'], k: 1, concurrency: 1 }]);
     expect(reduce(evals, { type: 'artifacts_focus' })).toEqual(evals);
   });
 

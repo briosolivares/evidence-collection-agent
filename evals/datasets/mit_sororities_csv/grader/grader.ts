@@ -15,7 +15,10 @@
 // no-op — a silently-renamed assertion would leave this variant quietly
 // grading one check fewer than it claims.
 
-import { grade as gradeWithSheet, SHEET_ASSERTION_NAME } from '../../mit_sororities/grader/grader.js';
+import {
+  grade as gradeWithSheet,
+  SHEET_ASSERTION_NAME,
+} from '../../mit_sororities/grader/grader.js';
 import type { AssertionResult, Grader } from '../../../types.js';
 
 export const grade: Grader = async (runDirPath, oracleData) => {

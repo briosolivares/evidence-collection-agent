@@ -79,9 +79,7 @@ function budget(overrides: Partial<RunBudgetConfig> = {}) {
   });
 }
 
-function accepted(
-  status: 'verified' | 'needs_correction',
-): AcceptedModelResponse {
+function accepted(status: 'verified' | 'needs_correction'): AcceptedModelResponse {
   const findings =
     status === 'verified'
       ? []
@@ -93,13 +91,13 @@ function accepted(
           },
         ];
   return acceptedContent([
-      {
-        type: 'tool_use' as const,
-        id: 'verdict',
-        name: 'report_verification',
-        input: { status, findings },
-      },
-    ]);
+    {
+      type: 'tool_use' as const,
+      id: 'verdict',
+      name: 'report_verification',
+      input: { status, findings },
+    },
+  ]);
 }
 
 function acceptedContent(
@@ -134,9 +132,7 @@ function scriptedModel(steps: readonly AcceptedModelResponse[]): ModelDriver {
 }
 
 function report(input: unknown, id = 'verdict'): AcceptedModelResponse {
-  return acceptedContent([
-    { type: 'tool_use', id, name: 'report_verification', input },
-  ]);
+  return acceptedContent([{ type: 'tool_use', id, name: 'report_verification', input }]);
 }
 
 function inspect(id = 'inspect'): AcceptedModelResponse {
@@ -176,9 +172,7 @@ describe('verifier binding', () => {
   });
 
   it('validates model-driver limits at construction', () => {
-    expect(() => createVerifierModelDriver({ maxOutputTokens: 0 })).toThrow(
-      /maxOutputTokens/,
-    );
+    expect(() => createVerifierModelDriver({ maxOutputTokens: 0 })).toThrow(/maxOutputTokens/);
   });
 
   it('pins the fail-closed verdict schema', () => {
@@ -192,9 +186,7 @@ describe('verifier binding', () => {
     expect(
       verificationResultSchema.safeParse({
         status: 'verified',
-        findings: [
-          { area: 'output', code: 'contradiction', message: 'not empty' },
-        ],
+        findings: [{ area: 'output', code: 'contradiction', message: 'not empty' }],
       }).success,
     ).toBe(false);
     expect(
@@ -316,25 +308,20 @@ describe('runVerifier', () => {
       reason: 'verifier ended without a valid report_verification call',
     });
 
-    const repaired = scriptedModel([
-      prose,
-      report({ status: 'verified', findings: [] }),
-    ]);
+    const repaired = scriptedModel([prose, report({ status: 'verified', findings: [] })]);
     await expect(verifyWith(repaired)).resolves.toEqual({
       status: 'verified',
       findings: [],
     });
-    expect(
-      JSON.stringify(vi.mocked(repaired.generate).mock.calls[1]![0].messages),
-    ).toContain('Prose is never a verdict');
+    expect(JSON.stringify(vi.mocked(repaired.generate).mock.calls[1]![0].messages)).toContain(
+      'Prose is never a verdict',
+    );
   });
 
   it('repairs one malformed report, then fails closed on a second', async () => {
     const invalid = report({
       status: 'verified',
-      findings: [
-        { area: 'output', code: 'contradiction', message: 'not empty' },
-      ],
+      findings: [{ area: 'output', code: 'contradiction', message: 'not empty' }],
     });
     const repaired = scriptedModel([
       invalid,
@@ -352,13 +339,11 @@ describe('runVerifier', () => {
     await expect(verifyWith(repaired)).resolves.toMatchObject({
       status: 'needs_correction',
     });
-    expect(
-      JSON.stringify(vi.mocked(repaired.generate).mock.calls[1]![0].messages),
-    ).toContain('failed validation');
+    expect(JSON.stringify(vi.mocked(repaired.generate).mock.calls[1]![0].messages)).toContain(
+      'failed validation',
+    );
 
-    await expect(
-      verifyWith(scriptedModel([invalid, invalid])),
-    ).resolves.toMatchObject({
+    await expect(verifyWith(scriptedModel([invalid, invalid]))).resolves.toMatchObject({
       status: 'invalid_verdict',
       reason: expect.stringContaining('invalid report_verification input'),
     });
@@ -409,9 +394,9 @@ describe('runVerifier', () => {
         budget: budget(),
       }),
     ).resolves.toMatchObject({ status: 'needs_correction' });
-    expect(
-      JSON.stringify(vi.mocked(model.generate).mock.calls[1]![0].messages),
-    ).toContain('objective structural findings remain');
+    expect(JSON.stringify(vi.mocked(model.generate).mock.calls[1]![0].messages)).toContain(
+      'objective structural findings remain',
+    );
   });
 
   it('teaches the incomplete exit when verified contradicts unresolved requirements', async () => {
@@ -447,12 +432,8 @@ describe('runVerifier', () => {
         budget: budget(),
       }),
     ).resolves.toMatchObject({ status: 'incomplete' });
-    const repairMessages = JSON.stringify(
-      vi.mocked(model.generate).mock.calls[1]![0].messages,
-    );
-    expect(repairMessages).toContain(
-      'return incomplete with one finding per blocked requirement',
-    );
+    const repairMessages = JSON.stringify(vi.mocked(model.generate).mock.calls[1]![0].messages);
+    expect(repairMessages).toContain('return incomplete with one finding per blocked requirement');
     expect(repairMessages).toContain('needs_correction with a typed finding');
   });
 
@@ -495,9 +476,7 @@ describe('runVerifier', () => {
     },
   ])('rejects $name after one repair', async ({ calls, reason }) => {
     const invalid = acceptedContent(calls);
-    await expect(
-      verifyWith(scriptedModel([invalid, invalid])),
-    ).resolves.toMatchObject({
+    await expect(verifyWith(scriptedModel([invalid, invalid]))).resolves.toMatchObject({
       status: 'invalid_verdict',
       reason: expect.stringContaining(reason),
     });
@@ -534,9 +513,9 @@ describe('runVerifier', () => {
     await expect(verifyWith(corrected)).resolves.toMatchObject({
       status: 'needs_correction',
     });
-    expect(
-      JSON.stringify(vi.mocked(corrected.generate).mock.calls[1]![0].messages),
-    ).toContain('inspection budget is exhausted');
+    expect(JSON.stringify(vi.mocked(corrected.generate).mock.calls[1]![0].messages)).toContain(
+      'inspection budget is exhausted',
+    );
 
     await expect(
       verifyWith(scriptedModel([overCeiling, inspect('inspect-again')])),
@@ -570,12 +549,9 @@ describe('runVerifier', () => {
   });
 
   it('charges verifier inspection calls and records model-visible result bytes', async () => {
-    writeArtifact(
-      runDir,
-      'artifacts/report.csv',
-      Buffer.from('name\nAlice\n', 'utf8'),
-      { roles: ['requested_output'] },
-    );
+    writeArtifact(runDir, 'artifacts/report.csv', Buffer.from('name\nAlice\n', 'utf8'), {
+      roles: ['requested_output'],
+    });
     const tracker = budget();
     const steps = [
       acceptedContent([
@@ -596,15 +572,17 @@ describe('runVerifier', () => {
       }),
     };
 
-    await expect(runVerifier({
-      taskText: 'Create report.csv.',
-      runDir,
-      contract: CONTRACT,
-      finish: FINISH,
-      surfacedArtifacts: SURFACED_ARTIFACTS,
-      model,
-      budget: tracker,
-    })).resolves.toMatchObject({
+    await expect(
+      runVerifier({
+        taskText: 'Create report.csv.',
+        runDir,
+        contract: CONTRACT,
+        finish: FINISH,
+        surfacedArtifacts: SURFACED_ARTIFACTS,
+        model,
+        budget: tracker,
+      }),
+    ).resolves.toMatchObject({
       status: 'verified',
     });
     const snapshot = captureRunBudgetSnapshot(tracker);
@@ -640,10 +618,10 @@ describe('runVerifier', () => {
 
   it('fails closed on a fatal model call while retaining known billing', async () => {
     const tracker = budget();
-    const failure = new ModelGenerationFailedError(
-      new Error('transport failed'),
-      { input_tokens: 7, output_tokens: 2 },
-    );
+    const failure = new ModelGenerationFailedError(new Error('transport failed'), {
+      input_tokens: 7,
+      output_tokens: 2,
+    });
     const model: ModelDriver = {
       generate: vi.fn(async () => {
         throw failure;
@@ -709,9 +687,7 @@ describe('runVerifier', () => {
       ],
     });
 
-    const opening = JSON.stringify(
-      vi.mocked(model.generate).mock.calls[0]![0].messages,
-    );
+    const opening = JSON.stringify(vi.mocked(model.generate).mock.calls[0]![0].messages);
     expect(opening).toContain('Worker completion report (untrusted claim)');
     expect(opening).toContain('Surfaced manifest entries');
     expect(opening).toContain('artifacts/report.csv');
@@ -749,9 +725,7 @@ describe('runVerifier', () => {
         },
       ],
     });
-    const opening = JSON.stringify(
-      vi.mocked(model.generate).mock.calls[0]![0].messages,
-    );
+    const opening = JSON.stringify(vi.mocked(model.generate).mock.calls[0]![0].messages);
     expect(opening).toContain('Per-column nonblank coverage');
     expect(opening).toContain('informational');
     expect(opening).toContain('name: 2 nonblank');
@@ -807,9 +781,7 @@ describe('runVerifier', () => {
       }),
     ).resolves.toMatchObject({ status: 'verified' });
 
-    const opening = JSON.stringify(
-      vi.mocked(model.generate).mock.calls[0]![0].messages,
-    );
+    const opening = JSON.stringify(vi.mocked(model.generate).mock.calls[0]![0].messages);
     expect(opening).not.toContain('unmanifested-tree');
     expect(opening).not.toContain('unmanifested-tree');
   });

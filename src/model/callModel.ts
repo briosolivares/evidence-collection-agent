@@ -59,7 +59,14 @@ export type ProgressEvent =
   | { type: 'turn_start'; turn: number }
   | { type: 'text_delta'; turn: number; text: string }
   | { type: 'tool_use_start'; turn: number; toolName: string }
-  | { type: 'retry'; turn: number; attempt: number; maxAttempts: number; delayMs: number; reason: string }
+  | {
+      type: 'retry';
+      turn: number;
+      attempt: number;
+      maxAttempts: number;
+      delayMs: number;
+      reason: string;
+    }
   | { type: 'turn_end'; turn: number; usage: Usage };
 
 /** Configuration for one model call. The system prompt and tool
@@ -212,10 +219,7 @@ export const COLLAPSED_BROWSER_RESULT_MARKER =
   'successful browser_execute results stay expanded.]';
 
 /** Whether a content block is one of the context view's deterministic stubs. */
-export function isCollapsedBrowserResult(block: {
-  type: string;
-  content?: unknown;
-}): boolean {
+export function isCollapsedBrowserResult(block: { type: string; content?: unknown }): boolean {
   return (
     block.type === 'tool_result' &&
     typeof block.content === 'string' &&

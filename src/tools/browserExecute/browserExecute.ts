@@ -35,12 +35,9 @@ import {
 } from './runner.js';
 
 export const DEFAULT_BROWSER_EXECUTE_TIMEOUT_MS = 30_000;
-export const MAX_BROWSER_EXECUTE_TIMEOUT_MS =
-  BROWSER_PROGRAM_LIMITS.maxProgramTimeoutMs;
-export const BROWSER_EXECUTE_MAX_OUTPUT_BYTES =
-  BROWSER_PROGRAM_LIMITS.maxCaptureOutputBytes;
-export const BROWSER_UPLOAD_MAX_FILE_BYTES =
-  BROWSER_PROGRAM_LIMITS.maxUploadFileBytes;
+export const MAX_BROWSER_EXECUTE_TIMEOUT_MS = BROWSER_PROGRAM_LIMITS.maxProgramTimeoutMs;
+export const BROWSER_EXECUTE_MAX_OUTPUT_BYTES = BROWSER_PROGRAM_LIMITS.maxCaptureOutputBytes;
+export const BROWSER_UPLOAD_MAX_FILE_BYTES = BROWSER_PROGRAM_LIMITS.maxUploadFileBytes;
 
 export const BROWSER_EXECUTE_POLICY_DENIED_MESSAGE =
   'browser_execute is disabled for this run (javascriptPolicy=deny). ' +
@@ -61,17 +58,12 @@ export const browserExecuteInputSchema = z.strictObject({
     .refine((value) => value.trim().length > 0, {
       message: 'code must contain at least one non-whitespace character',
     })
-    .refine(
-      (value) =>
-        Buffer.byteLength(value, 'utf8') <=
-        BROWSER_PROGRAM_LIMITS.maxSourceBytes,
-      {
-        message: `code must not exceed ${BROWSER_PROGRAM_LIMITS.maxSourceBytes} UTF-8 bytes`,
-      },
-    )
+    .refine((value) => Buffer.byteLength(value, 'utf8') <= BROWSER_PROGRAM_LIMITS.maxSourceBytes, {
+      message: `code must not exceed ${BROWSER_PROGRAM_LIMITS.maxSourceBytes} UTF-8 bytes`,
+    })
     .describe(
       'Body of an async JavaScript function run in a bounded Node child process (not in the ' +
-      'page) receiving the protected `browser` helper object. ' +
+        'page) receiving the protected `browser` helper object. ' +
         'Example batch shape: `const items = [/* known { id, url } items */]; const results = []; ' +
         'for (const item of items.slice(0, 20)) { try { const page = await browser.goto(item.url); ' +
         "results.push({ id: item.id, url: page.url, title: await browser.js('document.title') }); " +
@@ -183,13 +175,9 @@ export function createBrowserExecuteTool(
   };
 }
 
-function requireJavaScriptPolicy(
-  policy: BrowserJavaScriptPolicy,
-): BrowserJavaScriptPolicy {
+function requireJavaScriptPolicy(policy: BrowserJavaScriptPolicy): BrowserJavaScriptPolicy {
   if (policy !== 'allow' && policy !== 'deny') {
-    throw new Error(
-      'browser_execute requires an explicit javascriptPolicy of "allow" or "deny".',
-    );
+    throw new Error('browser_execute requires an explicit javascriptPolicy of "allow" or "deny".');
   }
   return policy;
 }
@@ -210,10 +198,7 @@ async function executeBrowserProgram(
   }
 
   const browser = requireBrowser(ctx.browser);
-  const workspaceDir = resolveRunPath(
-    ctx.runDir,
-    `${SCRATCH_DIR}/workspace`,
-  );
+  const workspaceDir = resolveRunPath(ctx.runDir, `${SCRATCH_DIR}/workspace`);
   mkdirSync(workspaceDir, { recursive: true, mode: 0o700 });
 
   let commandSession: BrowserCommandSession | undefined;
@@ -224,10 +209,7 @@ async function executeBrowserProgram(
     programResult = await deps.executeProgram({
       code: input.code,
       cwd: workspaceDir,
-      env: buildBrowserProgramEnvironment(
-        deps.environment(),
-        deps.secretEnvDenylist,
-      ),
+      env: buildBrowserProgramEnvironment(deps.environment(), deps.secretEnvDenylist),
       timeoutMs: input.timeout_ms ?? DEFAULT_BROWSER_EXECUTE_TIMEOUT_MS,
       maxOutputBytes: BROWSER_EXECUTE_MAX_OUTPUT_BYTES,
       abortSignal: ctx.abortSignal,
@@ -238,10 +220,7 @@ async function executeBrowserProgram(
       sendCdp: (method, params) => commandSession!.send(method, params),
       navigate: (url, options) => commandSession!.navigate(url, options),
       upload: async (backendDOMNodeId, workspacePath) => {
-        const absolutePath = resolveWorkspaceUploadPath(
-          workspaceDir,
-          workspacePath,
-        );
+        const absolutePath = resolveWorkspaceUploadPath(workspaceDir, workspacePath);
         await commandSession!.upload(backendDOMNodeId, absolutePath);
       },
     });
@@ -249,11 +228,7 @@ async function executeBrowserProgram(
     executionError = error;
   }
 
-  const cleanup = await cleanupAfterBrowserProgram(
-    ctx.runDir,
-    browser,
-    commandSession,
-  );
+  const cleanup = await cleanupAfterBrowserProgram(ctx.runDir, browser, commandSession);
 
   if (executionError !== undefined) {
     throw combinedFailure('browser program failed to run', executionError, cleanup.errors);
@@ -280,19 +255,14 @@ async function executeBrowserProgram(
   };
 }
 
-function requireBrowser(
-  browser: BrowserController | undefined,
-): BrowserController {
+function requireBrowser(browser: BrowserController | undefined): BrowserController {
   if (browser === undefined) {
     throw new Error('browser_execute requires an active browser session.');
   }
   return browser;
 }
 
-function resolveWorkspaceUploadPath(
-  workspaceDir: string,
-  workspacePath: string,
-): string {
+function resolveWorkspaceUploadPath(workspaceDir: string, workspacePath: string): string {
   const workspaceStats = lstatSync(workspaceDir);
   if (workspaceStats.isSymbolicLink()) {
     throw new Error('browser.upload scratch/workspace root must not be a symbolic link');
@@ -303,8 +273,7 @@ function resolveWorkspaceUploadPath(
   if (
     typeof workspacePath !== 'string' ||
     workspacePath.length === 0 ||
-    Buffer.byteLength(workspacePath, 'utf8') >
-      BROWSER_PROGRAM_LIMITS.maxWorkspacePathBytes
+    Buffer.byteLength(workspacePath, 'utf8') > BROWSER_PROGRAM_LIMITS.maxWorkspacePathBytes
   ) {
     throw new Error(
       `browser.upload workspace path must contain 1 through ` +
@@ -359,9 +328,7 @@ function resolveWorkspaceUploadPath(
   }
 
   const flags =
-    fsConstants.O_RDONLY |
-    (fsConstants.O_NOFOLLOW ?? 0) |
-    (fsConstants.O_NONBLOCK ?? 0);
+    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
   let fd: number;
   try {
     fd = openSync(absolutePath, flags);
@@ -377,9 +344,7 @@ function resolveWorkspaceUploadPath(
       throw new Error('browser.upload path must name a regular file');
     }
     if (stats.size > BROWSER_UPLOAD_MAX_FILE_BYTES) {
-      throw new Error(
-        `browser.upload file exceeds ${BROWSER_UPLOAD_MAX_FILE_BYTES} bytes`,
-      );
+      throw new Error(`browser.upload file exceeds ${BROWSER_UPLOAD_MAX_FILE_BYTES} bytes`);
     }
   } finally {
     closeSync(fd);
@@ -405,11 +370,7 @@ function buildBrowserProgramEnvironment(
 ): NodeJS.ProcessEnv {
   const withoutConfiguredSecrets: NodeJS.ProcessEnv = { ...source };
   for (const key of Object.keys(withoutConfiguredSecrets)) {
-    if (
-      secretEnvDenylist.some(
-        (denied) => key === denied || key.startsWith(denied),
-      )
-    ) {
+    if (secretEnvDenylist.some((denied) => key === denied || key.startsWith(denied))) {
       delete withoutConfiguredSecrets[key];
     }
   }
@@ -474,9 +435,7 @@ function combinedFailure(
   cleanupErrors: readonly string[],
 ): Error {
   const cleanup =
-    cleanupErrors.length > 0
-      ? ` (cleanup also failed: ${cleanupErrors.join('; ')})`
-      : '';
+    cleanupErrors.length > 0 ? ` (cleanup also failed: ${cleanupErrors.join('; ')})` : '';
   return new Error(`${prefix}: ${safeMessage(primary)}${cleanup}`);
 }
 

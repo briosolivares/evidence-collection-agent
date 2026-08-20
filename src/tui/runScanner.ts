@@ -28,24 +28,19 @@ export interface RunListEntry {
 
 function readMetricsStatus(runDir: string): string | undefined {
   try {
-    const metrics = JSON.parse(
-      readFileSync(join(runDir, 'metrics.json'), 'utf8'),
-    ) as { status?: unknown };
+    const metrics = JSON.parse(readFileSync(join(runDir, 'metrics.json'), 'utf8')) as {
+      status?: unknown;
+    };
     return typeof metrics.status === 'string' ? metrics.status : undefined;
   } catch {
     return undefined;
   }
 }
 
-function classifyRun(
-  runDir: string,
-  manifest: Manifest,
-): RunListEntry['status'] {
+function classifyRun(runDir: string, manifest: Manifest): RunListEntry['status'] {
   if (manifest.finishedAt === undefined) return 'unfinished';
   const metricsStatus = readMetricsStatus(runDir);
-  return metricsStatus === 'completed' || metricsStatus === 'verified'
-    ? 'complete'
-    : 'stopped';
+  return metricsStatus === 'completed' || metricsStatus === 'verified' ? 'complete' : 'stopped';
 }
 
 function readManifest(runDir: string): Manifest | undefined {
@@ -94,9 +89,7 @@ export function scanRuns(runsBaseDir: string): RunListEntry[] {
 }
 
 /** Load the run-summary view (manifest + metrics) for one run. */
-export function loadRunSummary(
-  runDir: string,
-): { manifest: ManifestView; metrics?: MetricsView } {
+export function loadRunSummary(runDir: string): { manifest: ManifestView; metrics?: MetricsView } {
   const manifest = readManifest(runDir);
   if (manifest === undefined) {
     throw new Error(`no readable manifest in ${runDir}`);
@@ -125,9 +118,7 @@ export function loadRunSummary(
   };
 
   try {
-    const metrics = JSON.parse(
-      readFileSync(join(runDir, 'metrics.json'), 'utf8'),
-    ) as WorkerMetrics;
+    const metrics = JSON.parse(readFileSync(join(runDir, 'metrics.json'), 'utf8')) as WorkerMetrics;
     return {
       manifest: manifestView,
       metrics: {

@@ -49,7 +49,12 @@ const initializerCallModel: CallModel = async () => ({
 // this file depends on the verifier's production default staying unreached.
 const verifierCallModel: CallModel = async () => ({
   content: [
-    { type: 'tool_use', id: 'tu_verify', name: 'report_verification', input: { status: 'verified', findings: [] } },
+    {
+      type: 'tool_use',
+      id: 'tu_verify',
+      name: 'report_verification',
+      input: { status: 'verified', findings: [] },
+    },
   ],
   stop_reason: 'tool_use',
   usage: { input_tokens: 10, output_tokens: 2 },
@@ -94,8 +99,7 @@ describe('mid-stream failure', () => {
       status: 'incomplete',
       reason: 'worker_incomplete',
       detail: 'socket hang up',
-      finalText:
-        'The assistant stopped before it could prepare a final response.',
+      finalText: 'The assistant stopped before it could prepare a final response.',
       unresolved: [],
     });
 
@@ -120,13 +124,9 @@ describe('mid-stream failure', () => {
 
 describe('browser-death classification', () => {
   it('recognizes the controller and Playwright shutdown messages', () => {
-    expect(
-      isBrowserDeathMessage('Target page, context or browser has been closed'),
-    ).toBe(true);
+    expect(isBrowserDeathMessage('Target page, context or browser has been closed')).toBe(true);
     expect(isBrowserDeathMessage('The browser session is closed.')).toBe(true);
-    expect(
-      isBrowserDeathMessage('browserContext.newPage: Browser closed'),
-    ).toBe(true);
+    expect(isBrowserDeathMessage('browserContext.newPage: Browser closed')).toBe(true);
     expect(isBrowserDeathMessage('Target closed')).toBe(true);
     expect(
       isBrowserDeathMessage(

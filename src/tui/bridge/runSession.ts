@@ -207,10 +207,9 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
             askUser(request).then(decide, (error: unknown) =>
               decide({
                 behavior: 'deny',
-                feedback:
-                  `The question dialog failed: ${
-                    error instanceof Error ? error.message : String(error)
-                  }. Continue without this information.`,
+                feedback: `The question dialog failed: ${
+                  error instanceof Error ? error.message : String(error)
+                }. Continue without this information.`,
               }),
             );
           });
@@ -235,15 +234,9 @@ export function startRun(task: string, deps: RunSessionDeps): RunHandle {
         ...(deps.runsBaseDir === undefined ? {} : { runsBaseDir: deps.runsBaseDir }),
         ...(deps.model === undefined ? {} : { model: deps.model }),
         ...(deps.maxTurns === undefined ? {} : { maxTurns: deps.maxTurns }),
-        ...(deps.maxContextTokens === undefined
-          ? {}
-          : { maxContextTokens: deps.maxContextTokens }),
-        ...(deps.authenticated === undefined
-          ? {}
-          : { authenticated: deps.authenticated }),
-        ...(deps.javascriptPolicy === undefined
-          ? {}
-          : { javascriptPolicy: deps.javascriptPolicy }),
+        ...(deps.maxContextTokens === undefined ? {} : { maxContextTokens: deps.maxContextTokens }),
+        ...(deps.authenticated === undefined ? {} : { authenticated: deps.authenticated }),
+        ...(deps.javascriptPolicy === undefined ? {} : { javascriptPolicy: deps.javascriptPolicy }),
         ...(deps.startUrl === undefined ? {} : { startUrl: deps.startUrl }),
         ...(requestPermission === undefined ? {} : { requestPermission }),
         ...(deps.createStream === undefined ? {} : { createStream: deps.createStream }),

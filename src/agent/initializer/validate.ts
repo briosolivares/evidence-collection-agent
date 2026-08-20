@@ -153,7 +153,9 @@ function checkFilename(
   const errors: string[] = [];
   const problem = unsafeFilenameReason(filename);
   if (problem !== undefined) {
-    errors.push(`output ${JSON.stringify(output.id)} filename ${JSON.stringify(filename)}: ${problem}`);
+    errors.push(
+      `output ${JSON.stringify(output.id)} filename ${JSON.stringify(filename)}: ${problem}`,
+    );
     // A rejected name is not recorded as claimed: reporting it a second time
     // as a duplicate would obscure the real problem.
     return errors;
@@ -190,7 +192,9 @@ function unsafeFilenameReason(filename: string): string | undefined {
   if (/[\u0000-\u001f\u007f]/.test(filename)) {
     return 'must not contain control characters';
   }
-  if (RESERVED_OUTPUT_FILENAMES.some((reserved) => reserved.toLowerCase() === filename.toLowerCase())) {
+  if (
+    RESERVED_OUTPUT_FILENAMES.some((reserved) => reserved.toLowerCase() === filename.toLowerCase())
+  ) {
     return `is reserved for the run's own records (${RESERVED_OUTPUT_FILENAMES.join(', ')})`;
   }
   return undefined;
@@ -202,9 +206,7 @@ function checkFilenamePattern(outputId: string, pattern: string): string[] {
   const problem = unsafeFilenameReason(pattern);
   return problem === undefined
     ? []
-    : [
-        `output ${JSON.stringify(outputId)} filenamePattern ${JSON.stringify(pattern)}: ${problem}`,
-      ];
+    : [`output ${JSON.stringify(outputId)} filenamePattern ${JSON.stringify(pattern)}: ${problem}`];
 }
 
 /** Column-level checks: distinct headers, well-formed enum value sets, and
@@ -269,7 +271,9 @@ function checkRules(
   const exactRules = rules.filter((rule) => rule.type === 'exact_row_count');
   const minimumRules = rules.filter((rule) => rule.type === 'minimum_row_count');
   if (exactRules.length > 1) {
-    errors.push(`${label} declares ${exactRules.length} exact_row_count rules; at most one is allowed`);
+    errors.push(
+      `${label} declares ${exactRules.length} exact_row_count rules; at most one is allowed`,
+    );
   }
   if (minimumRules.length > 1) {
     errors.push(
@@ -298,9 +302,7 @@ function checkRules(
       }
       for (const column of rule.columns) {
         if (!declared.has(column)) {
-          errors.push(
-            `${label} unique rule names undeclared column ${JSON.stringify(column)}`,
-          );
+          errors.push(`${label} unique rule names undeclared column ${JSON.stringify(column)}`);
         }
       }
       // Order-insensitive: unique over [a, b] and [b, a] are one rule.
@@ -366,9 +368,7 @@ function checkDocument(output: Extract<OutputSpec, { kind: 'document' }>): strin
     output.evidenceRequirement === 'per_required_section' &&
     (output.requiredSections === undefined || output.requiredSections.length === 0)
   ) {
-    errors.push(
-      `${label} requires evidence per required section but declares no requiredSections`,
-    );
+    errors.push(`${label} requires evidence per required section but declares no requiredSections`);
   }
   if (output.evidenceRequirement === 'none' && output.evidencePresentation === 'footnotes') {
     errors.push(
@@ -382,9 +382,7 @@ function checkDocument(output: Extract<OutputSpec, { kind: 'document' }>): strin
 /** External-action checks: the mustShow expectation binds to proof captures,
  * so requiring visible content without requiring any capture is a contract
  * no run could satisfy deliberately. */
-function checkExternalAction(
-  output: Extract<OutputSpec, { kind: 'external_action' }>,
-): string[] {
+function checkExternalAction(output: Extract<OutputSpec, { kind: 'external_action' }>): string[] {
   if (output.proof.mustShow !== undefined && output.proof.screenshots === undefined) {
     return [
       `output ${JSON.stringify(output.id)} lists proof.mustShow but requires no ` +

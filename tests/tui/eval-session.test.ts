@@ -71,7 +71,10 @@ function makeFixture(outcomes: RunOutcome[]): BatchFixture & {
   let call = 0;
 
   const runner: EvalRunner = (task, onEvent, opts) => {
-    fixture.runnerCalls.push({ task, ...(opts?.startUrl === undefined ? {} : { startUrl: opts.startUrl }) });
+    fixture.runnerCalls.push({
+      task,
+      ...(opts?.startUrl === undefined ? {} : { startUrl: opts.startUrl }),
+    });
     const outcome = outcomes[Math.min(call, outcomes.length - 1)]!;
     call += 1;
     onEvent({ type: 'run_started', task, at: 0 });
@@ -263,7 +266,9 @@ describe('startEvalBatch', () => {
       const done = (async (): Promise<RunOutcome> => {
         // The trial asks the user a question (e.g. a login blocker) through
         // the resolver the batch threaded in.
-        expect(await opts.requestPermission?.({ toolName: 'ask_user', input: {} })).toEqual(decision);
+        expect(await opts.requestPermission?.({ toolName: 'ask_user', input: {} })).toEqual(
+          decision,
+        );
         return { status: 'verified', finalText: '', runDir };
       })();
       return { cancel: vi.fn(), done };
@@ -284,7 +289,9 @@ describe('startEvalBatch', () => {
     // One allow, one deny → exactly one assist, stamped and labeled.
     expect(fixture.written[0]?.report.assistedDialogs).toBe(1);
     const reportAction = fixture.actions.find((action) => action.type === 'eval_report_ready');
-    expect((reportAction as { text: string }).text).toContain('ASSISTED: a human answered 1 interactive dialog(s)');
+    expect((reportAction as { text: string }).text).toContain(
+      'ASSISTED: a human answered 1 interactive dialog(s)',
+    );
   });
 
   it('a batch that never needed a dialog stays unlabeled even with a resolver present', async () => {

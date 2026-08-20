@@ -281,13 +281,9 @@ describe('executeToolCall permission gate', () => {
     );
 
     // The gate saw the validated input…
-    expect(requests).toEqual([
-      { toolName: 'interactive', input: { question: 'proceed?' } },
-    ]);
+    expect(requests).toEqual([{ toolName: 'interactive', input: { question: 'proceed?' } }]);
     // …and the executor received the trusted updated input unchanged.
-    expect(executed).toEqual([
-      { question: 'proceed?', answers: { chosen: ['Yes'] } },
-    ]);
+    expect(executed).toEqual([{ question: 'proceed?', answers: { chosen: ['Yes'] } }]);
     expect(result.isError).toBe(false);
   });
 
@@ -375,10 +371,15 @@ describe('executeToolCall execution deadline', () => {
       inputSchema: z.object({}).strict(),
       getAccess: () => ({ reads: [], writes: [] }),
       timeoutMs: 20,
-      execute: () => new Promise<never>((_resolve, reject) => { rejectLate = reject; }),
+      execute: () =>
+        new Promise<never>((_resolve, reject) => {
+          rejectLate = reject;
+        }),
     };
     const unhandled: unknown[] = [];
-    const onUnhandled = (error: unknown): void => { unhandled.push(error); };
+    const onUnhandled = (error: unknown): void => {
+      unhandled.push(error);
+    };
     process.on('unhandledRejection', onUnhandled);
     try {
       const result = await executeToolCall(
@@ -483,7 +484,10 @@ describe('executeToolCall busy-resource gate', () => {
       inputSchema: z.object({ pageId: z.string() }),
       timeoutMs: 20,
       getAccess: (input) => ({ reads: [], writes: [accessKey.page(input.pageId)] }),
-      execute: () => new Promise<string>((resolve) => { resolveWedged = resolve; }),
+      execute: () =>
+        new Promise<string>((resolve) => {
+          resolveWedged = resolve;
+        }),
     };
     const registry = createRegistry([wedgedWrite as ToolDef, writesPage as ToolDef]);
 

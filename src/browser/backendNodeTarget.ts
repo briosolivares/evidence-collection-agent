@@ -21,9 +21,7 @@ function runtimeException(response: unknown): string | undefined {
     return record.exception.description;
   }
   if (record.exception?.value !== undefined) return String(record.exception.value);
-  return typeof record.text === 'string'
-    ? record.text
-    : 'browser backend-node marker failed';
+  return typeof record.text === 'string' ? record.text : 'browser backend-node marker failed';
 }
 
 /**
@@ -53,9 +51,7 @@ export async function withBackendNodeLocator<T>(
   })) as { object?: { objectId?: unknown } };
   const objectId = resolved.object?.objectId;
   if (typeof objectId !== 'string' || objectId.length === 0) {
-    throw new Error(
-      `DOM.resolveNode returned no object for backend node ${backendDOMNodeId}`,
-    );
+    throw new Error(`DOM.resolveNode returned no object for backend node ${backendDOMNodeId}`);
   }
 
   const marker = randomUUID();
@@ -68,10 +64,7 @@ export async function withBackendNodeLocator<T>(
         }
         this.setAttribute(attribute, marker);
       }`,
-      arguments: [
-        { value: BACKEND_NODE_MARKER_ATTRIBUTE },
-        { value: marker },
-      ],
+      arguments: [{ value: BACKEND_NODE_MARKER_ATTRIBUTE }, { value: marker }],
       returnByValue: true,
     });
     const markerError = runtimeException(marked);
@@ -98,10 +91,7 @@ export async function withBackendNodeLocator<T>(
       functionDeclaration: `function(attribute, marker) {
         if (this.getAttribute?.(attribute) === marker) this.removeAttribute(attribute);
       }`,
-      arguments: [
-        { value: BACKEND_NODE_MARKER_ATTRIBUTE },
-        { value: marker },
-      ],
+      arguments: [{ value: BACKEND_NODE_MARKER_ATTRIBUTE }, { value: marker }],
       returnByValue: true,
     }).catch(() => undefined);
     await send('Runtime.releaseObject', { objectId }).catch(() => undefined);

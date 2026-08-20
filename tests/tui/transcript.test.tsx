@@ -103,12 +103,7 @@ describe('Transcript', () => {
     const { frames, rerender, unmount } = render(<Transcript items={first} />);
     await tick();
     rerender(
-      <Transcript
-        items={[
-          ...first,
-          { id: 1, kind: 'user_task', text: 'second investigation' },
-        ]}
-      />,
+      <Transcript items={[...first, { id: 1, kind: 'user_task', text: 'second investigation' }]} />,
     );
     await tick();
     const output = frames.join('\n');

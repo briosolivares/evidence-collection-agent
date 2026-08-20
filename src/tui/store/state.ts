@@ -101,7 +101,12 @@ export type TranscriptItemBody =
       status: 'ok' | 'error' | 'retried';
       verbose?: { input: string; result: string };
     }
-  | { kind: 'evidence'; line: string; sourceUrl?: string; verbose?: { input: string; result: string } }
+  | {
+      kind: 'evidence';
+      line: string;
+      sourceUrl?: string;
+      verbose?: { input: string; result: string };
+    }
   | {
       kind: 'completion';
       outcome: 'complete' | 'incomplete';

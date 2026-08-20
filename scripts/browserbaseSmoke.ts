@@ -30,10 +30,7 @@ import {
   createBrowserbaseClient,
   requireBrowserbaseApiKey,
 } from '../src/browser/browserbaseBrowserSessionProvider.js';
-import type {
-  BrowserCommandSession,
-  BrowserController,
-} from '../src/browser/controller.js';
+import type { BrowserCommandSession, BrowserController } from '../src/browser/controller.js';
 import { findDevRoot, loadFirstEnvFile, resolveSherlockPaths } from '../src/config/paths.js';
 import { createRunDir } from '../src/run/runDir.js';
 import { generateRunId } from '../src/run/runId.js';
@@ -117,10 +114,7 @@ async function prepareTaskPage(
   await browser.prepareTaskPage({ ownershipId, startUrl });
 }
 
-async function evaluate(
-  session: BrowserCommandSession,
-  expression: string,
-): Promise<unknown> {
+async function evaluate(session: BrowserCommandSession, expression: string): Promise<unknown> {
   const response = (await session.send('Runtime.evaluate', {
     expression,
     awaitPromise: true,
@@ -149,9 +143,7 @@ async function accessibilityNodes(
   const response = (await session.send('Accessibility.getFullAXTree')) as {
     nodes?: unknown;
   };
-  return Array.isArray(response.nodes)
-    ? (response.nodes as AccessibilityNode[])
-    : [];
+  return Array.isArray(response.nodes) ? (response.nodes as AccessibilityNode[]) : [];
 }
 
 function findBackendNodeId(
@@ -248,10 +240,7 @@ async function main(): Promise<void> {
     );
     check('one page is tracked', (await browser.pages()).length === 1);
 
-    check(
-      'fixture built in-page',
-      (await evaluate(commandSession, BUILD_FIXTURE_JS)) === 'built',
-    );
+    check('fixture built in-page', (await evaluate(commandSession, BUILD_FIXTURE_JS)) === 'built');
     const nodes = await accessibilityNodes(commandSession);
     const textBackendNodeId = findBackendNodeId(nodes, 'textbox', 'Smoke text');
     // Chrome exposes a file input as a button.
@@ -269,10 +258,7 @@ async function main(): Promise<void> {
       await fillBackendNode(commandSession, textBackendNodeId, 'smoke');
       check(
         'backend-node fill committed',
-        (await evaluate(
-          commandSession,
-          "document.getElementById('smoke-text').value",
-        )) === 'smoke',
+        (await evaluate(commandSession, "document.getElementById('smoke-text').value")) === 'smoke',
       );
     }
 
@@ -297,24 +283,15 @@ async function main(): Promise<void> {
     const uploadPayload = 'id,value\n1,smoke\n';
     writeFileSync(join(workspace, 'smoke-upload.csv'), uploadPayload);
     if (fileBackendNodeId !== undefined) {
-      await commandSession.upload(
-        fileBackendNodeId,
-        join(workspace, 'smoke-upload.csv'),
-      );
+      await commandSession.upload(fileBackendNodeId, join(workspace, 'smoke-upload.csv'));
       check(
         'the remote page received the file name',
-        (await evaluate(
-          commandSession,
-          "document.getElementById('smoke-file').files[0]?.name",
-        )) ===
+        (await evaluate(commandSession, "document.getElementById('smoke-file').files[0]?.name")) ===
           'smoke-upload.csv',
       );
       check(
         'the remote page received the file BYTES',
-        (await evaluate(
-          commandSession,
-          "document.getElementById('smoke-file').files[0]?.size",
-        )) ===
+        (await evaluate(commandSession, "document.getElementById('smoke-file').files[0]?.size")) ===
           Buffer.byteLength(uploadPayload),
         'a path-based upload to a remote browser attaches nothing',
       );
@@ -330,10 +307,7 @@ async function main(): Promise<void> {
       paperWidth: 8.5,
       paperHeight: 11,
     })) as { data?: unknown };
-    const pdf = Buffer.from(
-      typeof printed.data === 'string' ? printed.data : '',
-      'base64',
-    );
+    const pdf = Buffer.from(typeof printed.data === 'string' ? printed.data : '', 'base64');
     check(
       'rendered real PDF bytes',
       pdf.length > 500 && pdf.subarray(0, 5).toString() === '%PDF-',
@@ -418,11 +392,7 @@ async function main(): Promise<void> {
   const writing = await writer.createSession();
   let writingSession: BrowserCommandSession | undefined;
   try {
-    await prepareTaskPage(
-      writing,
-      `${runDir}:context-writer`,
-      FIXTURE_PAGE_URL,
-    );
+    await prepareTaskPage(writing, `${runDir}:context-writer`, FIXTURE_PAGE_URL);
     writingSession = await writing.openCommandSession();
     await evaluate(
       writingSession,
@@ -452,11 +422,7 @@ async function main(): Promise<void> {
   const reading = await reader.createSession();
   let readingSession: BrowserCommandSession | undefined;
   try {
-    await prepareTaskPage(
-      reading,
-      `${runDir}:context-reader`,
-      FIXTURE_PAGE_URL,
-    );
+    await prepareTaskPage(reading, `${runDir}:context-reader`, FIXTURE_PAGE_URL);
     readingSession = await reading.openCommandSession();
     check(
       'cookie survived into a SECOND session on the same context',

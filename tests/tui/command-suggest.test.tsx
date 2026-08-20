@@ -30,9 +30,7 @@ const DESCRIPTIONS = {
 
 describe('slash-command autosuggest panel (R1)', () => {
   it('typing / lists every command with its description', async () => {
-    const { lastFrame, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} />,
-    );
+    const { lastFrame, stdin, unmount } = render(<App config={config} apiKeyPresent={true} />);
     await tick();
     await typeText(stdin, '/');
     const frame = lastFrame() ?? '';
@@ -45,9 +43,7 @@ describe('slash-command autosuggest panel (R1)', () => {
   });
 
   it('typing /e filters to /evals and /exit only', async () => {
-    const { lastFrame, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} />,
-    );
+    const { lastFrame, stdin, unmount } = render(<App config={config} apiKeyPresent={true} />);
     await tick();
     await typeText(stdin, '/e');
     const frame = lastFrame() ?? '';
@@ -61,9 +57,7 @@ describe('slash-command autosuggest panel (R1)', () => {
 
   it('down arrow then Enter opens the highlighted command overlay', async () => {
     const runsConfig = createConfig({ runsBaseDir: '/nonexistent-runs-dir' });
-    const { lastFrame, stdin, unmount } = render(
-      <App config={runsConfig} apiKeyPresent={true} />,
-    );
+    const { lastFrame, stdin, unmount } = render(<App config={runsConfig} apiKeyPresent={true} />);
     await tick();
     await typeText(stdin, '/');
     stdin.write(DOWN); // from /help to /runs
@@ -78,9 +72,7 @@ describe('slash-command autosuggest panel (R1)', () => {
 
   it('Enter submits the selected command, not the typed prefix', async () => {
     const onExit = vi.fn();
-    const { stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} onExit={onExit} />,
-    );
+    const { stdin, unmount } = render(<App config={config} apiKeyPresent={true} onExit={onExit} />);
     await tick();
     await typeText(stdin, '/e');
     stdin.write(DOWN); // from /evals to /exit
@@ -92,9 +84,7 @@ describe('slash-command autosuggest panel (R1)', () => {
   });
 
   it('selection clamps at both ends instead of wrapping', async () => {
-    const { lastFrame, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} />,
-    );
+    const { lastFrame, stdin, unmount } = render(<App config={config} apiKeyPresent={true} />);
     await tick();
     await typeText(stdin, '/e');
     stdin.write(UP); // at the top stays on /evals
@@ -133,9 +123,7 @@ describe('slash-command autosuggest panel (R1)', () => {
 
   it('Enter after Tab submits the completed command', async () => {
     const onExit = vi.fn();
-    const { stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} onExit={onExit} />,
-    );
+    const { stdin, unmount } = render(<App config={config} apiKeyPresent={true} onExit={onExit} />);
     await tick();
     await typeText(stdin, '/ex');
     stdin.write('\t');
@@ -147,9 +135,7 @@ describe('slash-command autosuggest panel (R1)', () => {
   });
 
   it('Esc dismisses the panel and typing brings it back', async () => {
-    const { lastFrame, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} />,
-    );
+    const { lastFrame, stdin, unmount } = render(<App config={config} apiKeyPresent={true} />);
     await tick();
     await typeText(stdin, '/');
     expect(lastFrame()).toContain(DESCRIPTIONS.help);
@@ -180,9 +166,7 @@ describe('slash-command autosuggest panel (R1)', () => {
   });
 
   it('hides once the input contains a space (a task, not a command)', async () => {
-    const { lastFrame, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} />,
-    );
+    const { lastFrame, stdin, unmount } = render(<App config={config} apiKeyPresent={true} />);
     await tick();
     await typeText(stdin, '/help ');
     expect(lastFrame()).not.toContain(DESCRIPTIONS.help);
@@ -190,9 +174,7 @@ describe('slash-command autosuggest panel (R1)', () => {
   });
 
   it('locks the open panel frame (all commands, /help selected)', async () => {
-    const { lastFrame, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} />,
-    );
+    const { lastFrame, stdin, unmount } = render(<App config={config} apiKeyPresent={true} />);
     await tick();
     await typeText(stdin, '/');
     expect(lastFrame()).toMatchSnapshot();
@@ -231,14 +213,10 @@ describe('CommandSuggestions rendering contract', () => {
 describe('composer ghost completion (R5)', () => {
   /** The composer's input row (bordered, holds the › marker). */
   const composerLine = (frame: string | undefined): string =>
-    (frame ?? '')
-      .split('\n')
-      .find((line) => line.includes('│') && line.includes('› ')) ?? '';
+    (frame ?? '').split('\n').find((line) => line.includes('│') && line.includes('› ')) ?? '';
 
   it('shows the untyped remainder inline and follows the selection', async () => {
-    const { lastFrame, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} />,
-    );
+    const { lastFrame, stdin, unmount } = render(<App config={config} apiKeyPresent={true} />);
     await tick();
     await typeText(stdin, '/e');
     // TextInput's cursor renders as one cell between value and ghost.
@@ -250,9 +228,7 @@ describe('composer ghost completion (R5)', () => {
   });
 
   it('Tab fills the value; ghost and panel disappear once complete', async () => {
-    const { lastFrame, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} />,
-    );
+    const { lastFrame, stdin, unmount } = render(<App config={config} apiKeyPresent={true} />);
     await tick();
     await typeText(stdin, '/r');
     expect(composerLine(lastFrame())).toContain('/r uns');

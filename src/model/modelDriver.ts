@@ -61,9 +61,7 @@ export type ModelRejectionReason =
  * when told what went wrong; everything else is terminal for the call. */
 export function isProtocolCorrectableRejection(reason: ModelRejectionReason): boolean {
   return (
-    reason === 'too_many_tool_calls' ||
-    reason === 'malformed_tool_call' ||
-    reason === 'max_tokens'
+    reason === 'too_many_tool_calls' || reason === 'malformed_tool_call' || reason === 'max_tokens'
   );
 }
 
@@ -80,7 +78,12 @@ export class ModelResponseRejectedError extends Error {
   readonly protocolFeedback: string;
   readonly usage?: Usage;
 
-  constructor(reason: ModelRejectionReason, message: string, protocolFeedback: string, usage?: Usage) {
+  constructor(
+    reason: ModelRejectionReason,
+    message: string,
+    protocolFeedback: string,
+    usage?: Usage,
+  ) {
     super(message);
     this.reason = reason;
     this.protocolFeedback = protocolFeedback;
@@ -114,9 +117,7 @@ export class ModelGenerationFailedError extends Error {
   }
 }
 
-export function isModelGenerationFailedError(
-  error: unknown,
-): error is ModelGenerationFailedError {
+export function isModelGenerationFailedError(error: unknown): error is ModelGenerationFailedError {
   return error instanceof Error && error.name === 'ModelGenerationFailedError';
 }
 
@@ -459,10 +460,7 @@ export function createAnthropicModelDriver(config: ModelDriverConfig): ModelDriv
         // carrying the first complete attempt's already-reported usage.
         if (error instanceof Error && error.name === 'AbortError') throw error;
         options.signal?.throwIfAborted();
-        throw new ModelGenerationFailedError(
-          error,
-          aggregateUsage(knownUsages),
-        );
+        throw new ModelGenerationFailedError(error, aggregateUsage(knownUsages));
       }
       try {
         return accept(second);
@@ -505,8 +503,6 @@ function aggregateUsage(usages: readonly Usage[]): Usage {
     input_tokens: usages.reduce((sum, usage) => sum + usage.input_tokens, 0),
     output_tokens: usages.reduce((sum, usage) => sum + usage.output_tokens, 0),
     ...(cacheRead === undefined ? {} : { cache_read_input_tokens: cacheRead }),
-    ...(cacheCreation === undefined
-      ? {}
-      : { cache_creation_input_tokens: cacheCreation }),
+    ...(cacheCreation === undefined ? {} : { cache_creation_input_tokens: cacheCreation }),
   };
 }

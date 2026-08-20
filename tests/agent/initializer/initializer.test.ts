@@ -1,10 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import type {
-  CallModel,
-  ModelResponse,
-  ToolUseBlock,
-} from '../../../src/model/messages.js';
+import type { CallModel, ModelResponse, ToolUseBlock } from '../../../src/model/messages.js';
 import { ModelResponseRejectedError } from '../../../src/model/modelDriver.js';
 import { contractPrompt } from '../../../src/prompts/index.js';
 import type { OutputContract } from '../../../src/agent/initializer/outputContract.schema.js';
@@ -68,10 +64,7 @@ function response(content: ModelResponse['content']): ModelResponse {
   };
 }
 
-function contractCall(
-  id = 'contract-1',
-  contract: OutputContract = CONTRACT,
-): ToolUseBlock {
+function contractCall(id = 'contract-1', contract: OutputContract = CONTRACT): ToolUseBlock {
   return {
     type: 'tool_use',
     id,
@@ -107,28 +100,18 @@ describe('contract initializer static prefix', () => {
     const contractSchema = schema.properties?.contract as {
       properties?: Record<string, unknown>;
     };
-    expect(Object.keys(contractSchema.properties ?? {})).not.toContain(
-      'assumptions',
-    );
+    expect(Object.keys(contractSchema.properties ?? {})).not.toContain('assumptions');
     expect(contractPrompt).not.toContain('report.csv');
-    expect(contractPrompt).toContain(
-      'one immutable output contract',
-    );
-    expect(contractPrompt).toContain(
-      'original user request remains authoritative',
-    );
-    expect(contractPrompt).toContain(
-      'declare the matching column as type enum',
-    );
-    expect(contractPrompt).toContain(
-      'Never emit a matches_expected_values rule',
-    );
+    expect(contractPrompt).toContain('one immutable output contract');
+    expect(contractPrompt).toContain('original user request remains authoritative');
+    expect(contractPrompt).toContain('declare the matching column as type enum');
+    expect(contractPrompt).toContain('Never emit a matches_expected_values rule');
   });
 
   it('builds the strict driver with validated finite output limits', () => {
-    expect(() =>
-      createContractInitializerModelDriver({ maxOutputTokens: 0 }),
-    ).toThrow(/maxOutputTokens/);
+    expect(() => createContractInitializerModelDriver({ maxOutputTokens: 0 })).toThrow(
+      /maxOutputTokens/,
+    );
   });
 });
 
@@ -137,11 +120,9 @@ describe('runContractInitializer', () => {
     const state = createContractInitializerState('Create report.csv.');
     const afterAttempt = vi.fn(async () => undefined);
 
-    const outcome = await runContractInitializer(
-      state,
-      scripted([response([contractCall()])]),
-      { afterAttempt },
-    );
+    const outcome = await runContractInitializer(state, scripted([response([contractCall()])]), {
+      afterAttempt,
+    });
 
     expect(outcome).toEqual({ ok: true, contract: CONTRACT });
     expect(state.attempts).toBe(1);
@@ -174,9 +155,7 @@ describe('runContractInitializer', () => {
     const state = createContractInitializerState('Create report.csv.');
     const callModel = vi.fn<CallModel>(async (messages) => {
       if (messages.length === 1) return response([invalid]);
-      expect(JSON.stringify(messages.at(-1))).toContain(
-        'never a deterministic presence rule',
-      );
+      expect(JSON.stringify(messages.at(-1))).toContain('never a deterministic presence rule');
       return response([contractCall('repaired-contract')]);
     });
 
@@ -222,9 +201,10 @@ describe('runContractInitializer', () => {
       return response([contractCall('repaired-contract')]);
     });
 
-    await expect(
-      runContractInitializer(state, callModel),
-    ).resolves.toEqual({ ok: true, contract: CONTRACT });
+    await expect(runContractInitializer(state, callModel)).resolves.toEqual({
+      ok: true,
+      contract: CONTRACT,
+    });
     expect(state.attempts).toBe(INITIALIZER_MAX_ATTEMPTS);
     expect(callModel).toHaveBeenCalledTimes(2);
   });
@@ -244,9 +224,7 @@ describe('runContractInitializer', () => {
       reason: expect.stringContaining('made no set_output_contract call'),
     });
     expect(state.attempts).toBe(2);
-    await expect(
-      runContractInitializer(state, scripted([])),
-    ).resolves.toEqual(outcome);
+    await expect(runContractInitializer(state, scripted([]))).resolves.toEqual(outcome);
   });
 
   it('uses one repair for a correctable whole-response rejection', async () => {
@@ -259,16 +237,11 @@ describe('runContractInitializer', () => {
     );
 
     await expect(
-      runContractInitializer(
-        state,
-        scripted([rejected, response([contractCall()])]),
-      ),
+      runContractInitializer(state, scripted([rejected, response([contractCall()])])),
     ).resolves.toEqual({ ok: true, contract: CONTRACT });
     expect(state.messages[1]).toEqual({
       role: 'user',
-      content: [
-        { type: 'text', text: 'Issue one well-formed contract call.' },
-      ],
+      content: [{ type: 'text', text: 'Issue one well-formed contract call.' }],
     });
   });
 });

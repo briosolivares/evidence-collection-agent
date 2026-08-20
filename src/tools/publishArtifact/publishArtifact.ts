@@ -10,10 +10,7 @@ import { join, posix, relative, resolve, sep } from 'node:path';
 
 import { z } from 'zod';
 
-import type {
-  BrowserController,
-  BrowserDownloadResult,
-} from '../../browser/controller.js';
+import type { BrowserController, BrowserDownloadResult } from '../../browser/controller.js';
 import {
   ARTIFACTS_DIR,
   type ArtifactRole,
@@ -83,13 +80,8 @@ type ModeField = (typeof MODE_FIELDS)[number];
 export const publishArtifactInputSchema = z
   .strictObject({
     kind: z.enum(['file', 'text', 'screenshot', 'download']),
-    artifact_path: z
-      .string()
-      .min(1)
-      .describe('Run-relative destination under artifacts/.'),
-    roles: rolesSchema.describe(
-      'One or both semantic roles: requested_output and evidence.',
-    ),
+    artifact_path: z.string().min(1).describe('Run-relative destination under artifacts/.'),
+    roles: rolesSchema.describe('One or both semantic roles: requested_output and evidence.'),
     source_url: z
       .url()
       .optional()
@@ -103,10 +95,7 @@ export const publishArtifactInputSchema = z
           'write_file or browser_execute changed_files. It must begin with ' +
           'scratch/workspace/ (for example scratch/workspace/report.csv).',
       ),
-    content: z
-      .string()
-      .optional()
-      .describe('Text-mode content, encoded exactly as UTF-8.'),
+    content: z.string().optional().describe('Text-mode content, encoded exactly as UTF-8.'),
     page_id: z
       .string()
       .min(1)
@@ -116,18 +105,14 @@ export const publishArtifactInputSchema = z
       .boolean()
       .optional()
       .describe('Screenshot mode: capture the whole scrollable page.'),
-    url: httpUrlSchema
-      .optional()
-      .describe('Download mode: direct HTTP(S) resource URL.'),
+    url: httpUrlSchema.optional().describe('Download mode: direct HTTP(S) resource URL.'),
     backend_node_id: z
       .number()
       .int()
       .min(1)
       .max(2_147_483_647)
       .optional()
-      .describe(
-        'Download mode: accessibility backend DOM node id for a link or control.',
-      ),
+      .describe('Download mode: accessibility backend DOM node id for a link or control.'),
   })
   .superRefine((input, ctx) => {
     const allowedByMode: Record<typeof input.kind, readonly ModeField[]> = {
@@ -138,10 +123,7 @@ export const publishArtifactInputSchema = z
     };
 
     for (const field of MODE_FIELDS) {
-      if (
-        input[field] !== undefined &&
-        !allowedByMode[input.kind].includes(field)
-      ) {
+      if (input[field] !== undefined && !allowedByMode[input.kind].includes(field)) {
         ctx.addIssue({
           code: 'custom',
           path: [field],
@@ -171,8 +153,7 @@ export const publishArtifactInputSchema = z
       ctx.addIssue({
         code: 'custom',
         path: ['url'],
-        message:
-          'download mode requires exactly one of url or backend_node_id',
+        message: 'download mode requires exactly one of url or backend_node_id',
       });
     }
     if (
@@ -187,9 +168,7 @@ export const publishArtifactInputSchema = z
     }
   });
 
-export type PublishArtifactInput = z.infer<
-  typeof publishArtifactInputSchema
->;
+export type PublishArtifactInput = z.infer<typeof publishArtifactInputSchema>;
 
 /**
  * Publish one generic artifact through the existing manifest chokepoint.
@@ -217,11 +196,7 @@ export const publishArtifactTool: ToolDef<PublishArtifactInput> = {
     assertNotCancelled(ctx.abortSignal);
 
     const roles = canonicalRoles(input.roles);
-    const artifactPath = prepareArtifactWrite(
-      ctx.runDir,
-      input.artifact_path,
-      roles,
-    );
+    const artifactPath = prepareArtifactWrite(ctx.runDir, input.artifact_path, roles);
 
     let bytes: Uint8Array;
     let sourceUrl: string | undefined;
@@ -241,9 +216,7 @@ export const publishArtifactTool: ToolDef<PublishArtifactInput> = {
         bytes = await abortable(
           browser.screenshot({
             fullPage: input.full_page ?? false,
-            ...(input.page_id === undefined
-              ? {}
-              : { pageId: input.page_id }),
+            ...(input.page_id === undefined ? {} : { pageId: input.page_id }),
           }),
           ctx.abortSignal,
         );
@@ -257,24 +230,18 @@ export const publishArtifactTool: ToolDef<PublishArtifactInput> = {
             input.backend_node_id === undefined
               ? {
                   url: input.url!,
-                  ...(input.page_id === undefined
-                    ? {}
-                    : { pageId: input.page_id }),
+                  ...(input.page_id === undefined ? {} : { pageId: input.page_id }),
                 }
               : {
                   backendNodeId: input.backend_node_id,
-                  ...(input.page_id === undefined
-                    ? {}
-                    : { pageId: input.page_id }),
+                  ...(input.page_id === undefined ? {} : { pageId: input.page_id }),
                 },
           ),
           ctx.abortSignal,
         );
         assertSuccessfulDownload(response);
         bytes = response.bytes;
-        sourceUrl = isHttpUrl(response.finalUrl)
-          ? response.finalUrl
-          : initiatingPageUrl;
+        sourceUrl = isHttpUrl(response.finalUrl) ? response.finalUrl : initiatingPageUrl;
         break;
       }
     }
@@ -290,9 +257,7 @@ export const publishArtifactTool: ToolDef<PublishArtifactInput> = {
 };
 
 function canonicalRoles(roles: readonly ArtifactRole[]): ArtifactRole[] {
-  return (['requested_output', 'evidence'] as const).filter((role) =>
-    roles.includes(role),
-  );
+  return (['requested_output', 'evidence'] as const).filter((role) => roles.includes(role));
 }
 
 /** Resolve and validate an artifact destination before acquiring bytes. */
@@ -312,20 +277,14 @@ function prepareArtifactWrite(
   const existingEntry = readManifest(runDir).artifacts.find(
     (entry) => entry.filename === normalizedPath,
   );
-  if (
-    existingEntry !== undefined &&
-    !sameRoleSet(existingEntry.roles, roles)
-  ) {
+  if (existingEntry !== undefined && !sameRoleSet(existingEntry.roles, roles)) {
     throw new Error(
       `cannot overwrite ${normalizedPath}: existing roles ${formatRoles(existingEntry.roles)} ` +
         `do not match requested roles ${formatRoles(roles)}`,
     );
   }
 
-  const destinationState = inspectDestinationPath(
-    runDir,
-    normalizedPath,
-  );
+  const destinationState = inspectDestinationPath(runDir, normalizedPath);
   if (destinationState === 'file' && existingEntry === undefined) {
     throw new Error(
       `cannot overwrite unmanifested file at ${normalizedPath}; choose another artifact_path`,
@@ -353,10 +312,7 @@ function formatRoles(roles: readonly ArtifactRole[] | undefined): string {
  * file. `writeArtifact` is intentionally still the writer; this guard keeps
  * its ordinary filesystem write from following a model-created link.
  */
-function inspectDestinationPath(
-  runDir: string,
-  normalizedPath: string,
-): 'missing' | 'file' {
+function inspectDestinationPath(runDir: string, normalizedPath: string): 'missing' | 'file' {
   const segments = normalizedPath.split(sep);
   let current = resolve(runDir);
 
@@ -378,16 +334,12 @@ function inspectDestinationPath(
     }
     if (index < segments.length - 1) {
       if (!stats.isDirectory()) {
-        throw new Error(
-          `artifact destination ancestor is not a directory: ${display}`,
-        );
+        throw new Error(`artifact destination ancestor is not a directory: ${display}`);
       }
       continue;
     }
     if (!stats.isFile()) {
-      throw new Error(
-        `artifact destination is not a regular file: ${normalizedPath}`,
-      );
+      throw new Error(`artifact destination is not a regular file: ${normalizedPath}`);
     }
     return 'file';
   }
@@ -402,10 +354,7 @@ function inspectDestinationPath(
 function readWorkspaceSource(runDir: string, requestedPath: string): Buffer {
   const absolutePath = resolveRunPath(runDir, requestedPath);
   const normalizedPath = relative(resolve(runDir), absolutePath).split(sep).join('/');
-  if (
-    normalizedPath !== requestedPath ||
-    !isCanonicalWorkspaceSourcePath(normalizedPath)
-  ) {
+  if (normalizedPath !== requestedPath || !isCanonicalWorkspaceSourcePath(normalizedPath)) {
     throw new Error(
       'source_path must be the exact canonical run-relative path of a file under ' +
         `${WORKSPACE_PREFIX} (for example "scratch/workspace/report.csv"): ` +
@@ -416,17 +365,13 @@ function readWorkspaceSource(runDir: string, requestedPath: string): Buffer {
   assertSourceAncestorsAreDirectories(runDir, normalizedPath);
 
   const flags =
-    fsConstants.O_RDONLY |
-    (fsConstants.O_NOFOLLOW ?? 0) |
-    (fsConstants.O_NONBLOCK ?? 0);
+    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
   let fd: number;
   try {
     fd = openSync(absolutePath, flags);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ELOOP') {
-      throw new Error(
-        `source_path is a symlink, which is never followed: ${normalizedPath}`,
-      );
+      throw new Error(`source_path is a symlink, which is never followed: ${normalizedPath}`);
     }
     throw error;
   }
@@ -434,9 +379,7 @@ function readWorkspaceSource(runDir: string, requestedPath: string): Buffer {
   try {
     const stats = fstatSync(fd);
     if (!stats.isFile()) {
-      throw new Error(
-        `source_path is not a regular file: ${normalizedPath}`,
-      );
+      throw new Error(`source_path is not a regular file: ${normalizedPath}`);
     }
     if (stats.size > MAX_PUBLISH_ARTIFACT_BYTES) {
       throw new Error(
@@ -475,10 +418,7 @@ function isCanonicalWorkspaceSourcePath(value: string): boolean {
   );
 }
 
-function assertSourceAncestorsAreDirectories(
-  runDir: string,
-  normalizedPath: string,
-): void {
+function assertSourceAncestorsAreDirectories(runDir: string, normalizedPath: string): void {
   const segments = normalizedPath.split('/');
   let current = resolve(runDir);
   for (let index = 0; index < segments.length; index += 1) {
@@ -486,9 +426,7 @@ function assertSourceAncestorsAreDirectories(
     const stats = lstatSync(current);
     const display = segments.slice(0, index + 1).join('/');
     if (stats.isSymbolicLink()) {
-      throw new Error(
-        `source_path contains a symlink, which is never followed: ${display}`,
-      );
+      throw new Error(`source_path contains a symlink, which is never followed: ${display}`);
     }
     if (index < segments.length - 1 && !stats.isDirectory()) {
       throw new Error(`source_path ancestor is not a directory: ${display}`);
@@ -501,21 +439,14 @@ function requireBrowser(
   kind: 'screenshot' | 'download',
 ): BrowserController {
   if (browser === undefined) {
-    throw new Error(
-      `publish_artifact kind=${kind} requires an active browser session`,
-    );
+    throw new Error(`publish_artifact kind=${kind} requires an active browser session`);
   }
   return browser;
 }
 
 function assertSuccessfulDownload(response: BrowserDownloadResult): void {
-  if (
-    response.status !== undefined &&
-    (response.status < 200 || response.status >= 300)
-  ) {
-    throw new Error(
-      `download request failed with HTTP ${response.status}: ${response.finalUrl}`,
-    );
+  if (response.status !== undefined && (response.status < 200 || response.status >= 300)) {
+    throw new Error(`download request failed with HTTP ${response.status}: ${response.finalUrl}`);
   }
 }
 
@@ -548,10 +479,7 @@ function assertNotCancelled(signal: AbortSignal | undefined): void {
 }
 
 /** Wait for a provider operation without publishing bytes after cancellation. */
-function abortable<T>(
-  operation: Promise<T>,
-  signal: AbortSignal | undefined,
-): Promise<T> {
+function abortable<T>(operation: Promise<T>, signal: AbortSignal | undefined): Promise<T> {
   if (signal === undefined) return operation;
   assertNotCancelled(signal);
 
@@ -560,8 +488,7 @@ function abortable<T>(
       signal.removeEventListener('abort', onAbort);
       callback();
     };
-    const onAbort = (): void =>
-      settle(() => rejectPromise(cancelledError()));
+    const onAbort = (): void => settle(() => rejectPromise(cancelledError()));
 
     signal.addEventListener('abort', onAbort, { once: true });
     operation.then(

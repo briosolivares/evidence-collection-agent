@@ -95,10 +95,7 @@ describe('createRunBudgetTracker', () => {
     expect(tokens.exceededLimit()).toBe('model_tokens');
 
     let nowMs = 1000;
-    const wall = createRunBudgetTracker(
-      { ...UNBOUNDED, maxWallTimeMs: 500 },
-      { now: () => nowMs },
-    );
+    const wall = createRunBudgetTracker({ ...UNBOUNDED, maxWallTimeMs: 500 }, { now: () => nowMs });
     expect(wall.exceededLimit()).toBeUndefined();
     nowMs = 1500;
     expect(wall.exceededLimit()).toBe('wall_time');

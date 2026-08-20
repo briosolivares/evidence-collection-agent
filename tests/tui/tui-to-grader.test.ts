@@ -15,11 +15,7 @@ import {
 import type { CallModel, ModelResponse } from '../../src/model/messages.js';
 import { TRANSCRIPT_FILENAME } from '../../src/run/transcript.js';
 import { startRun } from '../../src/tui/bridge/runSession.js';
-import {
-  createInitialState,
-  reduce,
-  type StoreAction,
-} from '../../src/tui/store/reducer.js';
+import { createInitialState, reduce, type StoreAction } from '../../src/tui/store/reducer.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
 import { scriptedResponse, scriptedStreamFactory } from './streamFixtures.js';
 import { stubBrowser } from './stubBrowser.js';
@@ -165,9 +161,7 @@ function eventIndex(
   predicate: (event: UiEvent) => boolean,
   after = -1,
 ): number {
-  const index = events.findIndex(
-    (event, candidate) => candidate > after && predicate(event),
-  );
+  const index = events.findIndex((event, candidate) => candidate > after && predicate(event));
   expect(index).toBeGreaterThan(after);
   return index;
 }
@@ -184,10 +178,7 @@ describe('Sherlock TUI-to-grader acceptance', () => {
       bytes: DOWNLOAD,
       suggestedFilename: 'export.bin',
     });
-    const streams = scriptedStreamFactory([
-      publicationResponse(),
-      finishResponse(),
-    ]);
+    const streams = scriptedStreamFactory([publicationResponse(), finishResponse()]);
     const events: UiEvent[] = [];
 
     const outcome = await startRun(TASK, {
@@ -208,16 +199,8 @@ describe('Sherlock TUI-to-grader acceptance', () => {
 
     let cursor = eventIndex(events, (event) => event.type === 'run_started');
     cursor = eventIndex(events, (event) => event.type === 'run_dir', cursor);
-    cursor = eventIndex(
-      events,
-      (event) => event.type === 'turn_start' && event.turn === 1,
-      cursor,
-    );
-    for (const name of [
-      'publish_artifact',
-      'publish_artifact',
-      'publish_artifact',
-    ]) {
+    cursor = eventIndex(events, (event) => event.type === 'turn_start' && event.turn === 1, cursor);
+    for (const name of ['publish_artifact', 'publish_artifact', 'publish_artifact']) {
       cursor = eventIndex(
         events,
         (event) => event.type === 'tool_pending' && event.name === name,
@@ -234,16 +217,12 @@ describe('Sherlock TUI-to-grader acceptance', () => {
     ]) {
       const started = eventIndex(
         events,
-        (event) =>
-          event.type === 'tool_exec_start' &&
-          event.name === 'publish_artifact',
+        (event) => event.type === 'tool_exec_start' && event.name === 'publish_artifact',
         cursor,
       );
       const published = eventIndex(
         events,
-        (event) =>
-          event.type === 'artifact_published' &&
-          event.entry.filename === filename,
+        (event) => event.type === 'artifact_published' && event.entry.filename === filename,
         started,
       );
       const publishedEvent = events[published];
@@ -253,16 +232,11 @@ describe('Sherlock TUI-to-grader acceptance', () => {
       publishedEvents.push(publishedEvent);
       cursor = eventIndex(
         events,
-        (event) =>
-          event.type === 'tool_exec_end' && event.id === publishedEvent.toolExecId,
+        (event) => event.type === 'tool_exec_end' && event.id === publishedEvent.toolExecId,
         published,
       );
     }
-    cursor = eventIndex(
-      events,
-      (event) => event.type === 'turn_start' && event.turn === 2,
-      cursor,
-    );
+    cursor = eventIndex(events, (event) => event.type === 'turn_start' && event.turn === 2, cursor);
     cursor = eventIndex(
       events,
       (event) => event.type === 'tool_pending' && event.name === 'finish',
@@ -271,8 +245,7 @@ describe('Sherlock TUI-to-grader acceptance', () => {
     cursor = eventIndex(events, (event) => event.type === 'turn_end', cursor);
     eventIndex(
       events,
-      (event) =>
-        event.type === 'run_finished' && event.outcome === 'verified',
+      (event) => event.type === 'run_finished' && event.outcome === 'verified',
       cursor,
     );
 
@@ -288,11 +261,7 @@ describe('Sherlock TUI-to-grader acceptance', () => {
       events
         .filter((event) => event.type === 'artifact_published')
         .map((event) => event.entry.filename),
-    ).toEqual([
-      'artifacts/answer.md',
-      'artifacts/source.png',
-      'artifacts/export.bin',
-    ]);
+    ).toEqual(['artifacts/answer.md', 'artifacts/source.png', 'artifacts/export.bin']);
 
     const expected = new Map<
       string,
@@ -302,14 +271,8 @@ describe('Sherlock TUI-to-grader acceptance', () => {
         sourceUrl: string | undefined;
       }
     >([
-      [
-        'artifacts/answer.md',
-        { bytes: ANSWER, roles: ['requested_output'], sourceUrl: undefined },
-      ],
-      [
-        'artifacts/source.png',
-        { bytes: SCREENSHOT, roles: ['evidence'], sourceUrl: SOURCE_URL },
-      ],
+      ['artifacts/answer.md', { bytes: ANSWER, roles: ['requested_output'], sourceUrl: undefined }],
+      ['artifacts/source.png', { bytes: SCREENSHOT, roles: ['evidence'], sourceUrl: SOURCE_URL }],
       [
         'artifacts/export.bin',
         {

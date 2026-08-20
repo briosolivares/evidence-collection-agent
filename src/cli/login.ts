@@ -38,10 +38,7 @@ import {
   launchPersistentChrome,
   pinProfileDownloadDirectory,
 } from '../browser/playwrightBrowserController.js';
-import {
-  describeBrowserProvider,
-  resolveBrowserProviderKind,
-} from '../browser/provider.js';
+import { describeBrowserProvider, resolveBrowserProviderKind } from '../browser/provider.js';
 import {
   chromeExecutablePath,
   findDevRoot,
@@ -51,11 +48,7 @@ import {
 import { runBrowserbaseLogin } from './browserbaseLogin.js';
 import { checkProfileLogins, probeServices } from './loginCheck.js';
 import { HEADED_LANE_SERVICES, allLoggedIn, formatLoginState } from './loginProbe.js';
-import {
-  MANUAL_LOGIN_START_URL,
-  manualLoginArgs,
-  resolveRealChromePath,
-} from './manualLogin.js';
+import { MANUAL_LOGIN_START_URL, manualLoginArgs, resolveRealChromePath } from './manualLogin.js';
 
 const PROBE_NAVIGATION_TIMEOUT_MS = 20_000;
 /** How long to keep retrying the verification probe while the manually
@@ -78,8 +71,7 @@ const loadedEnvFile = loadFirstEnvFile(paths.envFileCandidates);
 /** Where a newly created Browserbase Context id is saved: the file that
  * loaded, or the last candidate (the repo `.env` in a checkout,
  * `~/.sherlock/.env` installed) when none existed yet. */
-const envFilePath =
-  loadedEnvFile ?? paths.envFileCandidates[paths.envFileCandidates.length - 1]!;
+const envFilePath = loadedEnvFile ?? paths.envFileCandidates[paths.envFileCandidates.length - 1]!;
 /** Resolve the provider, reporting a misconfiguration as a message rather than
  * a stack trace: the whole failure here is a wrong value in a `.env` line, and
  * a stack trace buries the one sentence that says which. */
@@ -269,10 +261,12 @@ if (provider === 'browserbase') {
     if (checkOnly) {
       console.log('Verifying login state (headless)…');
       const ready = await verifyAll(context);
-      console.log(ready
-        ? `\nLOGIN OK — ${paths.profileDir} is ready for headed batches.`
-        : '\nNOT READY — run `npm run login` to log in, or `npm run login -- --manual` ' +
-          'if a sign-in page refuses the automated browser (Google always does).');
+      console.log(
+        ready
+          ? `\nLOGIN OK — ${paths.profileDir} is ready for headed batches.`
+          : '\nNOT READY — run `npm run login` to log in, or `npm run login -- --manual` ' +
+              'if a sign-in page refuses the automated browser (Google always does).',
+      );
       process.exitCode = ready ? 0 : 1;
     } else {
       // One tab per service so each sign-in page is right there to act on.

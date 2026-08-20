@@ -10,11 +10,7 @@ import type {
   ModelDriver,
   ModelGenerateOptions,
 } from '../../../src/model/modelDriver.js';
-import {
-  initManifest,
-  readManifest,
-  verifyManifestFiles,
-} from '../../../src/run/artifacts.js';
+import { initManifest, readManifest, verifyManifestFiles } from '../../../src/run/artifacts.js';
 import { createRunBudgetTracker } from '../../../src/run/runBudget.js';
 import { createWorkerToolRegistry } from '../../../src/tools/index.js';
 import {
@@ -38,9 +34,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function accepted(
-  content: AcceptedModelResponse['response']['content'],
-): AcceptedModelResponse {
+function accepted(content: AcceptedModelResponse['response']['content']): AcceptedModelResponse {
   const usage = {
     input_tokens: 10,
     output_tokens: 5,
@@ -137,11 +131,7 @@ describe('session vertical acceptance', () => {
       'name,value\nalpha,1\n',
     );
 
-    const restored = restoreWorker(
-      captureWorkerSnapshot(worker),
-      deps,
-      config,
-    );
+    const restored = restoreWorker(captureWorkerSnapshot(worker), deps, config);
     const outcome = await runWorker(restored);
 
     expect(outcome).toMatchObject({
@@ -157,9 +147,9 @@ describe('session vertical acceptance', () => {
     });
     expect(restored.state.messages[0]).toEqual(worker.state.messages[0]);
     expect(
-      requests[2]?.at(-1)?.content.some(
-        (block) => block.type === 'text' && block.text === NO_TOOL_CONTINUATION,
-      ),
+      requests[2]
+        ?.at(-1)
+        ?.content.some((block) => block.type === 'text' && block.text === NO_TOOL_CONTINUATION),
     ).toBe(true);
 
     const manifest = readManifest(runDir);

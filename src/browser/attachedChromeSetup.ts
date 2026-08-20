@@ -42,11 +42,9 @@ export function attachedChromeEndpoint(
 }
 
 /** Chrome stable's default user-data directory, matching Playwright's channel discovery. */
-export function defaultChromeUserDataDir(options: {
-  platform?: string;
-  home?: string;
-  localAppData?: string;
-} = {}): string | undefined {
+export function defaultChromeUserDataDir(
+  options: { platform?: string; home?: string; localAppData?: string } = {},
+): string | undefined {
   const platform = options.platform ?? process.platform;
   const home = options.home ?? homedir();
 
@@ -104,29 +102,21 @@ export async function discoverAttachedChromeEndpoint(
     );
   } catch (error) {
     if (isMissingFile(error)) return undefined;
-    throw new AttachedChromeSetupError(
-      'Could not read Chrome remote-debugging discovery state.',
-    );
+    throw new AttachedChromeSetupError('Could not read Chrome remote-debugging discovery state.');
   }
 
   try {
     const stat = await handle.stat();
     if (!stat.isFile() || stat.size > MAX_ACTIVE_PORT_BYTES) {
-      throw new AttachedChromeSetupError(
-        'Chrome remote-debugging discovery state is invalid.',
-      );
+      throw new AttachedChromeSetupError('Chrome remote-debugging discovery state is invalid.');
     }
 
     const buffer = Buffer.alloc(Math.min(MAX_ACTIVE_PORT_BYTES + 1, stat.size + 1));
     const { bytesRead } = await handle.read(buffer, 0, buffer.length, 0);
     if (bytesRead > MAX_ACTIVE_PORT_BYTES) {
-      throw new AttachedChromeSetupError(
-        'Chrome remote-debugging discovery state is invalid.',
-      );
+      throw new AttachedChromeSetupError('Chrome remote-debugging discovery state is invalid.');
     }
-    const endpoint = parseDevToolsActivePort(
-      buffer.subarray(0, bytesRead).toString('utf8'),
-    );
+    const endpoint = parseDevToolsActivePort(buffer.subarray(0, bytesRead).toString('utf8'));
     if (endpoint === undefined) return undefined;
     const port = Number(new URL(endpoint).port);
     return (await isPortReachable(port)) ? endpoint : undefined;
@@ -162,9 +152,7 @@ function isMissingFile(error: unknown): boolean {
 }
 
 /** Open Chrome's own remote-debugging permission page without automating it. */
-export async function openAttachedChromeSetupPage(
-  executablePath?: string,
-): Promise<void> {
+export async function openAttachedChromeSetupPage(executablePath?: string): Promise<void> {
   const chromePath = resolveRealChromePath(executablePath);
   if (chromePath === undefined) {
     throw new AttachedChromeSetupError(
@@ -180,9 +168,7 @@ export async function openAttachedChromeSetupPage(
       stdio: 'ignore',
     });
   } catch {
-    throw new AttachedChromeSetupError(
-      'Could not open Chrome remote-debugging setup.',
-    );
+    throw new AttachedChromeSetupError('Could not open Chrome remote-debugging setup.');
   }
 
   await new Promise<void>((resolve, reject) => {
@@ -190,9 +176,7 @@ export async function openAttachedChromeSetupPage(
       cleanup();
       child.unref();
       reject(
-        new AttachedChromeSetupError(
-          'Timed out while opening Chrome remote-debugging setup.',
-        ),
+        new AttachedChromeSetupError('Timed out while opening Chrome remote-debugging setup.'),
       );
     }, OPEN_SETUP_TIMEOUT_MS);
 
@@ -328,10 +312,7 @@ export class AttachedChromeSetupBrowserSessionProvider implements BrowserSession
     }
   }
 
-  private async connectDiscovered(
-    endpoint: string,
-    deadline: number,
-  ): Promise<BrowserController> {
+  private async connectDiscovered(endpoint: string, deadline: number): Promise<BrowserController> {
     const remaining = deadline - this.now();
     if (remaining <= 0) throw setupTimeoutError();
 

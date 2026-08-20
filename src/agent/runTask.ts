@@ -9,11 +9,7 @@ import {
 import type { BrowserController } from '../browser/controller.js';
 import { findDevRoot, resolveSherlockPaths } from '../config/paths.js';
 import type { CallModel, Message } from '../model/messages.js';
-import {
-  DEFAULT_MODEL,
-  type CallModelConfig,
-  type ProgressEvent,
-} from '../model/callModel.js';
+import { DEFAULT_MODEL, type CallModelConfig, type ProgressEvent } from '../model/callModel.js';
 import {
   createAnthropicModelDriver,
   isModelResponseRejectedError,
@@ -22,25 +18,17 @@ import {
   type ModelAttemptEvent,
   type ModelDriver,
 } from '../model/modelDriver.js';
-import {
-  initManifest,
-} from '../run/artifacts.js';
+import { initManifest } from '../run/artifacts.js';
 import { createRunDir } from '../run/runDir.js';
 import { generateRunId } from '../run/runId.js';
-import {
-  incompleteFinalText,
-  type RunOutcome,
-} from '../run/runOutcome.js';
+import { incompleteFinalText, type RunOutcome } from '../run/runOutcome.js';
 import { createRunTracing, type RunTracing } from '../tracing/runTracing.js';
 import type { ToolCtx } from '../tools/registry.js';
 import {
   INITIALIZER_MODEL,
   createContractInitializerModelDriver,
 } from './initializer/initializer.js';
-import {
-  VERIFIER_MODEL,
-  createVerifierModelDriver,
-} from './verifier/verifier.js';
+import { VERIFIER_MODEL, createVerifierModelDriver } from './verifier/verifier.js';
 import {
   readCheckpointResumeInfo,
   ceilingFromCheckpoint,
@@ -53,10 +41,7 @@ import {
 } from './checkpoint.schema.js';
 import { runAgent } from './lifecycle.js';
 import { workerPrompt } from '../prompts/index.js';
-import {
-  WORKER_API_TOOL_DEFS,
-  createWorkerToolRegistry,
-} from '../tools/index.js';
+import { WORKER_API_TOOL_DEFS, createWorkerToolRegistry } from '../tools/index.js';
 import { BASH_SECRET_ENV_DENYLIST } from '../tools/bash/secretEnvironment.js';
 
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -143,15 +128,9 @@ export interface ResumeTaskConfig {
 
 /** Start a fresh run through the initializer → worker → verifier
  * coordinator while preserving runTask's public dependency seams. */
-export async function runTask(
-  taskText: string,
-  config: RunTaskConfig,
-): Promise<RunTaskResult> {
+export async function runTask(taskText: string, config: RunTaskConfig): Promise<RunTaskResult> {
   const configuration = buildFreshConfiguration(taskText, config);
-  const runDir = createRunDir(
-    config.runsBaseDir ?? DEFAULT_RUNS_BASE_DIR,
-    generateRunId(taskText),
-  );
+  const runDir = createRunDir(config.runsBaseDir ?? DEFAULT_RUNS_BASE_DIR, generateRunId(taskText));
   initManifest(runDir, taskText, configuration.browserProvider);
 
   return executeRun(runDir, configuration, config);
@@ -160,10 +139,7 @@ export async function runTask(
 /** Resume a checkpoint. The read-only loader performs no locking or
  * mutation; the coordinator re-reads the full checkpoint after acquiring its
  * run lock and rejects any configuration drift. */
-export async function resumeTask(
-  runDir: string,
-  config: ResumeTaskConfig,
-): Promise<RunTaskResult> {
+export async function resumeTask(runDir: string, config: ResumeTaskConfig): Promise<RunTaskResult> {
   const resumeInfo = readCheckpointResumeInfo(runDir);
   const durable = resumeInfo.configuration;
   assertResumeConfigurationMatches(durable, config);
@@ -235,46 +211,34 @@ async function executeRun(
     );
 
     const initializerModel = traceModelDriver(
-      modelFromCallModel(
-        config.harness?.initializerCallModel,
-        () =>
-          createContractInitializerModelDriver({
-            ...(config.createStream === undefined
-              ? {}
-              : { createStream: config.createStream }),
-          }),
+      modelFromCallModel(config.harness?.initializerCallModel, () =>
+        createContractInitializerModelDriver({
+          ...(config.createStream === undefined ? {} : { createStream: config.createStream }),
+        }),
       ),
       tracing,
       INITIALIZER_MODEL,
       'initializer',
     );
     const workerModel = traceModelDriver(
-      modelFromCallModel(
-        config.callModel,
-        () =>
-          createAnthropicModelDriver({
-            model: configuration.model,
-            system: workerPrompt,
-            apiToolDefs: WORKER_API_TOOL_DEFS,
-            maxOutputTokens: configuration.maxOutputTokens,
-            ...(config.createStream === undefined
-              ? {}
-              : { createStream: config.createStream }),
-          }),
+      modelFromCallModel(config.callModel, () =>
+        createAnthropicModelDriver({
+          model: configuration.model,
+          system: workerPrompt,
+          apiToolDefs: WORKER_API_TOOL_DEFS,
+          maxOutputTokens: configuration.maxOutputTokens,
+          ...(config.createStream === undefined ? {} : { createStream: config.createStream }),
+        }),
       ),
       tracing,
       configuration.model,
       'worker',
     );
     const verifierModel = traceModelDriver(
-      modelFromCallModel(
-        config.harness?.verifierCallModel,
-        () =>
-          createVerifierModelDriver({
-            ...(config.createStream === undefined
-              ? {}
-              : { createStream: config.createStream }),
-          }),
+      modelFromCallModel(config.harness?.verifierCallModel, () =>
+        createVerifierModelDriver({
+          ...(config.createStream === undefined ? {} : { createStream: config.createStream }),
+        }),
       ),
       tracing,
       VERIFIER_MODEL,
@@ -309,21 +273,14 @@ async function executeRun(
   }
 }
 
-function buildFreshConfiguration(
-  taskText: string,
-  config: RunTaskConfig,
-): DurableRunConfiguration {
+function buildFreshConfiguration(taskText: string, config: RunTaskConfig): DurableRunConfiguration {
   const authenticated = config.authenticated ?? false;
-  const javascriptPolicy = assertJavaScriptPolicy(
-    config.javascriptPolicy,
-    authenticated,
-  );
+  const javascriptPolicy = assertJavaScriptPolicy(config.javascriptPolicy, authenticated);
   const startUrl = usableStartUrl(config.startUrl);
   return durableRunConfigurationSchema.parse({
     taskText,
     model: config.model ?? DEFAULT_MODEL,
-    maxOutputTokens:
-      config.maxOutputTokens ?? PRODUCTION_DEFAULTS.maxOutputTokens,
+    maxOutputTokens: config.maxOutputTokens ?? PRODUCTION_DEFAULTS.maxOutputTokens,
     maxContextTokens: ceilingToCheckpoint(
       config.maxContextTokens ?? PRODUCTION_DEFAULTS.maxContextTokens,
     ),
@@ -333,24 +290,15 @@ function buildFreshConfiguration(
     ...(startUrl === undefined ? {} : { startUrl }),
     maxInitializerAttempts: 2,
     maxCompletionCheckFailures:
-      config.harness?.maxCompletionCheckFailures ??
-      PRODUCTION_DEFAULTS.maxCompletionCheckFailures,
+      config.harness?.maxCompletionCheckFailures ?? PRODUCTION_DEFAULTS.maxCompletionCheckFailures,
     budgetLimits: {
-      maxWorkerTurns: ceilingToCheckpoint(
-        config.maxTurns ?? PRODUCTION_DEFAULTS.maxWorkerTurns,
-      ),
-      maxToolCalls: ceilingToCheckpoint(
-        config.maxToolCalls ?? PRODUCTION_DEFAULTS.maxToolCalls,
-      ),
+      maxWorkerTurns: ceilingToCheckpoint(config.maxTurns ?? PRODUCTION_DEFAULTS.maxWorkerTurns),
+      maxToolCalls: ceilingToCheckpoint(config.maxToolCalls ?? PRODUCTION_DEFAULTS.maxToolCalls),
       maxModelTokens: ceilingToCheckpoint(
         config.maxModelTokens ?? PRODUCTION_DEFAULTS.maxModelTokens,
       ),
-      maxWallTimeMs: ceilingToCheckpoint(
-        config.maxWallTimeMs ?? PRODUCTION_DEFAULTS.maxWallTimeMs,
-      ),
-      maxVerifierCorrections: ceilingToCheckpoint(
-        PRODUCTION_DEFAULTS.maxVerifierCorrections,
-      ),
+      maxWallTimeMs: ceilingToCheckpoint(config.maxWallTimeMs ?? PRODUCTION_DEFAULTS.maxWallTimeMs),
+      maxVerifierCorrections: ceilingToCheckpoint(PRODUCTION_DEFAULTS.maxVerifierCorrections),
     },
   });
 }
@@ -369,9 +317,7 @@ function assertResumeConfigurationMatches(
   };
 
   if (typeof config.authenticated !== 'boolean') {
-    throw new Error(
-      'resume requires the caller to explicitly state authenticated=true or false',
-    );
+    throw new Error('resume requires the caller to explicitly state authenticated=true or false');
   }
 
   const provider = browserProvider(config.browser);
@@ -384,11 +330,7 @@ function assertResumeConfigurationMatches(
 
   check('model', config.model, durable.model);
   check('maxOutputTokens', config.maxOutputTokens, durable.maxOutputTokens);
-  check(
-    'maxTurns',
-    config.maxTurns,
-    ceilingFromCheckpoint(durable.budgetLimits.maxWorkerTurns),
-  );
+  check('maxTurns', config.maxTurns, ceilingFromCheckpoint(durable.budgetLimits.maxWorkerTurns));
   check(
     'maxContextTokens',
     config.maxContextTokens,
@@ -480,15 +422,19 @@ function traceModelDriver(
   return {
     async generate(options): Promise<AcceptedModelResponse> {
       let accepted: AcceptedModelResponse | undefined;
-      const traced = tracing.wrapCallModel(async (messages: readonly Message[]) => {
-        accepted = await driver.generate({ ...options, messages });
-        return {
-          ...accepted.response,
-          // Langfuse must see every known billable attempt in this logical
-          // request, including a discarded max_tokens re-ask.
-          usage: accepted.usage,
-        };
-      }, model, role);
+      const traced = tracing.wrapCallModel(
+        async (messages: readonly Message[]) => {
+          accepted = await driver.generate({ ...options, messages });
+          return {
+            ...accepted.response,
+            // Langfuse must see every known billable attempt in this logical
+            // request, including a discarded max_tokens re-ask.
+            usage: accepted.usage,
+          };
+        },
+        model,
+        role,
+      );
       await traced(options.messages);
       if (accepted === undefined) {
         throw new Error('traced model call returned without an accepted response');
@@ -542,10 +488,7 @@ function createWorkerProgressBridge(
   };
 }
 
-function normalizeOutcome(
-  runDir: string,
-  outcome: DurableTerminalOutcome,
-): RunTaskResult {
+function normalizeOutcome(runDir: string, outcome: DurableTerminalOutcome): RunTaskResult {
   if (outcome.status === 'verified') return { runDir, ...outcome };
   if (outcome.status === 'incomplete') {
     return {
@@ -562,14 +505,10 @@ function normalizeOutcome(
     error.name = 'AbortError';
     throw error;
   }
-  throw new Error(
-    `run failed during ${outcome.during}: ${outcome.message}`,
-  );
+  throw new Error(`run failed during ${outcome.during}: ${outcome.message}`);
 }
 
-function browserProvider(
-  browser: BrowserController,
-): DurableRunConfiguration['browserProvider'] {
+function browserProvider(browser: BrowserController): DurableRunConfiguration['browserProvider'] {
   return browser.sessionDiagnostics?.provider ?? 'local';
 }
 

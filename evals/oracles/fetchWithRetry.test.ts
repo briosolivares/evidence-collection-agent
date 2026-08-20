@@ -82,10 +82,7 @@ describe('fetchWithRetry', () => {
   });
 
   it('honors a small Retry-After verbatim instead of the backoff', async () => {
-    const { deps, sleeps } = scriptedDeps([
-      response(503, { 'retry-after': '7' }),
-      response(200),
-    ]);
+    const { deps, sleeps } = scriptedDeps([response(503, { 'retry-after': '7' }), response(200)]);
     const result = await fetchWithRetry('https://example.test/x', undefined, deps);
     expect(result.status).toBe(200);
     expect(sleeps).toEqual([7_000]);
@@ -102,9 +99,7 @@ describe('fetchWithRetry', () => {
   it('gives up after 4 attempts, throwing the last network error', async () => {
     const errors = [1, 2, 3, 4].map((n) => new Error(`fetch failed #${n}`));
     const { deps, calls, sleeps } = scriptedDeps(errors);
-    await expect(fetchWithRetry('https://example.test/x', undefined, deps)).rejects.toBe(
-      errors[3],
-    );
+    await expect(fetchWithRetry('https://example.test/x', undefined, deps)).rejects.toBe(errors[3]);
     expect(calls()).toBe(MAX_FETCH_ATTEMPTS);
     expect(sleeps).toEqual([1_000, 2_000, 4_000]);
   });
@@ -125,9 +120,7 @@ describe('fetchWithRetry', () => {
   it('does not retry an exhausted rate-limit 429 — the raise-the-limit path stays intact', async () => {
     // githubGetJson turns this response into its "set GITHUB_TOKEN" error;
     // returning it unretried on attempt 1 is what preserves that message.
-    const { deps, calls, sleeps } = scriptedDeps([
-      response(429, { 'x-ratelimit-remaining': '0' }),
-    ]);
+    const { deps, calls, sleeps } = scriptedDeps([response(429, { 'x-ratelimit-remaining': '0' })]);
     const result = await fetchWithRetry('https://example.test/x', undefined, deps);
     expect(result.status).toBe(429);
     expect(calls()).toBe(1);

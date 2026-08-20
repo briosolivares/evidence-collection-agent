@@ -94,12 +94,10 @@ export function runFinishChecks({
 
   const requestedEntries = inspection.entries.filter(
     (entry) =>
-      entry.canonicalPath.startsWith(`${ARTIFACTS_DIR}/`) &&
-      hasRole(entry, 'requested_output'),
+      entry.canonicalPath.startsWith(`${ARTIFACTS_DIR}/`) && hasRole(entry, 'requested_output'),
   );
   const evidenceEntries = inspection.entries.filter(
-    (entry) =>
-      entry.canonicalPath.startsWith(`${ARTIFACTS_DIR}/`) && hasRole(entry, 'evidence'),
+    (entry) => entry.canonicalPath.startsWith(`${ARTIFACTS_DIR}/`) && hasRole(entry, 'evidence'),
   );
   const browserProvider =
     inspection.manifest.browserProvider === 'local' ||
@@ -165,9 +163,7 @@ export function runFinishChecks({
       const outcome = inspectExternalAction(
         output,
         inspection.entries.filter(
-          (entry) =>
-            entry.canonicalPath.startsWith(`${ARTIFACTS_DIR}/`) &&
-            entry.integrityVerified,
+          (entry) => entry.canonicalPath.startsWith(`${ARTIFACTS_DIR}/`) && entry.integrityVerified,
         ),
       );
       defects.push(...outcome.defects);
@@ -245,17 +241,12 @@ export function runFinishChecks({
       hasSource(entry),
   );
   checkActive?.();
-  facts.evidenceScreenshotPaths = evidenceScreenshots.map(
-    (entry) => entry.canonicalPath,
-  );
+  facts.evidenceScreenshotPaths = evidenceScreenshots.map((entry) => entry.canonicalPath);
 
   const documentNeedsEvidence = contract.outputs.some(
     (output) => output.kind === 'document' && output.evidenceRequirement !== 'none',
   );
-  if (
-    documentNeedsEvidence &&
-    !evidenceEntries.some((entry) => entry.integrityVerified)
-  ) {
+  if (documentNeedsEvidence && !evidenceEntries.some((entry) => entry.integrityVerified)) {
     defects.push({
       code: 'missing_document_evidence',
       message:
@@ -263,9 +254,7 @@ export function runFinishChecks({
     });
   }
 
-  return defects.length === 0
-    ? { status: 'passed', defects: [], facts }
-    : failed(defects, facts);
+  return defects.length === 0 ? { status: 'passed', defects: [], facts } : failed(defects, facts);
 }
 
 /**
@@ -351,10 +340,7 @@ function finishChecksNeedFullBytes(
       continue;
     }
     if (output.kind === 'document') {
-      if (
-        output.format !== 'pdf' &&
-        artifactPath === `${ARTIFACTS_DIR}/${output.filename}`
-      ) {
+      if (output.format !== 'pdf' && artifactPath === `${ARTIFACTS_DIR}/${output.filename}`) {
         return true;
       }
       continue;
@@ -593,7 +579,9 @@ function inspectCaptureOutput(
       acceptable = false;
     }
     if (entry.byteLength === 0) {
-      defects.push(captureDefect(output, entry, 'empty_capture', `${entry.canonicalPath} is empty.`));
+      defects.push(
+        captureDefect(output, entry, 'empty_capture', `${entry.canonicalPath} is empty.`),
+      );
       acceptable = false;
     }
     if (!hasSource(entry)) {
@@ -680,9 +668,7 @@ function inspectCaptureOutput(
       outputId: output.id,
       artifactPaths: valid.map(({ entry }) => entry.canonicalPath),
       count: valid.length,
-      ...(output.filenamePattern === undefined
-        ? {}
-        : { filenamePattern: output.filenamePattern }),
+      ...(output.filenamePattern === undefined ? {} : { filenamePattern: output.filenamePattern }),
       inferredMediaTypes: valid.map(({ entry }) =>
         inferMediaTypes(inspectionBytes(entry), artifactBasename(entry)),
       ),

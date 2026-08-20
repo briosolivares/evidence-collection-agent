@@ -13,10 +13,7 @@ import {
   requireBrowserbaseApiKey,
 } from '../browser/browserbaseBrowserSessionProvider.js';
 import { launchPersistentChrome } from '../browser/playwrightBrowserController.js';
-import {
-  requireBrowserbaseContextId,
-  resolveBrowserProviderKind,
-} from '../browser/provider.js';
+import { requireBrowserbaseContextId, resolveBrowserProviderKind } from '../browser/provider.js';
 import type { BrowserProviderKind } from '../browser/sessionProvider.js';
 import {
   settleProbe,
@@ -46,7 +43,11 @@ export async function probeService(
       waitUntil: 'domcontentloaded',
       timeout: PROBE_NAVIGATION_TIMEOUT_MS,
     });
-    return await settleProbe(service, () => page.url(), (ms) => page.waitForTimeout(ms));
+    return await settleProbe(
+      service,
+      () => page.url(),
+      (ms) => page.waitForTimeout(ms),
+    );
   } catch {
     return 'pending';
   } finally {

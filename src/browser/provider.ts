@@ -145,9 +145,7 @@ export function createBrowserSessionProvider(
       const explicitEndpoint = attachedChromeEndpoint(env);
       return new AttachedChromeSetupBrowserSessionProvider({
         ...(explicitEndpoint === undefined ? {} : { explicitEndpoint }),
-        ...(options.executablePath === undefined
-          ? {}
-          : { executablePath: options.executablePath }),
+        ...(options.executablePath === undefined ? {} : { executablePath: options.executablePath }),
         onSetupState: options.onAttachedSetupState,
       });
     }

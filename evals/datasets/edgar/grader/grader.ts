@@ -1,7 +1,12 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { findArtifactBySha256, readManifest, requestedOutputs, verifyManifestHashes } from '../../../grading/manifestVerification.js';
+import {
+  findArtifactBySha256,
+  readManifest,
+  requestedOutputs,
+  verifyManifestHashes,
+} from '../../../grading/manifestVerification.js';
 import type { AssertionResult, Grader } from '../../../types.js';
 import type { EdgarOracle } from '../oracle/edgarClient.js';
 
@@ -60,9 +65,10 @@ function isPngOnDisk(runDirPath: string, filename: string): boolean {
 }
 
 function asEdgarOracle(data: unknown): EdgarOracle {
-  const obj = data as
-    | { filing?: { accessionNumber?: unknown; primaryDocument?: unknown }; documentSha256?: unknown }
-    | null;
+  const obj = data as {
+    filing?: { accessionNumber?: unknown; primaryDocument?: unknown };
+    documentSha256?: unknown;
+  } | null;
   const valid =
     typeof obj === 'object' &&
     obj !== null &&

@@ -137,9 +137,7 @@ export async function captureClickDownload(
   }
 }
 
-async function readNavigationResponse(
-  response: Response,
-): Promise<BrowserDownloadResult> {
+async function readNavigationResponse(response: Response): Promise<BrowserDownloadResult> {
   const headers = response.headers();
   return {
     finalUrl: response.url(),
@@ -182,6 +180,8 @@ function suggestedFilenameFromHeaders(
     }
   }
 
-  return disposition.match(/filename="([^"]+)"/i)?.[1]
-    ?? disposition.match(/filename=([^;]+)/i)?.[1]?.trim();
+  return (
+    disposition.match(/filename="([^"]+)"/i)?.[1] ??
+    disposition.match(/filename=([^;]+)/i)?.[1]?.trim()
+  );
 }

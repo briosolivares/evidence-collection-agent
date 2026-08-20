@@ -69,8 +69,7 @@ type DeepReadonly<T> = T extends readonly (infer Child)[]
 /** Detached, recursively frozen configuration observed before resume opens
  * the mutating checkpoint store. The coordinator still re-reads and
  * revalidates the complete checkpoint after acquiring the run lock. */
-export type ReadonlyDurableRunConfiguration =
-  DeepReadonly<DurableRunConfiguration>;
+export type ReadonlyDurableRunConfiguration = DeepReadonly<DurableRunConfiguration>;
 
 /** Minimal, immutable composition-time view used to route a resume
  * without exposing or mutating the checkpoint's actionable cargo. */
@@ -79,16 +78,9 @@ export interface CheckpointResumeInfo {
   readonly configuration: ReadonlyDurableRunConfiguration;
 }
 
-const VALID_PHASE_TRANSITIONS: Readonly<
-  Record<CheckpointPhase, readonly CheckpointPhase[]>
-> = {
+const VALID_PHASE_TRANSITIONS: Readonly<Record<CheckpointPhase, readonly CheckpointPhase[]>> = {
   initializing: ['initializing', 'ready_for_model', 'terminal'],
-  ready_for_model: [
-    'ready_for_model',
-    'executing_tool',
-    'checking',
-    'terminal',
-  ],
+  ready_for_model: ['ready_for_model', 'executing_tool', 'checking', 'terminal'],
   executing_tool: ['executing_tool', 'ready_for_model', 'terminal'],
   checking: ['ready_for_model', 'verifying', 'terminal'],
   verifying: ['verifying', 'ready_for_model', 'terminal'],
@@ -121,9 +113,7 @@ export interface CheckpointStore {
  * a finite byte ceiling and no-follow regular-file checks. The returned value
  * is detached from the parsed checkpoint and recursively frozen.
  */
-export function readCheckpointConfiguration(
-  runDir: string,
-): ReadonlyDurableRunConfiguration {
+export function readCheckpointConfiguration(runDir: string): ReadonlyDurableRunConfiguration {
   return readCheckpointResumeInfo(runDir).configuration;
 }
 
@@ -131,9 +121,7 @@ export function readCheckpointConfiguration(
  * Terminal resumes use this hint to avoid constructing a new external trace;
  * the coordinator still re-reads and validates the full checkpoint under its
  * exclusive run lock before trusting either value. */
-export function readCheckpointResumeInfo(
-  runDir: string,
-): Readonly<CheckpointResumeInfo> {
+export function readCheckpointResumeInfo(runDir: string): Readonly<CheckpointResumeInfo> {
   assertRealRunDirectory(runDir);
   const harnessDir = existingHarnessDirectory(runDir);
   const checkpointPath = join(harnessDir, RUN_CHECKPOINT_FILENAME);
@@ -163,12 +151,7 @@ export async function openCheckpointStore(
   const checkpointPath = join(harnessDir, RUN_CHECKPOINT_FILENAME);
   const instanceId = randomUUID();
 
-  acquireRunLock(
-    harnessDir,
-    instanceId,
-    now,
-    options.beforeStaleLockUnlink,
-  );
+  acquireRunLock(harnessDir, instanceId, now, options.beforeStaleLockUnlink);
 
   let seed: Checkpoint | undefined;
   try {
@@ -194,10 +177,7 @@ export async function openCheckpointStore(
           `the last saved revision ${lastRevision}`,
       );
     }
-    if (
-      lastPhase !== undefined &&
-      !VALID_PHASE_TRANSITIONS[lastPhase].includes(checkpoint.phase)
-    ) {
+    if (lastPhase !== undefined && !VALID_PHASE_TRANSITIONS[lastPhase].includes(checkpoint.phase)) {
       throw new Error(
         `invalid checkpoint phase transition ${lastPhase} -> ${checkpoint.phase}; ` +
           (lastPhase === 'terminal'
@@ -383,16 +363,13 @@ function acquireRunLock(
     acquiredAt: new Date(now()).toISOString(),
   };
   try {
-    writeFileDurablyAtomic(
-      recoveryPath,
-      `${JSON.stringify(recoveryLock, null, 2)}\n`,
-      { mode: 'create', fileMode: HARNESS_FILE_MODE },
-    );
+    writeFileDurablyAtomic(recoveryPath, `${JSON.stringify(recoveryLock, null, 2)}\n`, {
+      mode: 'create',
+      fileMode: HARNESS_FILE_MODE,
+    });
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'EEXIST') {
-      throw new Error(
-        `another process is already recovering the stale run lock at ${path}`,
-      );
+      throw new Error(`another process is already recovering the stale run lock at ${path}`);
     }
     throw error;
   }
@@ -520,15 +497,11 @@ function readCheckpointText(path: string): string | undefined {
     throw error;
   }
   if (!before.isFile() || before.isSymbolicLink()) {
-    throw new Error(
-      `checkpoint at ${path} must be a regular file; symlinks are not followed`,
-    );
+    throw new Error(`checkpoint at ${path} must be a regular file; symlinks are not followed`);
   }
 
   const flags =
-    fsConstants.O_RDONLY |
-    (fsConstants.O_NOFOLLOW ?? 0) |
-    (fsConstants.O_NONBLOCK ?? 0);
+    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
   let descriptor: number;
   try {
     descriptor = openSync(path, flags);
@@ -573,11 +546,7 @@ function readCheckpointText(path: string): string | undefined {
     if (after.size > CHECKPOINT_MAX_BYTES) {
       throw checkpointSizeLimitError(path, Math.max(after.size, total + overflow));
     }
-    if (
-      overflow !== 0 ||
-      total !== opened.size ||
-      after.size !== opened.size
-    ) {
+    if (overflow !== 0 || total !== opened.size || after.size !== opened.size) {
       throw new Error(`checkpoint at ${path} changed while it was being read`);
     }
     return bytes.toString('utf8');

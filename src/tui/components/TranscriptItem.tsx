@@ -142,7 +142,9 @@ function VerboseDetail({ verbose }: { verbose: { input: string; result: string }
 function EvalTrial({ item }: { item: Extract<TranscriptItem, { kind: 'eval_trial' }> }) {
   return (
     <Box flexDirection="column" marginTop={1}>
-      <Text color={theme.muted}>{`— ${item.task} · trial ${item.trial}/${item.k} · ${formatDuration(item.elapsedMs)} —`}</Text>
+      <Text
+        color={theme.muted}
+      >{`— ${item.task} · trial ${item.trial}/${item.k} · ${formatDuration(item.elapsedMs)} —`}</Text>
       {item.assertions.map((assertion) => (
         <Text key={assertion.name}>
           <Text color={assertion.passed ? theme.success : theme.error}>

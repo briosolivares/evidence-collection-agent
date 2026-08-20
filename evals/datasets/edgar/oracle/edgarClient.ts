@@ -141,7 +141,11 @@ export async function fetchEdgarOracle(): Promise<EdgarOracle> {
   const submissionsResponse = await fetch(`${SEC_SUBMISSIONS_BASE}/CIK${APPLE_CIK}.json`, {
     headers: { 'User-Agent': SEC_USER_AGENT },
   });
-  const filing = parseSubmissions(await submissionsResponse.json(), TARGET_FORM, TARGET_FILING_DATE);
+  const filing = parseSubmissions(
+    await submissionsResponse.json(),
+    TARGET_FORM,
+    TARGET_FILING_DATE,
+  );
 
   const documentUrl = buildEdgarDocumentUrl(APPLE_CIK, filing);
   const documentResponse = await fetch(documentUrl, { headers: { 'User-Agent': SEC_USER_AGENT } });

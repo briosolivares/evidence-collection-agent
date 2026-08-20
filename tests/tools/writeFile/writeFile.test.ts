@@ -15,11 +15,7 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import {
-  initManifest,
-  readManifest,
-  writeArtifact,
-} from '../../../src/run/artifacts.js';
+import { initManifest, readManifest, writeArtifact } from '../../../src/run/artifacts.js';
 import { executeToolCall } from '../../../src/tools/pipeline.js';
 import { createRegistry, type ToolCtx } from '../../../src/tools/registry.js';
 import { FILE_TOOL_MAX_BYTES } from '../../../src/tools/fileAccess.js';
@@ -39,11 +35,7 @@ afterEach(() => {
 const registry = createRegistry([writeFileTool]);
 
 function call(name: 'write_file', input: unknown, ctx: Partial<ToolCtx> = {}) {
-  return executeToolCall(
-    registry,
-    { id: `call-${name}`, name, input },
-    { runDir, ...ctx },
-  );
+  return executeToolCall(registry, { id: `call-${name}`, name, input }, { runDir, ...ctx });
 }
 
 function writeRaw(relativePath: string, bytes: string | Buffer): string {
@@ -68,9 +60,7 @@ describe('write_file', () => {
     const bytes = Buffer.from('alpha\r\nbeta\n', 'utf8');
     expect(created).toMatchObject({ isError: false });
     expect(appended).toMatchObject({ isError: false });
-    expect(created.content).toBe(
-      JSON.stringify({ path: 'scratch/notes.txt', bytes: 7 }),
-    );
+    expect(created.content).toBe(JSON.stringify({ path: 'scratch/notes.txt', bytes: 7 }));
     expect(appended.content).toBe(
       JSON.stringify({ path: 'scratch/notes.txt', bytes: bytes.length }),
     );
@@ -81,9 +71,7 @@ describe('write_file', () => {
     );
     expect(entries).toHaveLength(1);
     expect(entries[0]).not.toHaveProperty('roles');
-    expect(entries[0]?.sha256).toBe(
-      createHash('sha256').update(bytes).digest('hex'),
-    );
+    expect(entries[0]?.sha256).toBe(createHash('sha256').update(bytes).digest('hex'));
   });
 
   it('appends UTF-8 content without decoding or changing existing bytes', async () => {
@@ -103,9 +91,7 @@ describe('write_file', () => {
     );
     expect(readFileSync(join(runDir, 'scratch/blob.bin'))).toEqual(expected);
     expect(
-      readManifest(runDir).artifacts.find(
-        (entry) => entry.filename === 'scratch/blob.bin',
-      )?.sha256,
+      readManifest(runDir).artifacts.find((entry) => entry.filename === 'scratch/blob.bin')?.sha256,
     ).toBe(createHash('sha256').update(expected).digest('hex'));
   });
 

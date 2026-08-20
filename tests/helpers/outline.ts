@@ -5,9 +5,7 @@
  */
 export function refFor(outline: string, roleAndName: string): string {
   const escapedRoleAndName = roleAndName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const match = outline.match(
-    new RegExp(`- ${escapedRoleAndName} \\[ref=([^\\]\\s]+)\\]`),
-  );
+  const match = outline.match(new RegExp(`- ${escapedRoleAndName} \\[ref=([^\\]\\s]+)\\]`));
   if (match?.[1] === undefined) {
     throw new Error(`No ref found for ${roleAndName} in:\n${outline}`);
   }

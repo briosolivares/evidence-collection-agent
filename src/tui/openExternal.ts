@@ -66,12 +66,9 @@ export interface OpenExternalDeps {
  * module (src/tui/ → repo root). The binary is gitignored: present on
  * machines that ran the build, absent otherwise — hence the runtime
  * existence probe before choosing it. */
-const DEFAULT_QUICK_LOOK_HELPER = fileURLToPath(
-  new URL('../../bin/sherlock-ql', import.meta.url),
-);
+const DEFAULT_QUICK_LOOK_HELPER = fileURLToPath(new URL('../../bin/sherlock-ql', import.meta.url));
 
-const defaultSpawn: SpawnFn = (command, args, options) =>
-  nodeSpawn(command, args, options);
+const defaultSpawn: SpawnFn = (command, args, options) => nodeSpawn(command, args, options);
 
 const defaultExists = (absPath: string): boolean => {
   try {
@@ -134,10 +131,7 @@ export function revealPath(
   if (missing !== undefined) return missing;
   const platform = deps.platform ?? process.platform;
   if (platform === 'darwin')
-    return launch(
-      { command: 'open', args: ['-R', absPath], capability: 'Reveal in Finder' },
-      deps,
-    );
+    return launch({ command: 'open', args: ['-R', absPath], capability: 'Reveal in Finder' }, deps);
   return notSupported(`Reveal in the file manager is not supported on ${platform}`);
 }
 
@@ -156,16 +150,11 @@ export function quickLookPath(
   const platform = deps.platform ?? process.platform;
   if (platform === 'darwin') {
     const helper =
-      deps.quickLookHelper === undefined
-        ? DEFAULT_QUICK_LOOK_HELPER
-        : deps.quickLookHelper;
+      deps.quickLookHelper === undefined ? DEFAULT_QUICK_LOOK_HELPER : deps.quickLookHelper;
     const exists = deps.exists ?? defaultExists;
     if (helper !== null && exists(helper))
       return launch({ command: helper, args: [absPath], capability: 'Quick Look' }, deps);
-    return launch(
-      { command: 'qlmanage', args: ['-p', absPath], capability: 'Quick Look' },
-      deps,
-    );
+    return launch({ command: 'qlmanage', args: ['-p', absPath], capability: 'Quick Look' }, deps);
   }
   if (platform === 'linux')
     return launch(
@@ -195,10 +184,7 @@ function notSupported(message: string): Promise<OpenExternalResult> {
   return Promise.resolve({ ok: false, message });
 }
 
-function launch(
-  spec: LaunchSpec,
-  deps: OpenExternalDeps,
-): Promise<OpenExternalResult> {
+function launch(spec: LaunchSpec, deps: OpenExternalDeps): Promise<OpenExternalResult> {
   const spawnFn = deps.spawn ?? defaultSpawn;
   return new Promise((resolve) => {
     let child: SpawnedChild;
@@ -214,9 +200,7 @@ function launch(
     // 'spawn' cannot double-settle.
     child.unref();
     child.once('spawn', () => resolve({ ok: true }));
-    child.once('error', (error) =>
-      resolve({ ok: false, message: launchFailure(spec, error) }),
-    );
+    child.once('error', (error) => resolve({ ok: false, message: launchFailure(spec, error) }));
   });
 }
 
@@ -236,8 +220,5 @@ function launchFailure(spec: LaunchSpec, error: unknown): string {
 }
 
 function isMissingBinary(error: unknown): boolean {
-  return (
-    error instanceof Error &&
-    (error as NodeJS.ErrnoException).code === 'ENOENT'
-  );
+  return error instanceof Error && (error as NodeJS.ErrnoException).code === 'ENOENT';
 }

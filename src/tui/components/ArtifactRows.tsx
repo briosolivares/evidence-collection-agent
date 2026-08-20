@@ -10,12 +10,7 @@
 import { Box, Text, useInput } from 'ink';
 
 import { formatBytes } from '../format.js';
-import {
-  openPath,
-  quickLookPath,
-  revealPath,
-  type OpenExternalResult,
-} from '../openExternal.js';
+import { openPath, quickLookPath, revealPath, type OpenExternalResult } from '../openExternal.js';
 import { isHelperProposalArtifact, type UiAction } from '../store/reducer.js';
 import type { ArtifactUiState, PublishedArtifact } from '../store/state.js';
 import { glyphs, theme } from '../theme.js';
@@ -148,13 +143,9 @@ export function ArtifactRows({
               </Text>
             )}
             <Text>
-              <Text color={selected ? theme.emphasis : undefined}>
-                {selected ? '› ' : '  '}
-              </Text>
+              <Text color={selected ? theme.emphasis : undefined}>{selected ? '› ' : '  '}</Text>
               <Text color={theme.emphasis}>{`${glyphs.evidence} `}</Text>
-              <Text color={selected ? theme.emphasis : undefined}>
-                {artifact.entry.filename}
-              </Text>
+              <Text color={selected ? theme.emphasis : undefined}>{artifact.entry.filename}</Text>
               <Text color={theme.muted}>
                 {`  ${artifact.sizeBytes === undefined ? '?' : formatBytes(artifact.sizeBytes)}`}
               </Text>
@@ -164,9 +155,7 @@ export function ArtifactRows({
       })}
       {artifacts.length > limit && (
         <Text color={theme.muted}>
-          {showCursor
-            ? `  ${cursor + 1}/${artifacts.length}`
-            : `  ${artifacts.length} artifacts`}
+          {showCursor ? `  ${cursor + 1}/${artifacts.length}` : `  ${artifacts.length} artifacts`}
         </Text>
       )}
     </Box>

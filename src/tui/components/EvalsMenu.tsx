@@ -93,9 +93,11 @@ export function EvalsMenu({ tasks, onConfirm, onClose }: EvalsMenuProps) {
 
   return (
     <Box flexDirection="column" marginTop={1}>
-      <Text color={theme.primary} bold>Eval tasks</Text>
+      <Text color={theme.primary} bold>
+        Eval tasks
+      </Text>
       {tasks.length === 0 ? (
-        <Text color={theme.muted}>  No eval tasks found.</Text>
+        <Text color={theme.muted}>{'  No eval tasks found.'}</Text>
       ) : stage === 'tasks' ? (
         <>
           {tasks.map((task, index) => (
@@ -110,15 +112,15 @@ export function EvalsMenu({ tasks, onConfirm, onClose }: EvalsMenuProps) {
               </Text>
             </Box>
           ))}
-          <Text color={theme.muted}>  space toggle · enter continue · esc cancel</Text>
+          <Text color={theme.muted}>{'  space toggle · enter continue · esc cancel'}</Text>
         </>
       ) : (
         <>
           <Text>
-            {stage === 'k' ? '  Trials per task — k: ' : '  Parallel headless trials — concurrency: '}
-            <Text color={theme.emphasis}>
-              {(stage === 'k' ? kText : concurrencyText) || '∙'}
-            </Text>
+            {stage === 'k'
+              ? '  Trials per task — k: '
+              : '  Parallel headless trials — concurrency: '}
+            <Text color={theme.emphasis}>{(stage === 'k' ? kText : concurrencyText) || '∙'}</Text>
           </Text>
           <Text color={theme.muted}>
             {`  running ${[...selected].join(', ')} · enter ${

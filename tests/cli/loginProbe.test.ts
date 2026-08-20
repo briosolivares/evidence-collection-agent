@@ -21,7 +21,9 @@ describe('GOOGLE_SHEETS.classify', () => {
 
   it('reads a surviving Sheets page as logged in', () => {
     expect(GOOGLE_SHEETS.classify('https://docs.google.com/spreadsheets/u/0/')).toBe('logged-in');
-    expect(GOOGLE_SHEETS.classify('https://docs.google.com/spreadsheets/u/0/?tgif=d')).toBe('logged-in');
+    expect(GOOGLE_SHEETS.classify('https://docs.google.com/spreadsheets/u/0/?tgif=d')).toBe(
+      'logged-in',
+    );
   });
 
   it('reports anything else — including unparseable URLs — as pending', () => {
@@ -33,7 +35,9 @@ describe('GOOGLE_SHEETS.classify', () => {
 
 describe('X_HOME.classify', () => {
   it('reads the login flow as logged out, on x.com and twitter.com alike', () => {
-    expect(X_HOME.classify('https://x.com/i/flow/login?redirect_after_login=%2Fhome')).toBe('logged-out');
+    expect(X_HOME.classify('https://x.com/i/flow/login?redirect_after_login=%2Fhome')).toBe(
+      'logged-out',
+    );
     expect(X_HOME.classify('https://twitter.com/login')).toBe('logged-out');
   });
 
@@ -59,7 +63,11 @@ describe('settleProbe', () => {
   it('polls through pending states until a verdict appears, then confirms it', async () => {
     const urls = ['about:blank', 'about:blank', 'https://x.com/home', 'https://x.com/home'];
     let reads = 0;
-    const state = await settleProbe(X_HOME, () => urls[Math.min(reads++, urls.length - 1)]!, instantSleep);
+    const state = await settleProbe(
+      X_HOME,
+      () => urls[Math.min(reads++, urls.length - 1)]!,
+      instantSleep,
+    );
     expect(state).toBe('logged-in');
   });
 
@@ -68,14 +76,22 @@ describe('settleProbe', () => {
     // JS bounces a signed-out session to the login flow.
     const urls = ['https://x.com/home', 'https://x.com/i/flow/login?redirect_after_login=%2Fhome'];
     let reads = 0;
-    const state = await settleProbe(X_HOME, () => urls[Math.min(reads++, urls.length - 1)]!, instantSleep);
+    const state = await settleProbe(
+      X_HOME,
+      () => urls[Math.min(reads++, urls.length - 1)]!,
+      instantSleep,
+    );
     expect(state).toBe('logged-out');
   });
 
   it('keeps the first verdict when the confirmation read is pending mid-navigation', async () => {
     const urls = ['https://accounts.google.com/ServiceLogin', 'about:blank'];
     let reads = 0;
-    const state = await settleProbe(GOOGLE_SHEETS, () => urls[Math.min(reads++, urls.length - 1)]!, instantSleep);
+    const state = await settleProbe(
+      GOOGLE_SHEETS,
+      () => urls[Math.min(reads++, urls.length - 1)]!,
+      instantSleep,
+    );
     expect(state).toBe('logged-out');
   });
 
@@ -85,7 +101,11 @@ describe('settleProbe', () => {
     // classifier learned that `/` means signed out.
     const urls = ['https://x.com/home', 'https://x.com/'];
     let reads = 0;
-    const state = await settleProbe(X_HOME, () => urls[Math.min(reads++, urls.length - 1)]!, instantSleep);
+    const state = await settleProbe(
+      X_HOME,
+      () => urls[Math.min(reads++, urls.length - 1)]!,
+      instantSleep,
+    );
     expect(state).toBe('logged-out');
   });
 
@@ -95,7 +115,11 @@ describe('settleProbe', () => {
     // the confirmation cannot label where it went, the gate must not pass.
     const urls = ['https://x.com/home', 'https://x.com/i/some-interstitial'];
     let reads = 0;
-    const state = await settleProbe(X_HOME, () => urls[Math.min(reads++, urls.length - 1)]!, instantSleep);
+    const state = await settleProbe(
+      X_HOME,
+      () => urls[Math.min(reads++, urls.length - 1)]!,
+      instantSleep,
+    );
     expect(state).toBe('pending');
   });
 

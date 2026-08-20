@@ -42,12 +42,7 @@ const tableFactSchema = z.strictObject({
    * checkpoints written before this field existed still parse. */
   columnNonblankCounts: z.array(columnNonblankCountSchema).optional(),
   satisfiedRules: z.array(
-    z.enum([
-      'exact_row_count',
-      'minimum_row_count',
-      'unique',
-      'matches_expected_values',
-    ]),
+    z.enum(['exact_row_count', 'minimum_row_count', 'unique', 'matches_expected_values']),
   ),
 });
 
@@ -110,11 +105,7 @@ export type TableFact = z.infer<typeof tableFactSchema>;
 export type DocumentFact = z.infer<typeof documentFactSchema>;
 export type CaptureFact = z.infer<typeof captureFactSchema>;
 export type ExternalActionFact = z.infer<typeof externalActionFactSchema>;
-export type OutputFact =
-  | TableFact
-  | DocumentFact
-  | CaptureFact
-  | ExternalActionFact;
+export type OutputFact = TableFact | DocumentFact | CaptureFact | ExternalActionFact;
 export type FinishFacts = z.infer<typeof finishFactsSchema>;
 export type ManifestFacts = NonNullable<FinishFacts['manifest']>;
 

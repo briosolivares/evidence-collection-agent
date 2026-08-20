@@ -8,7 +8,7 @@ interface Arguments {
 }
 
 void main().catch(async (error: unknown) => {
-  const message = error instanceof Error ? error.stack ?? error.message : String(error);
+  const message = error instanceof Error ? (error.stack ?? error.message) : String(error);
   try {
     await send({ type: 'error', message });
   } catch {
@@ -78,9 +78,7 @@ async function main(): Promise<void> {
 }
 
 async function waitForPages(
-  controller: Awaited<
-    ReturnType<AttachedChromeBrowserSessionProvider['createSession']>
-  >,
+  controller: Awaited<ReturnType<AttachedChromeBrowserSessionProvider['createSession']>>,
   count: number,
 ): Promise<Awaited<ReturnType<typeof controller.pages>>> {
   const deadline = Date.now() + 5_000;

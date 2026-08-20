@@ -196,7 +196,11 @@ function failProtocol(message) {
 }
 
 process.on('message', (message) => {
-  if (!isRecord(message) || message.version !== PROTOCOL_VERSION || typeof message.kind !== 'string') {
+  if (
+    !isRecord(message) ||
+    message.version !== PROTOCOL_VERSION ||
+    typeof message.kind !== 'string'
+  ) {
     failProtocol('parent sent a malformed browser-program IPC message');
     return;
   }
@@ -236,7 +240,12 @@ process.on('message', (message) => {
   }
 
   if (message.kind === 'cdp_response' || message.kind === 'host_response') {
-    if (!started || !Number.isSafeInteger(message.id) || message.id <= 0 || typeof message.ok !== 'boolean') {
+    if (
+      !started ||
+      !Number.isSafeInteger(message.id) ||
+      message.id <= 0 ||
+      typeof message.ok !== 'boolean'
+    ) {
       failProtocol('browser program received a malformed request response');
       return;
     }
@@ -246,9 +255,7 @@ process.on('message', (message) => {
       return;
     }
     if (entry.responseKind !== message.kind) {
-      failProtocol(
-        `browser program received ${message.kind} for a pending ${entry.responseKind}`,
-      );
+      failProtocol(`browser program received ${message.kind} for a pending ${entry.responseKind}`);
       return;
     }
     pending.delete(message.id);

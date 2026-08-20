@@ -16,11 +16,24 @@ export interface FixtureRun {
   /** Present ⇒ manifest is finalized. */
   finishedAt?: string;
   /** Present ⇒ metrics.json exists (normal loop completion). */
-  metrics?: { status: string; turns: number; inputTokens: number; outputTokens: number; cacheReadInputTokens: number; wallClockMs: number };
+  metrics?: {
+    status: string;
+    turns: number;
+    inputTokens: number;
+    outputTokens: number;
+    cacheReadInputTokens: number;
+    wallClockMs: number;
+  };
   /** Artifact files to create, with manifest entries. Published (artifacts/)
    * entries carry roles; scratch entries none — roles presence is the
    * published/private marker, exactly as writeArtifact records it. */
-  artifacts?: { filename: string; content: string; sha256: string; sourceUrl?: string; roles?: ArtifactRole[] }[];
+  artifacts?: {
+    filename: string;
+    content: string;
+    sha256: string;
+    sourceUrl?: string;
+    roles?: ArtifactRole[];
+  }[];
 }
 
 /** Create one fixture run directory under baseDir. */

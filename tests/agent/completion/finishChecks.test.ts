@@ -1,17 +1,13 @@
-import {
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  symlinkSync,
-  writeFileSync,
-} from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import type { OutputContract, OutputSpec } from '../../../src/agent/initializer/outputContract.schema.js';
+import type {
+  OutputContract,
+  OutputSpec,
+} from '../../../src/agent/initializer/outputContract.schema.js';
 import { initManifest, writeArtifact } from '../../../src/run/artifacts.js';
 import type { FinishInput } from '../../../src/tools/finish/finish.js';
 import {
@@ -60,9 +56,7 @@ function contract(...outputs: OutputSpec[]): OutputContract {
   return { outputs } as OutputContract;
 }
 
-function finish(
-  summary = 'Created and checked every requested output.',
-): FinishInput {
+function finish(summary = 'Created and checked every requested output.'): FinishInput {
   return {
     summary,
     unresolved: [],
@@ -132,12 +126,10 @@ describe('runFinishChecks — manifest-derived finish facts', () => {
         statement: expect.stringContaining('exactly 1 data row'),
       }),
     ]);
-    expect(
-      finishFactsSchema.parse(JSON.parse(JSON.stringify(result.facts))),
-    ).toEqual(result.facts);
-    expect(
-      finishFactsSchema.safeParse({ ...result.facts, unrecognized: true }).success,
-    ).toBe(false);
+    expect(finishFactsSchema.parse(JSON.parse(JSON.stringify(result.facts)))).toEqual(result.facts);
+    expect(finishFactsSchema.safeParse({ ...result.facts, unrecognized: true }).success).toBe(
+      false,
+    );
   });
 
   it('does not mutate the immutable contract or finish input', () => {
@@ -162,12 +154,8 @@ describe('runFinishChecks — manifest-derived finish facts', () => {
     });
 
     expect(result.status).toBe('passed');
-    expect(result.facts.manifest?.requestedOutputPaths).toEqual([
-      'artifacts/roster.csv',
-    ]);
-    expect(result.facts.manifest?.evidencePaths).toEqual([
-      'artifacts/support.txt',
-    ]);
+    expect(result.facts.manifest?.requestedOutputPaths).toEqual(['artifacts/roster.csv']);
+    expect(result.facts.manifest?.evidencePaths).toEqual(['artifacts/support.txt']);
   });
 
   it('reports hash drift and a recorded file that disappeared', () => {
@@ -241,11 +229,13 @@ describe('runFinishChecks — manifest-derived finish facts', () => {
     noncanonicalStart.startedAt = original.startedAt.replace('Z', '+00:00');
     writeFileSync(manifestPath, `${JSON.stringify(noncanonicalStart)}\n`);
     expect(
-      codes(runFinishChecks({
-        runDir,
-        contract: contract(tableSpec()),
-        finish: finish(),
-      })),
+      codes(
+        runFinishChecks({
+          runDir,
+          contract: contract(tableSpec()),
+          finish: finish(),
+        }),
+      ),
     ).toContain('invalid_manifest_shape');
 
     const noncanonicalCapture = structuredClone(original);
@@ -255,11 +245,13 @@ describe('runFinishChecks — manifest-derived finish facts', () => {
     );
     writeFileSync(manifestPath, `${JSON.stringify(noncanonicalCapture)}\n`);
     expect(
-      codes(runFinishChecks({
-        runDir,
-        contract: contract(tableSpec()),
-        finish: finish(),
-      })),
+      codes(
+        runFinishChecks({
+          runDir,
+          contract: contract(tableSpec()),
+          finish: finish(),
+        }),
+      ),
     ).toContain('invalid_manifest_entry');
 
     const outOfOrder = structuredClone(original);
@@ -269,19 +261,18 @@ describe('runFinishChecks — manifest-derived finish facts', () => {
     outOfOrder.finishedAt = new Date(Date.parse(original.startedAt) - 1).toISOString();
     writeFileSync(manifestPath, `${JSON.stringify(outOfOrder)}\n`);
     expect(
-      codes(runFinishChecks({
-        runDir,
-        contract: contract(tableSpec()),
-        finish: finish(),
-      })),
+      codes(
+        runFinishChecks({
+          runDir,
+          contract: contract(tableSpec()),
+          finish: finish(),
+        }),
+      ),
     ).toContain('invalid_manifest_timestamp_order');
   });
 
   it('fails deterministically before parsing an oversized manifest', () => {
-    writeFileSync(
-      join(runDir, 'manifest.json'),
-      Buffer.alloc(FINISH_MAX_MANIFEST_BYTES + 1, 0x20),
-    );
+    writeFileSync(join(runDir, 'manifest.json'), Buffer.alloc(FINISH_MAX_MANIFEST_BYTES + 1, 0x20));
 
     const result = runFinishChecks({
       runDir,
@@ -297,10 +288,9 @@ describe('runFinishChecks — manifest-derived finish facts', () => {
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as {
       artifacts: Array<Record<string, unknown>>;
     };
-    manifest.artifacts = Array.from(
-      { length: FINISH_MAX_MANIFEST_ENTRIES + 1 },
-      () => ({ ...manifest.artifacts[0] }),
-    );
+    manifest.artifacts = Array.from({ length: FINISH_MAX_MANIFEST_ENTRIES + 1 }, () => ({
+      ...manifest.artifacts[0],
+    }));
     writeFileSync(manifestPath, `${JSON.stringify(manifest)}\n`);
 
     const result = runFinishChecks({
@@ -449,10 +439,7 @@ describe('inspectManifest — bounded streaming content', () => {
   it('propagates the trusted run guard while streaming the manifest itself', () => {
     const manifestPath = join(runDir, 'manifest.json');
     const raw = readFileSync(manifestPath);
-    writeFileSync(
-      manifestPath,
-      Buffer.concat([raw, Buffer.alloc(1024 * 1024, 0x20)]),
-    );
+    writeFileSync(manifestPath, Buffer.concat([raw, Buffer.alloc(1024 * 1024, 0x20)]));
     const interrupted = new Error('terminal inspection deadline reached');
     let checks = 0;
 
@@ -521,9 +508,7 @@ describe('runFinishChecks — generic tables', () => {
       limits: { maxRows: 1 },
     });
 
-    expect(result.defects.map((defect) => defect.code)).toEqual([
-      'table_row_limit_exceeded',
-    ]);
+    expect(result.defects.map((defect) => defect.code)).toEqual(['table_row_limit_exceeded']);
   });
 
   it('caps deterministic defect expansion with one stable terminal defect', () => {
@@ -564,17 +549,12 @@ describe('runFinishChecks — generic tables', () => {
     let thrown: unknown;
 
     try {
-      inspectTable(
-        spec,
-        'artifacts/roster.csv',
-        Buffer.from(`name\n${'x'.repeat(256 * 1024)}\n`),
-        {
-          checkActive: () => {
-            checks += 1;
-            if (checks === 20) throw interrupted;
-          },
+      inspectTable(spec, 'artifacts/roster.csv', Buffer.from(`name\n${'x'.repeat(256 * 1024)}\n`), {
+        checkActive: () => {
+          checks += 1;
+          if (checks === 20) throw interrupted;
         },
-      );
+      });
     } catch (error) {
       thrown = error;
     }
@@ -593,17 +573,12 @@ describe('runFinishChecks — generic tables', () => {
     let thrown: unknown;
 
     try {
-      inspectTable(
-        spec,
-        'artifacts/roster.csv',
-        Buffer.from(`name\n${rows}\n`),
-        {
-          checkActive: () => {
-            checks += 1;
-            if (checks === 36) throw interrupted;
-          },
+      inspectTable(spec, 'artifacts/roster.csv', Buffer.from(`name\n${rows}\n`), {
+        checkActive: () => {
+          checks += 1;
+          if (checks === 36) throw interrupted;
         },
-      );
+      });
     } catch (error) {
       thrown = error;
     }
@@ -613,10 +588,7 @@ describe('runFinishChecks — generic tables', () => {
   });
 
   it('threads the finish guard through table parsing', () => {
-    publish(
-      'artifacts/roster.csv',
-      `name\n${'x'.repeat(1024 * 1024)}\n`,
-    );
+    publish('artifacts/roster.csv', `name\n${'x'.repeat(1024 * 1024)}\n`);
     const interrupted = new Error('whole-run table deadline');
     let checks = 0;
     let thrown: unknown;
@@ -705,10 +677,7 @@ describe('runFinishChecks — generic tables', () => {
   });
 
   it('computes per-column nonblank counts, treating whitespace-only cells as blank', () => {
-    publish(
-      'artifacts/roster.csv',
-      'name,url\nAlpha,https://example.test/a\nBeta,\nGamma, \n',
-    );
+    publish('artifacts/roster.csv', 'name,url\nAlpha,https://example.test/a\nBeta,\nGamma, \n');
     const result = runFinishChecks({
       runDir,
       contract: contract(tableSpec()),
@@ -998,9 +967,7 @@ describe('runFinishChecks — documents and captures', () => {
       ['shots', 'screenshots'],
       ['download', 'download'],
     ]);
-    expect(
-      finishFactsSchema.parse(JSON.parse(JSON.stringify(result.facts))),
-    ).toEqual(result.facts);
+    expect(finishFactsSchema.parse(JSON.parse(JSON.stringify(result.facts)))).toEqual(result.facts);
   });
 
   it('rejects one valid capture satisfying two unconstrained capture outputs', () => {
@@ -1136,9 +1103,7 @@ describe('runFinishChecks — browser evidence', () => {
     const result = runFinishChecks({
       runDir,
       contract: contract(tableSpec()),
-      finish: finish(
-        'Published the table, but login access prevented a source screenshot.',
-      ),
+      finish: finish('Published the table, but login access prevented a source screenshot.'),
     });
     expect(result.status).toBe('passed');
   });
@@ -1192,9 +1157,7 @@ describe('runFinishChecks — external actions', () => {
       }),
       expect.objectContaining({ code: 'evidence_screenshots' }),
     ]);
-    expect(
-      finishFactsSchema.parse(JSON.parse(JSON.stringify(result.facts))),
-    ).toEqual(result.facts);
+    expect(finishFactsSchema.parse(JSON.parse(JSON.stringify(result.facts)))).toEqual(result.facts);
   });
 
   it('fails when no artifact was captured at the destination', () => {

@@ -5,10 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import { executeToolCall } from '../../../src/tools/pipeline.js';
 import { createRegistry } from '../../../src/tools/registry.js';
-import {
-  BROWSER_TEST_TIMEOUT_MS,
-  setupBrowserToolSuite,
-} from '../../helpers/browserToolSuite.js';
+import { BROWSER_TEST_TIMEOUT_MS, setupBrowserToolSuite } from '../../helpers/browserToolSuite.js';
 import {
   createBrowserExecuteTool,
   type BrowserExecuteResult,
@@ -94,15 +91,11 @@ describe('browser_execute real-browser journey', () => {
         extracted: { status: 'Ready', query: 'audit evidence' },
         popup: { url: popupUrl },
       });
-      expect(
-        (parsed.value as { axNodes: number }).axNodes,
-      ).toBeGreaterThanOrEqual(2);
+      expect((parsed.value as { axNodes: number }).axNodes).toBeGreaterThanOrEqual(2);
       expect(parsed.changed_files).toEqual([
         { path: 'scratch/workspace/journey.json', change: 'created' },
       ]);
-      expect(parsed.pages.map((page) => page.url).sort()).toEqual(
-        [startUrl, popupUrl].sort(),
-      );
+      expect(parsed.pages.map((page) => page.url).sort()).toEqual([startUrl, popupUrl].sort());
       expect(parsed.pending_dialogs).toEqual([]);
 
       await suite.controller().closeTaskPages();
@@ -162,10 +155,7 @@ describe('browser_execute real-browser journey', () => {
       );
       expect(handled.isError, handled.content).toBe(false);
       const handledResult = JSON.parse(handled.content) as BrowserExecuteResult;
-      expect(
-        handledResult.status,
-        JSON.stringify(handledResult),
-      ).toBe('exited');
+      expect(handledResult.status, JSON.stringify(handledResult)).toBe('exited');
       expect(handledResult).toMatchObject({
         value: 'complete',
         pending_dialogs: [],

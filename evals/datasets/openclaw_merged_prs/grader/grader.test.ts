@@ -10,7 +10,8 @@ import { grade } from './grader.js';
 
 /** Mirror the grader's public assertion names (this suite's convention:
  *  assert on names as plain strings). */
-const COLUMNS = 'CSV has exactly the columns pr_number, committer, reviewer, merger (no more, no fewer)';
+const COLUMNS =
+  'CSV has exactly the columns pr_number, committer, reviewer, merger (no more, no fewer)';
 const ROWS = 'CSV has 10 data rows with distinct valid PR numbers';
 const MEMBERSHIP = "every CSV PR is in the oracle's recently-merged window";
 const PEOPLE = 'committer and merger match the oracle for every detail-checked row';
@@ -49,12 +50,9 @@ const ORACLE = makeOracle();
 
 /** The 10 newest window PRs as correct CSV rows: number, committer, reviewer, merger. */
 function passingRows(): string[][] {
-  return ORACLE.mergedWindow.slice(0, 10).map((pr) => [
-    `#${pr.number}`,
-    pr.author,
-    (pr.reviewers ?? []).join('; '),
-    pr.mergedBy ?? '',
-  ]);
+  return ORACLE.mergedWindow
+    .slice(0, 10)
+    .map((pr) => [`#${pr.number}`, pr.author, (pr.reviewers ?? []).join('; '), pr.mergedBy ?? '']);
 }
 
 function csvText(header: string[], rows: string[][]): string {
@@ -197,7 +195,9 @@ describe('openclaw_merged_prs grader', () => {
 
     const results = await grade(runDir, oracle);
     expect(byName(results, PEOPLE).passed).toBe(false);
-    expect(byName(results, PEOPLE).detail).toMatch(/neither author author-900 nor a commit identity/);
+    expect(byName(results, PEOPLE).detail).toMatch(
+      /neither author author-900 nor a commit identity/,
+    );
   });
 
   it('fails the reviewer assertion when a reviewed PR names no actual reviewer', async () => {

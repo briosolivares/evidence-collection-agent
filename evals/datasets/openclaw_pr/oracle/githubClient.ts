@@ -60,10 +60,16 @@ function parseOnePullRequest(item: unknown, index: number): GithubPullRequest {
   if (typeof item !== 'object' || item === null) {
     throw new Error(`pulls[${index}]: entry is not an object`);
   }
-  const obj = item as { number?: unknown; title?: unknown; html_url?: unknown; created_at?: unknown };
+  const obj = item as {
+    number?: unknown;
+    title?: unknown;
+    html_url?: unknown;
+    created_at?: unknown;
+  };
   if (typeof obj.number !== 'number') throw new Error(`pulls[${index}]: missing numeric "number"`);
   if (typeof obj.title !== 'string') throw new Error(`pulls[${index}]: missing string "title"`);
-  if (typeof obj.html_url !== 'string') throw new Error(`pulls[${index}]: missing string "html_url"`);
+  if (typeof obj.html_url !== 'string')
+    throw new Error(`pulls[${index}]: missing string "html_url"`);
   if (typeof obj.created_at !== 'string' || Number.isNaN(Date.parse(obj.created_at))) {
     throw new Error(`pulls[${index}]: missing or unparseable "created_at"`);
   }
@@ -106,7 +112,9 @@ export function acceptablePrsInWindow(
   const createdAtOrBeforeStart = ascending.filter((p) => Date.parse(p.createdAt) <= startMs);
   const mostRecentAtStart = createdAtOrBeforeStart.at(-1);
 
-  return mostRecentAtStart !== undefined ? [mostRecentAtStart, ...createdDuringRun] : createdDuringRun;
+  return mostRecentAtStart !== undefined
+    ? [mostRecentAtStart, ...createdDuringRun]
+    : createdDuringRun;
 }
 
 /**

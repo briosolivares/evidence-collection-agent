@@ -57,21 +57,14 @@ function shortenedCwd(): string {
  * Ink renders and before Chrome launches, so a missing key is fixed
  * here instead of surfacing as a 401 halfway through the first run.
  * Skipping is allowed — the welcome card then shows its warning. */
-async function promptForApiKey(
-  checked: string[],
-  saveTarget: string,
-): Promise<void> {
+async function promptForApiKey(checked: string[], saveTarget: string): Promise<void> {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
   try {
     console.log(`No Anthropic API key found (checked ${checked.join(', ')}).`);
-    const key = (
-      await rl.question('Paste an API key to use (Enter to skip): ')
-    ).trim();
+    const key = (await rl.question('Paste an API key to use (Enter to skip): ')).trim();
     if (key === '') return;
     process.env.ANTHROPIC_API_KEY = key;
-    const save = (
-      await rl.question(`Save it to ${saveTarget} for future sessions? [Y/n] `)
-    )
+    const save = (await rl.question(`Save it to ${saveTarget} for future sessions? [Y/n] `))
       .trim()
       .toLowerCase();
     if (save === '' || save === 'y' || save === 'yes') {
@@ -139,16 +132,13 @@ const identity: BannerIdentity = {
 const demo = process.argv.includes('--demo');
 const verbose = process.argv.includes('--verbose');
 const runsDirFlag = argValue('--runs-dir');
-const runsBaseDir =
-  runsDirFlag !== undefined ? resolve(runsDirFlag) : paths.runsBaseDir;
+const runsBaseDir = runsDirFlag !== undefined ? resolve(runsDirFlag) : paths.runsBaseDir;
 const config = createConfig({
   verbose,
   runsBaseDir,
   evalsDir: paths.evalsDir,
   evalResultsDir:
-    runsDirFlag !== undefined
-      ? resolve(runsBaseDir, 'eval-results')
-      : paths.evalResultsDir,
+    runsDirFlag !== undefined ? resolve(runsBaseDir, 'eval-results') : paths.evalResultsDir,
 });
 
 if (verbose) {
@@ -179,10 +169,7 @@ if (
   process.env.ANTHROPIC_AUTH_TOKEN === undefined
 ) {
   const candidates = paths.envFileCandidates;
-  await promptForApiKey(
-    ['the environment', ...candidates],
-    candidates[candidates.length - 1]!,
-  );
+  await promptForApiKey(['the environment', ...candidates], candidates[candidates.length - 1]!);
 }
 
 // Local attachment completes before Ink claims the terminal, so Chrome's
@@ -202,9 +189,7 @@ try {
     const browserSessionProvider = createBrowserSessionProvider({
       localMode: 'attached',
       profileDir: paths.profileDir,
-      ...(browserExecutablePath === undefined
-        ? {}
-        : { executablePath: browserExecutablePath }),
+      ...(browserExecutablePath === undefined ? {} : { executablePath: browserExecutablePath }),
       // Interactive sessions are authenticated: local mode joins the user's
       // current Chrome, while remote mode uses the configured Context. This is
       // also the surface where a human can finish a re-auth prompt themselves.
@@ -216,9 +201,7 @@ try {
       onAttachedSetupState: (message) => console.error(message),
     });
     const initialBrowser =
-      browserProvider === 'local'
-        ? await browserSessionProvider.createSession()
-        : undefined;
+      browserProvider === 'local' ? await browserSessionProvider.createSession() : undefined;
     runtime = createTuiRuntime({
       browserSessionProvider,
       ...(initialBrowser === undefined ? {} : { initialBrowser }),

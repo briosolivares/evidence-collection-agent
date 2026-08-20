@@ -80,9 +80,7 @@ export function buildContextView(messages: readonly Message[]): readonly Message
   });
 }
 
-function collectBrowserCalls(
-  messages: readonly Message[],
-): Map<string, BrowserCallIdentity> {
+function collectBrowserCalls(messages: readonly Message[]): Map<string, BrowserCallIdentity> {
   const calls = new Map<string, BrowserCallIdentity>();
   for (const message of messages) {
     if (message.role !== 'assistant') continue;
@@ -98,23 +96,16 @@ function collectBrowserCalls(
 
 function callIdentity(call: ToolUseBlock): BrowserCallIdentity {
   const pageId =
-    isRecord(call.input) && typeof call.input.page_id === 'string'
-      ? call.input.page_id
-      : undefined;
+    isRecord(call.input) && typeof call.input.page_id === 'string' ? call.input.page_id : undefined;
   return {
     toolUseId: call.id,
     ...(pageId === undefined ? {} : { requestedPageId: pageId }),
   };
 }
 
-function stubBrowserResult(
-  block: ToolResultBlock,
-  identity: BrowserCallIdentity,
-): ToolResultBlock {
+function stubBrowserResult(block: ToolResultBlock, identity: BrowserCallIdentity): ToolResultBlock {
   const summary =
-    typeof block.content === 'string'
-      ? recoverBrowserResultSummary(block.content)
-      : {};
+    typeof block.content === 'string' ? recoverBrowserResultSummary(block.content) : {};
   const lines = [
     COLLAPSED_BROWSER_RESULT_MARKER,
     `Identity: ${JSON.stringify({
@@ -123,12 +114,8 @@ function stubBrowserResult(
         ? { requested_page: 'active task page' }
         : { requested_page_id: identity.requestedPageId }),
     })}`,
-    ...(summary.status === undefined
-      ? []
-      : [`Status: ${JSON.stringify(summary.status)}`]),
-    ...(summary.pages === undefined
-      ? []
-      : [`Pages: ${JSON.stringify(summary.pages)}`]),
+    ...(summary.status === undefined ? [] : [`Status: ${JSON.stringify(summary.status)}`]),
+    ...(summary.pages === undefined ? [] : [`Pages: ${JSON.stringify(summary.pages)}`]),
     RECOVERY_GUIDANCE,
   ];
   return { ...block, content: lines.join('\n') };

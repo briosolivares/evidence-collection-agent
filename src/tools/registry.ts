@@ -144,7 +144,10 @@ function filePathsOverlap(leftPath: string, rightPath: string): boolean {
  * a directory it reads or writes rather than a single file. */
 function keysOverlap(left: string, right: string): boolean {
   if (left.startsWith(FILE_KEY_PREFIX) && right.startsWith(FILE_KEY_PREFIX)) {
-    return filePathsOverlap(left.slice(FILE_KEY_PREFIX.length), right.slice(FILE_KEY_PREFIX.length));
+    return filePathsOverlap(
+      left.slice(FILE_KEY_PREFIX.length),
+      right.slice(FILE_KEY_PREFIX.length),
+    );
   }
   return left === right;
 }
@@ -230,11 +233,7 @@ export interface BusyResourceRegistry {
    * or `false` once `timeoutMs` elapses first. A conflicting entry added
    * AFTER this call starts waiting is not included — see the module note
    * on why that snapshot is intentional, not a race. */
-  waitUntilFree(
-    access: ToolAccess,
-    timeoutMs: number,
-    signal?: AbortSignal,
-  ): Promise<boolean>;
+  waitUntilFree(access: ToolAccess, timeoutMs: number, signal?: AbortSignal): Promise<boolean>;
   /** Wait without releasing the caller until every conflicting abandoned
    * effect has actually settled. Unlike `waitUntilFree`, this is a fixed-
    * point drain: entries added while an earlier snapshot is settling are
@@ -421,9 +420,6 @@ export function toApiToolDefs(registry: ToolRegistry): ApiToolDef[] {
     description: tool.description,
     // io: 'input' — the model *sends* inputs, so describe the input side of
     // the schema (matters once schemas use defaults/transforms).
-    input_schema: z.toJSONSchema(tool.inputSchema, { io: 'input' }) as Record<
-      string,
-      unknown
-    >,
+    input_schema: z.toJSONSchema(tool.inputSchema, { io: 'input' }) as Record<string, unknown>,
   }));
 }

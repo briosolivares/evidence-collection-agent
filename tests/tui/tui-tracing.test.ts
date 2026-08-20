@@ -115,9 +115,7 @@ describe('createTuiTracing', () => {
     const tracing = createTuiTracing({ onEvent: (event) => events.push(event), delegate });
     const wrapped = tracing.wrapRegistry(makeRegistry());
 
-    await expect(
-      wrapped.get('boom')!.execute({}, { runDir }),
-    ).rejects.toThrow('kaboom');
+    await expect(wrapped.get('boom')!.execute({}, { runDir })).rejects.toThrow('kaboom');
     expect(events.at(-1)).toMatchObject({
       type: 'tool_exec_end',
       ok: false,
@@ -172,10 +170,7 @@ describe('createTuiTracing', () => {
           description: 'capResult shape: a private scratch write, no roles',
           inputSchema: z.object({ file_path: z.string(), content: z.string() }),
           getAccess: () => ({ reads: [], writes: [] }),
-          execute: async (
-            input: { file_path: string; content: string },
-            ctx: ToolCtx,
-          ) => {
+          execute: async (input: { file_path: string; content: string }, ctx: ToolCtx) => {
             writeArtifact(ctx.runDir, input.file_path, Buffer.from(input.content));
             return { path: input.file_path };
           },
@@ -210,11 +205,21 @@ describe('createTuiTracing', () => {
       const publish = wrapped.get('publish')!;
       // Exercise evidence-with-source and requested-output manifest roles.
       await publish.execute(
-        { file_path: 'artifacts/page.png', content: 'png-bytes', source_url: 'https://sec.gov/filings', roles: ['evidence'] },
+        {
+          file_path: 'artifacts/page.png',
+          content: 'png-bytes',
+          source_url: 'https://sec.gov/filings',
+          roles: ['evidence'],
+        },
         ctx,
       );
       await publish.execute(
-        { file_path: 'artifacts/10k.pdf', content: 'pdf-bytes!', source_url: 'https://sec.gov/10k.pdf', roles: ['evidence'] },
+        {
+          file_path: 'artifacts/10k.pdf',
+          content: 'pdf-bytes!',
+          source_url: 'https://sec.gov/10k.pdf',
+          roles: ['evidence'],
+        },
         ctx,
       );
       await publish.execute(
@@ -256,8 +261,18 @@ describe('createTuiTracing', () => {
       await wrapped.get('batch')!.execute(
         {
           items: [
-            { file_path: 'artifacts/shot1.png', content: 'one', source_url: 'https://x.com/a', roles: ['evidence'] },
-            { file_path: 'artifacts/shot2.png', content: 'two', source_url: 'https://x.com/b', roles: ['evidence'] },
+            {
+              file_path: 'artifacts/shot1.png',
+              content: 'one',
+              source_url: 'https://x.com/a',
+              roles: ['evidence'],
+            },
+            {
+              file_path: 'artifacts/shot2.png',
+              content: 'two',
+              source_url: 'https://x.com/b',
+              roles: ['evidence'],
+            },
           ],
         },
         { runDir },
@@ -273,10 +288,12 @@ describe('createTuiTracing', () => {
 
     it('never announces scratch entries', async () => {
       const { events, wrapped } = setup();
-      await wrapped.get('offload')!.execute(
-        { file_path: 'scratch/tool-output/inspect-1.json', content: '{"big":1}' },
-        { runDir },
-      );
+      await wrapped
+        .get('offload')!
+        .execute(
+          { file_path: 'scratch/tool-output/inspect-1.json', content: '{"big":1}' },
+          { runDir },
+        );
       expect(events.filter((e) => e.type === 'artifact_published')).toEqual([]);
       expect(events.at(-1)).toMatchObject({ type: 'tool_exec_end', ok: true });
     });
@@ -305,9 +322,9 @@ describe('createTuiTracing', () => {
 
     it('surfaces artifacts a failing execution published before it threw', async () => {
       const { events, wrapped } = setup();
-      await expect(
-        wrapped.get('publish_boom')!.execute({}, { runDir }),
-      ).rejects.toThrow('batch step 3 failed');
+      await expect(wrapped.get('publish_boom')!.execute({}, { runDir })).rejects.toThrow(
+        'batch step 3 failed',
+      );
       const published = events.filter((e) => e.type === 'artifact_published');
       expect(published).toHaveLength(1);
       expect(published[0]!.entry.filename).toBe('artifacts/partial.png');
@@ -322,13 +339,13 @@ describe('createTuiTracing', () => {
     const { delegate } = makeDelegate();
     const tracing = createTuiTracing({ onEvent: () => {}, delegate });
 
-    const callModel = async () => ({ content: [], stop_reason: null, usage: { input_tokens: 0, output_tokens: 0 } });
+    const callModel = async () => ({
+      content: [],
+      stop_reason: null,
+      usage: { input_tokens: 0, output_tokens: 0 },
+    });
     tracing.wrapCallModel(callModel, 'model-x', 'verifier');
-    expect(delegate.wrapCallModel).toHaveBeenCalledWith(
-      callModel,
-      'model-x',
-      'verifier',
-    );
+    expect(delegate.wrapCallModel).toHaveBeenCalledWith(callModel, 'model-x', 'verifier');
 
     await tracing.traceRun('task', async () => 'result');
     expect(delegate.traceRun).toHaveBeenCalledTimes(1);

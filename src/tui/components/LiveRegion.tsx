@@ -37,13 +37,7 @@ export function LiveRegion({ config, live, cancelling, now, rng }: LiveRegionPro
           </Text>
         </Box>
       ))}
-      <StatusLine
-        config={config}
-        live={live}
-        cancelling={cancelling}
-        now={now}
-        rng={rng}
-      />
+      <StatusLine config={config} live={live} cancelling={cancelling} now={now} rng={rng} />
     </Box>
   );
 }

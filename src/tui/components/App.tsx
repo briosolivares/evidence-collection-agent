@@ -9,10 +9,7 @@ import {
   type EvalTaskChoice,
 } from '../bridge/evalSession.js';
 import type { RunHandle } from '../bridge/runSession.js';
-import type {
-  PermissionDecision,
-  PermissionRequest,
-} from '../../tools/registry.js';
+import type { PermissionDecision, PermissionRequest } from '../../tools/registry.js';
 import type { AskUserAnswers } from '../../tools/askUser/askUser.js';
 import type { SherlockConfig } from '../config.js';
 import { createDemoScript, playDemo } from '../demo.js';
@@ -54,9 +51,7 @@ interface AppProps {
     onEvent: (event: UiEvent) => void,
     opts?: {
       startUrl?: string;
-      requestPermission?: (
-        request: PermissionRequest,
-      ) => Promise<PermissionDecision>;
+      requestPermission?: (request: PermissionRequest) => Promise<PermissionDecision>;
     },
   ) => RunHandle;
   /** Eval-specific runner: isolated headless normally, persistent headed for auth. */
@@ -110,9 +105,7 @@ export function App({
     });
   };
 
-  const requestPermission = (
-    request: PermissionRequest,
-  ): Promise<PermissionDecision> =>
+  const requestPermission = (request: PermissionRequest): Promise<PermissionDecision> =>
     new Promise((resolve) => {
       setQuestion({ request, resolve });
     });
@@ -278,11 +271,7 @@ export function App({
     <Box flexDirection="column">
       <Transcript items={state.transcript} verbose={config.verbose} />
       {running && state.live !== undefined && (
-        <LiveRegion
-          config={config}
-          live={state.live}
-          cancelling={state.mode === 'cancelling'}
-        />
+        <LiveRegion config={config} live={state.live} cancelling={state.mode === 'cancelling'} />
       )}
       {/* Mounted for the whole run (it renders nothing until the first
           publish) so its key subscription is registered by the submit
@@ -300,10 +289,7 @@ export function App({
         <EvalsLiveRegion trials={state.evalsLive} />
       )}
       {state.mode === 'runsList' && (
-        <RunsList
-          entries={runEntries}
-          onClose={() => dispatch({ type: 'close_overlay' })}
-        />
+        <RunsList entries={runEntries} onClose={() => dispatch({ type: 'close_overlay' })} />
       )}
       {state.mode === 'evalsMenu' && (
         <EvalsMenu
@@ -361,7 +347,7 @@ export function App({
           dispatch={dispatch}
           onSubmit={handleSubmit}
         />
-        <Text color={theme.muted}>  /help for commands</Text>
+        <Text color={theme.muted}>{'  /help for commands'}</Text>
       </Box>
     </Box>
   );

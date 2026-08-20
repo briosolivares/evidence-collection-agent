@@ -64,9 +64,7 @@ async function main(): Promise<void> {
   const replayRunTask: RunTaskFn = async (_taskText, opts) => {
     const runDir = runDirsByTask.get(opts.taskName)?.[opts.trialIndex];
     if (runDir === undefined) {
-      throw new Error(
-        `missing run dir for task "${opts.taskName}" trial ${opts.trialNumber}`,
-      );
+      throw new Error(`missing run dir for task "${opts.taskName}" trial ${opts.trialNumber}`);
     }
     return { runDir };
   };

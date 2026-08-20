@@ -218,9 +218,7 @@ export function createRunBudgetTracker(
   const restoreSnapshotAtMs = opts.restoreSnapshotAtMs;
   if (restoreSnapshotAtMs !== undefined) {
     if (restore === undefined) {
-      throw new Error(
-        'restoreSnapshotAtMs requires a RunBudgetSnapshot in opts.restore',
-      );
+      throw new Error('restoreSnapshotAtMs requires a RunBudgetSnapshot in opts.restore');
     }
     if (!Number.isFinite(restoreSnapshotAtMs) || restoreSnapshotAtMs < 0) {
       throw new Error(
@@ -248,13 +246,9 @@ export function createRunBudgetTracker(
     restore === undefined
       ? 0
       : restore.elapsedWallTimeMs +
-        (restoreSnapshotAtMs === undefined
-          ? 0
-          : createdAtMs - restoreSnapshotAtMs);
+        (restoreSnapshotAtMs === undefined ? 0 : createdAtMs - restoreSnapshotAtMs);
   if (!Number.isFinite(restoredElapsedMs)) {
-    throw new Error(
-      `restored wall time must remain finite, got ${restoredElapsedMs}`,
-    );
+    throw new Error(`restored wall time must remain finite, got ${restoredElapsedMs}`);
   }
   const startedAt = createdAtMs - restoredElapsedMs;
 
@@ -353,10 +347,7 @@ export function createRunBudgetTracker(
       if (!ignored.has('wall_time') && now() - startedAt >= config.maxWallTimeMs) {
         return 'wall_time';
       }
-      if (
-        !ignored.has('verifier_corrections') &&
-        corrections > config.maxVerifierCorrections
-      ) {
+      if (!ignored.has('verifier_corrections') && corrections > config.maxVerifierCorrections) {
         return 'verifier_corrections';
       }
       return undefined;
@@ -391,8 +382,6 @@ export class RoleBudgetExceededError extends Error {
   }
 }
 
-export function isRoleBudgetExceededError(
-  error: unknown,
-): error is RoleBudgetExceededError {
+export function isRoleBudgetExceededError(error: unknown): error is RoleBudgetExceededError {
   return error instanceof RoleBudgetExceededError;
 }

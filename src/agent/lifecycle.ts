@@ -12,11 +12,7 @@ import {
   type ModelDriver,
   type ModelAttemptEvent,
 } from '../model/modelDriver.js';
-import {
-  finalizeManifest,
-  readManifest,
-  recoverPendingArtifactWrites,
-} from '../run/artifacts.js';
+import { finalizeManifest, readManifest, recoverPendingArtifactWrites } from '../run/artifacts.js';
 import { writeFileDurablyAtomic } from '../run/atomicFile.js';
 import {
   captureRunBudgetSnapshot,
@@ -24,10 +20,7 @@ import {
   type RunBudgetConfig,
   type RunBudgetTracker,
 } from '../run/runBudget.js';
-import {
-  TRANSCRIPT_FILENAME,
-  appendTranscriptEvent,
-} from '../run/transcript.js';
+import { TRANSCRIPT_FILENAME, appendTranscriptEvent } from '../run/transcript.js';
 import { syncScratchWorkspace } from '../run/syncScratchWorkspace.js';
 import { BUSY_RESOURCE_GATE_TIMEOUT_MS } from '../tools/pipeline.js';
 import {
@@ -76,14 +69,8 @@ import {
   type WorkerSnapshot,
 } from './worker/worker.js';
 import { createBudgetedCallModel } from '../model/budgetedCall.js';
-import {
-  RoleBudgetExceededError,
-  isRoleBudgetExceededError,
-} from '../run/runBudget.js';
-import {
-  durableFinishInputSchema,
-  type FinishInput,
-} from '../tools/finish/finish.js';
+import { RoleBudgetExceededError, isRoleBudgetExceededError } from '../run/runBudget.js';
+import { durableFinishInputSchema, type FinishInput } from '../tools/finish/finish.js';
 import {
   openCheckpointStore,
   ceilingFromCheckpoint,
@@ -104,10 +91,7 @@ import {
   type FindingsReportInput,
 } from './findingsReport.js';
 import { ensureOutputContractFile } from './initializer/contractFile.js';
-import {
-  createRunDeadline,
-  raceWithRunSignal,
-} from '../run/runDeadline.js';
+import { createRunDeadline, raceWithRunSignal } from '../run/runDeadline.js';
 
 type CheckpointCommonKey =
   | 'version'
@@ -135,14 +119,9 @@ export interface RunAgentOptions {
    * recovery tests. */
   busyRegistry?: BusyResourceRegistry;
   browser?: BrowserController;
-  requestPermission?: (
-    request: PermissionRequest,
-  ) => Promise<PermissionDecision>;
+  requestPermission?: (request: PermissionRequest) => Promise<PermissionDecision>;
   signal?: AbortSignal;
-  onModelEvent?: (
-    role: 'initializer' | 'worker' | 'verifier',
-    event: ModelAttemptEvent,
-  ) => void;
+  onModelEvent?: (role: 'initializer' | 'worker' | 'verifier', event: ModelAttemptEvent) => void;
   checkpointStoreOptions?: CheckpointStoreOptions;
   /** Observability/test seam called only after a checkpoint is durable. */
   afterCheckpoint?: (checkpoint: Checkpoint) => void | Promise<void>;
@@ -165,12 +144,8 @@ export const TERMINAL_RESUME_INSPECTION_TIMEOUT_MS = 30_000;
 /** Run or resume one initializer → worker → checks → verifier lifecycle.
  * The checkpoint is authoritative; a terminal checkpoint is returned without
  * invoking a model or touching the browser. */
-export async function runAgent(
-  options: RunAgentOptions,
-): Promise<DurableTerminalOutcome> {
-  const configuration = durableRunConfigurationSchema.parse(
-    options.configuration,
-  );
+export async function runAgent(options: RunAgentOptions): Promise<DurableTerminalOutcome> {
+  const configuration = durableRunConfigurationSchema.parse(options.configuration);
   terminalBrowserCleanupTimeout(options);
   terminalBusyResourceTimeout(options);
   terminalResumeInspectionTimeout(options);
@@ -181,10 +156,7 @@ export async function runAgent(
     );
   }
 
-  const store = await openCheckpointStore(
-    options.runDir,
-    options.checkpointStoreOptions,
-  );
+  const store = await openCheckpointStore(options.runDir, options.checkpointStoreOptions);
   try {
     const loaded = store.load();
     if (
@@ -196,12 +168,7 @@ export async function runAgent(
     const now = options.now ?? Date.now;
     if (loaded?.phase === 'terminal') {
       const checkActive = createTerminalResumeInspectionGuard(options, now);
-      recoverAndInspectRun(
-        options.runDir,
-        configuration,
-        loaded.phase,
-        checkActive,
-      );
+      recoverAndInspectRun(options.runDir, configuration, loaded.phase, checkActive);
       if (loaded.contract !== undefined) {
         ensureOutputContractFile(options.runDir, loaded.contract);
       }
@@ -222,24 +189,15 @@ export async function runAgent(
         }
       }
       repairTerminalProjections(options.runDir, loaded);
-      writeFindingsReportOnResume(
-        options.runDir,
-        loaded,
-        verifiedChecks?.facts,
-      );
+      writeFindingsReportOnResume(options.runDir, loaded, verifiedChecks?.facts);
       return loaded.outcome;
     }
 
-    const budget = createRunBudgetTracker(
-      budgetConfig(configuration),
-      {
-        now,
-        ...(loaded === undefined ? {} : { restore: loaded.budget }),
-        ...(loaded === undefined
-          ? {}
-          : { restoreSnapshotAtMs: Date.parse(loaded.updatedAt) }),
-      },
-    );
+    const budget = createRunBudgetTracker(budgetConfig(configuration), {
+      now,
+      ...(loaded === undefined ? {} : { restore: loaded.budget }),
+      ...(loaded === undefined ? {} : { restoreSnapshotAtMs: Date.parse(loaded.updatedAt) }),
+    });
     const deadline = createRunDeadline(budget, options.signal);
     try {
       const state = new CoordinatorState(
@@ -262,17 +220,8 @@ export async function runAgent(
         // deliberately ignoring the already-fired run signal. If this pass
         // cannot complete, refuse terminalization and leave the active
         // checkpoint for a later recovery attempt.
-        const cleanupCheck = createTerminalResumeInspectionGuard(
-          options,
-          now,
-          false,
-        );
-        recoverAndInspectRun(
-          options.runDir,
-          configuration,
-          loaded?.phase,
-          cleanupCheck,
-        );
+        const cleanupCheck = createTerminalResumeInspectionGuard(options, now, false);
+        recoverAndInspectRun(options.runDir, configuration, loaded?.phase, cleanupCheck);
         if (loaded?.contract !== undefined) {
           ensureOutputContractFile(options.runDir, loaded.contract);
         }
@@ -284,12 +233,7 @@ export async function runAgent(
         if (limit !== undefined) throw new RoleBudgetExceededError(limit);
       };
       try {
-        recoverAndInspectRun(
-          options.runDir,
-          configuration,
-          loaded?.phase,
-          checkActive,
-        );
+        recoverAndInspectRun(options.runDir, configuration, loaded?.phase, checkActive);
         if (loaded?.contract !== undefined) {
           ensureOutputContractFile(options.runDir, loaded.contract);
         }
@@ -307,12 +251,7 @@ export async function runAgent(
         }
         if (isRoleBudgetExceededError(error)) {
           return await terminalizePreflightControl(
-            incompleteBudget(
-              error.limit,
-              state.finalText(),
-              state.unresolved(),
-              state.phase,
-            ),
+            incompleteBudget(error.limit, state.finalText(), state.unresolved(), state.phase),
           );
         }
         if (deadline.signal.aborted) {
@@ -342,12 +281,7 @@ export async function runAgent(
         }
         if (isRoleBudgetExceededError(error)) {
           return await state.terminalize(
-            incompleteBudget(
-              error.limit,
-              state.finalText(),
-              state.unresolved(),
-              state.phase,
-            ),
+            incompleteBudget(error.limit, state.finalText(), state.unresolved(), state.phase),
           );
         }
         if (deadline.signal.aborted) {
@@ -367,10 +301,7 @@ export async function runAgent(
             unresolved: [],
           });
         }
-        if (
-          error instanceof WorkerModelUnavailableError ||
-          isModelGenerationFailedError(error)
-        ) {
+        if (error instanceof WorkerModelUnavailableError || isModelGenerationFailedError(error)) {
           return await state.terminalize({
             status: 'incomplete',
             during: state.phase,
@@ -426,20 +357,16 @@ class CoordinatorState {
     this.revision = loaded?.revision ?? 0;
     this.contract = loaded?.contract;
     this.verifierCycles = loaded?.progress.verifierCycles ?? 0;
-    this.completionCheckFailures =
-      loaded?.progress.completionCheckFailures ?? 0;
+    this.completionCheckFailures = loaded?.progress.completionCheckFailures ?? 0;
     this.verificationHistory =
-      loaded?.phase === 'initializing'
-        ? []
-        : structuredClone(loaded?.verificationHistory ?? []);
+      loaded?.phase === 'initializing' ? [] : structuredClone(loaded?.verificationHistory ?? []);
     if (loaded?.phase === 'executing_tool') this.pendingTurn = loaded.pendingTurn;
     if (loaded?.phase === 'checking' || loaded?.phase === 'verifying') {
       this.pendingFinish = loaded.pendingFinish;
     }
     if (loaded?.phase === 'verifying') {
       this.pendingFacts = loaded.pendingCheck.facts;
-      this.pendingStructuralFindings =
-        loaded.pendingCheck.structuralFindings ?? [];
+      this.pendingStructuralFindings = loaded.pendingCheck.structuralFindings ?? [];
     }
     this.busyRegistry = options.busyRegistry ?? createBusyResourceRegistry();
   }
@@ -543,10 +470,7 @@ class CoordinatorState {
             attempt: this.completionCheckFailures,
             defects: checks.defects,
           });
-          if (
-            this.completionCheckFailures >=
-            this.configuration.maxCompletionCheckFailures
-          ) {
+          if (this.completionCheckFailures >= this.configuration.maxCompletionCheckFailures) {
             await this.appendTerminalFinishFailure(
               request,
               JSON.stringify({
@@ -593,9 +517,7 @@ class CoordinatorState {
         const request = this.requirePendingFinish();
         const facts = this.requirePendingFacts();
         const surfacedArtifacts = collectSurfacedArtifacts(this.options.runDir);
-        const surfacedEvidenceFingerprint = fingerprintSurfacedArtifacts(
-          surfacedArtifacts,
-        );
+        const surfacedEvidenceFingerprint = fingerprintSurfacedArtifacts(surfacedArtifacts);
         let verification: Awaited<ReturnType<typeof runVerifier>>;
         try {
           verification = await runVerifier({
@@ -614,15 +536,10 @@ class CoordinatorState {
             ...(this.options.onModelEvent === undefined
               ? {}
               : {
-                  onEvent: (event) =>
-                    this.options.onModelEvent?.('verifier', event),
+                  onEvent: (event) => this.options.onModelEvent?.('verifier', event),
                 }),
             afterAccounting: async () => {
-              await this.saveVerifying(
-                request,
-                facts,
-                this.pendingStructuralFindings,
-              );
+              await this.saveVerifying(request, facts, this.pendingStructuralFindings);
             },
             now: this.now,
           });
@@ -631,11 +548,7 @@ class CoordinatorState {
           // Make that spend durable while retaining the `verifying` phase
           // before accepting its verdict. A deadline that fires after the
           // provider returns but before this boundary must still win.
-          await this.saveVerifying(
-            request,
-            facts,
-            this.pendingStructuralFindings,
-          );
+          await this.saveVerifying(request, facts, this.pendingStructuralFindings);
           this.runSignal.throwIfAborted();
         } catch (error) {
           const budgetError = verifierBudgetError(error, this.runSignal);
@@ -646,8 +559,7 @@ class CoordinatorState {
                 status: 'rejected',
                 source: 'run_budget',
                 budget_limit: budgetError.limit,
-                message:
-                  'Verification stopped because the shared run budget was exhausted.',
+                message: 'Verification stopped because the shared run budget was exhausted.',
               }),
             );
           }
@@ -713,10 +625,7 @@ class CoordinatorState {
           });
         }
 
-        if (
-          verification.status === 'incomplete' &&
-          request.input.unresolved.length > 0
-        ) {
+        if (verification.status === 'incomplete' && request.input.unresolved.length > 0) {
           return this.terminalize(
             {
               status: 'incomplete',
@@ -759,10 +668,7 @@ class CoordinatorState {
           previous !== undefined &&
           previous.surfacedEvidenceFingerprint === surfacedEvidenceFingerprint &&
           sameRequirementSet(previous.findings, correctionFindings) &&
-          !hasNewDistinctAttempt(
-            request.input.unresolved,
-            previous.completionReport.unresolved,
-          )
+          !hasNewDistinctAttempt(request.input.unresolved, previous.completionReport.unresolved)
         ) {
           return this.terminalize(
             {
@@ -781,10 +687,7 @@ class CoordinatorState {
             { kind: 'correction', findings: correctionFindings },
           );
         }
-        const correctionLimit = this.budget.exceededLimit([
-          'worker_turns',
-          'verifier_corrections',
-        ]);
+        const correctionLimit = this.budget.exceededLimit(['worker_turns', 'verifier_corrections']);
         if (correctionLimit !== undefined) {
           await this.appendTerminalFinishFailure(
             request,
@@ -909,12 +812,7 @@ class CoordinatorState {
     if (finalOutcome.status === 'verified') {
       const limit = this.budget.exceededLimit(['worker_turns']);
       if (limit !== undefined) {
-        finalOutcome = incompleteBudget(
-          limit,
-          finalOutcome.finalText,
-          [],
-          this.phase,
-        );
+        finalOutcome = incompleteBudget(limit, finalOutcome.finalText, [], this.phase);
       } else if (this.runSignal.aborted) {
         finalOutcome = {
           status: 'cancelled',
@@ -1006,9 +904,10 @@ class CoordinatorState {
       return;
     }
 
-    const state = this.loaded?.phase === 'initializing' && this.loaded.initializer
-      ? restoreContractInitializerState(this.loaded.initializer)
-      : createContractInitializerState(this.configuration.taskText);
+    const state =
+      this.loaded?.phase === 'initializing' && this.loaded.initializer
+        ? restoreContractInitializerState(this.loaded.initializer)
+        : createContractInitializerState(this.configuration.taskText);
     if (this.revision === 0) await this.saveInitializing({ initializer: state });
 
     const budgetedCallModel = createBudgetedCallModel({
@@ -1027,15 +926,11 @@ class CoordinatorState {
       ...(this.options.onModelEvent === undefined
         ? {}
         : {
-            onEvent: (event) =>
-              this.options.onModelEvent?.('initializer', event),
+            onEvent: (event) => this.options.onModelEvent?.('initializer', event),
           }),
       now: this.now,
     });
-    const callModel = initializerModelBoundary(
-      budgetedCallModel,
-      this.runSignal,
-    );
+    const callModel = initializerModelBoundary(budgetedCallModel, this.runSignal);
     let result;
     try {
       result = await runContractInitializer(state, callModel, {
@@ -1078,15 +973,9 @@ class CoordinatorState {
 
   private restoreOrCreateWorker(): void {
     if (this.session !== undefined) return;
-    const snapshot = this.loaded?.phase === 'initializing'
-      ? undefined
-      : this.loaded?.worker;
+    const snapshot = this.loaded?.phase === 'initializing' ? undefined : this.loaded?.worker;
     if (snapshot !== undefined) {
-      this.session = restoreWorker(
-        snapshot,
-        this.workerDeps(),
-        this.workerConfig(),
-      );
+      this.session = restoreWorker(snapshot, this.workerDeps(), this.workerConfig());
       return;
     }
     if (this.contract !== undefined) this.createWorker();
@@ -1108,16 +997,11 @@ class CoordinatorState {
 
   private workerDeps() {
     return {
-      model: workerModelBoundary(
-        this.options.workerModel,
-        this.runSignal,
-      ),
+      model: workerModelBoundary(this.options.workerModel, this.runSignal),
       registry: this.options.registry,
       runDir: this.options.runDir,
       busyRegistry: this.busyRegistry,
-      ...(this.options.browser === undefined
-        ? {}
-        : { browser: this.options.browser }),
+      ...(this.options.browser === undefined ? {} : { browser: this.options.browser }),
       ...(this.options.requestPermission === undefined
         ? {}
         : { requestPermission: this.options.requestPermission }),
@@ -1136,23 +1020,17 @@ class CoordinatorState {
   private workerConfig() {
     return {
       budget: this.budget,
-      maxContextTokens: ceilingFromCheckpoint(
-        this.configuration.maxContextTokens,
-      ),
+      maxContextTokens: ceilingFromCheckpoint(this.configuration.maxContextTokens),
     };
   }
 
-  private recordInitializerCorrectionResults(
-    state: ContractInitializerState,
-  ): void {
+  private recordInitializerCorrectionResults(state: ContractInitializerState): void {
     const trailing = state.messages.at(-1);
     if (trailing?.role !== 'user') return;
     const bytes = trailing.content.reduce((total, block) => {
       if (block.type !== 'tool_result') return total;
       const content =
-        typeof block.content === 'string'
-          ? block.content
-          : JSON.stringify(block.content);
+        typeof block.content === 'string' ? block.content : JSON.stringify(block.content);
       return total + Buffer.byteLength(content, 'utf8');
     }, 0);
     this.budget.recordToolResultBytes(bytes);
@@ -1249,11 +1127,7 @@ class CoordinatorState {
   ): Promise<void> {
     this.suppressFinishReadyCheckpoint = true;
     try {
-      await appendFinishResult(
-        this.requireSession(),
-        request,
-        content,
-      );
+      await appendFinishResult(this.requireSession(), request, content);
     } finally {
       this.suppressFinishReadyCheckpoint = false;
     }
@@ -1276,9 +1150,7 @@ class CoordinatorState {
   }
 
   private async saveReady(
-    snapshot: WorkerSnapshot = captureWorkerSnapshot(
-      this.requireSession(),
-    ),
+    snapshot: WorkerSnapshot = captureWorkerSnapshot(this.requireSession()),
   ): Promise<void> {
     await this.save({
       phase: 'ready_for_model',
@@ -1298,10 +1170,7 @@ class CoordinatorState {
     });
   }
 
-  private async saveChecking(
-    worker: WorkerSnapshot,
-    pendingFinish: FinishRequest,
-  ): Promise<void> {
+  private async saveChecking(worker: WorkerSnapshot, pendingFinish: FinishRequest): Promise<void> {
     await this.save({
       phase: 'checking',
       contract: this.requireContract(),
@@ -1339,25 +1208,17 @@ class CoordinatorState {
     });
   }
 
-  private async saveTerminal(
-    outcome: DurableTerminalOutcome,
-  ): Promise<void> {
+  private async saveTerminal(outcome: DurableTerminalOutcome): Promise<void> {
     await this.save({
       phase: 'terminal',
       ...(this.contract === undefined ? {} : { contract: this.contract }),
-      ...(this.session === undefined
-        ? {}
-        : { worker: captureWorkerSnapshot(this.session) }),
-      ...(outcome.status === 'verified'
-        ? { finish: this.requireVerifiedFinish() }
-        : {}),
+      ...(this.session === undefined ? {} : { worker: captureWorkerSnapshot(this.session) }),
+      ...(outcome.status === 'verified' ? { finish: this.requireVerifiedFinish() } : {}),
       outcome,
     });
   }
 
-  private async save(
-    phaseState: CheckpointPhaseState,
-  ): Promise<void> {
+  private async save(phaseState: CheckpointPhaseState): Promise<void> {
     const checkpoint = {
       version: CHECKPOINT_VERSION,
       revision: this.revision + 1,
@@ -1416,10 +1277,7 @@ class WorkerModelUnavailableError extends Error {
   override readonly name = 'WorkerModelUnavailableError';
 }
 
-function initializerModelBoundary(
-  callModel: CallModel,
-  signal: AbortSignal,
-): CallModel {
+function initializerModelBoundary(callModel: CallModel, signal: AbortSignal): CallModel {
   return async (messages) => {
     try {
       return await callModel(messages);
@@ -1438,10 +1296,7 @@ function initializerModelBoundary(
   };
 }
 
-function workerModelBoundary(
-  model: ModelDriver,
-  signal: AbortSignal,
-): ModelDriver {
+function workerModelBoundary(model: ModelDriver, signal: AbortSignal): ModelDriver {
   return {
     async generate(options) {
       try {
@@ -1477,8 +1332,7 @@ function inspectRunForResume(
       (defect) =>
         !(
           defect.artifactPath?.startsWith('scratch/workspace/') === true &&
-          (defect.code === 'hash_mismatch' ||
-            defect.code === 'missing_recorded_file')
+          (defect.code === 'hash_mismatch' || defect.code === 'missing_recorded_file')
         ),
     );
     if (unrecoverable.length > 0) {
@@ -1523,20 +1377,14 @@ function assertManifestMetadata(
     throw new Error('manifest task does not match the durable configuration');
   }
   if (manifest.browserProvider !== configuration.browserProvider) {
-    throw new Error(
-      'manifest browserProvider does not match the durable configuration',
-    );
+    throw new Error('manifest browserProvider does not match the durable configuration');
   }
   if (phase !== 'terminal' && manifest.finishedAt !== undefined) {
-    throw new Error(
-      'an active or fresh run cannot reuse an already-finalized manifest',
-    );
+    throw new Error('an active or fresh run cannot reuse an already-finalized manifest');
   }
 }
 
-function manifestIntegrityError(
-  defects: readonly { code: string; message: string }[],
-): Error {
+function manifestIntegrityError(defects: readonly { code: string; message: string }[]): Error {
   return new Error(
     `run manifest integrity check failed:\n${defects
       .map((defect) => `- ${defect.code}: ${defect.message}`)
@@ -1544,10 +1392,7 @@ function manifestIntegrityError(
   );
 }
 
-function ensureTerminalTranscriptEvent(
-  runDir: string,
-  outcome: DurableTerminalOutcome,
-): void {
+function ensureTerminalTranscriptEvent(runDir: string, outcome: DurableTerminalOutcome): void {
   let raw = '';
   try {
     raw = readFileSync(join(runDir, TRANSCRIPT_FILENAME), 'utf8');
@@ -1589,10 +1434,7 @@ function ensureTerminalTranscriptEvent(
       typeof event === 'object' &&
       (event as Record<string, unknown>).type === 'v3_run_terminal'
     ) {
-      if (
-        JSON.stringify((event as Record<string, unknown>).outcome) !==
-        JSON.stringify(outcome)
-      ) {
+      if (JSON.stringify((event as Record<string, unknown>).outcome) !== JSON.stringify(outcome)) {
         throw new Error(
           `${TRANSCRIPT_FILENAME} contains a terminal outcome that disagrees with the checkpoint`,
         );
@@ -1602,9 +1444,7 @@ function ensureTerminalTranscriptEvent(
   }
 
   if (matchingEvents > 1) {
-    throw new Error(
-      `${TRANSCRIPT_FILENAME} contains ${matchingEvents} duplicate terminal events`,
-    );
+    throw new Error(`${TRANSCRIPT_FILENAME} contains ${matchingEvents} duplicate terminal events`);
   }
   if (matchingEvents === 0) {
     appendTranscriptEvent(runDir, {
@@ -1621,10 +1461,7 @@ function repairTerminalProjections(
   const errors: string[] = [];
   const attempts: Array<[string, () => void]> = [
     ['metrics', () => writeTerminalMetrics(runDir, checkpoint)],
-    [
-      'transcript',
-      () => ensureTerminalTranscriptEvent(runDir, checkpoint.outcome),
-    ],
+    ['transcript', () => ensureTerminalTranscriptEvent(runDir, checkpoint.outcome)],
     ['manifest', () => finalizeManifestIfNeeded(runDir)],
   ];
   for (const [name, attempt] of attempts) {
@@ -1644,10 +1481,7 @@ function repairTerminalProjections(
 /** Best-effort audit-projection write: a render or write failure is recorded
  * as a diagnostic transcript event and never changes the verification
  * outcome or aborts the run. */
-function writeFindingsReportSafely(
-  runDir: string,
-  input: FindingsReportInput,
-): void {
+function writeFindingsReportSafely(runDir: string, input: FindingsReportInput): void {
   try {
     writeFindingsReport(runDir, input);
   } catch (error) {
@@ -1681,9 +1515,7 @@ function writeFindingsReportOnResume(
   if (input !== undefined) writeFindingsReportSafely(runDir, input);
 }
 
-function budgetConfig(
-  configuration: DurableRunConfiguration,
-): RunBudgetConfig {
+function budgetConfig(configuration: DurableRunConfiguration): RunBudgetConfig {
   const limits = configuration.budgetLimits;
   return {
     maxWorkerTurns: ceilingFromCheckpoint(limits.maxWorkerTurns),
@@ -1697,9 +1529,7 @@ function budgetConfig(
   };
 }
 
-function formatRunCapabilityGuidance(
-  configuration: DurableRunConfiguration,
-): string {
+function formatRunCapabilityGuidance(configuration: DurableRunConfiguration): string {
   const authority = configuration.authenticated
     ? 'authenticated browser state'
     : 'an anonymous browser session';
@@ -1735,9 +1565,7 @@ function workerIncomplete(
   return {
     status: 'incomplete',
     during,
-    reason: budgetReasons.includes(reason)
-      ? 'budget_exceeded'
-      : 'worker_incomplete',
+    reason: budgetReasons.includes(reason) ? 'budget_exceeded' : 'worker_incomplete',
     detail: boundedDiagnostic(detail ?? `worker ended incomplete: ${reason}`),
     finalText,
     unresolved,
@@ -1760,14 +1588,8 @@ function incompleteBudget(
   };
 }
 
-function writeMetricsAtomically(
-  runDir: string,
-  metrics: WorkerMetrics,
-): void {
-  writeFileDurablyAtomic(
-    join(runDir, 'metrics.json'),
-    `${JSON.stringify(metrics, null, 2)}\n`,
-  );
+function writeMetricsAtomically(runDir: string, metrics: WorkerMetrics): void {
+  writeFileDurablyAtomic(join(runDir, 'metrics.json'), `${JSON.stringify(metrics, null, 2)}\n`);
 }
 
 function writeTerminalMetrics(
@@ -1809,43 +1631,27 @@ function finalizeManifestIfNeeded(runDir: string): void {
   if (readManifest(runDir).finishedAt === undefined) finalizeManifest(runDir);
 }
 
-function terminalBrowserCleanupTimeout(
-  options: RunAgentOptions,
-): number {
-  const timeoutMs =
-    options.terminalBrowserCleanupTimeoutMs ??
-    TERMINAL_BROWSER_CLEANUP_TIMEOUT_MS;
+function terminalBrowserCleanupTimeout(options: RunAgentOptions): number {
+  const timeoutMs = options.terminalBrowserCleanupTimeoutMs ?? TERMINAL_BROWSER_CLEANUP_TIMEOUT_MS;
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
-    throw new Error(
-      `terminalBrowserCleanupTimeoutMs must be finite and > 0, got ${timeoutMs}`,
-    );
+    throw new Error(`terminalBrowserCleanupTimeoutMs must be finite and > 0, got ${timeoutMs}`);
   }
   return timeoutMs;
 }
 
-function terminalBusyResourceTimeout(
-  options: RunAgentOptions,
-): number {
-  const timeoutMs =
-    options.terminalBusyResourceTimeoutMs ?? BUSY_RESOURCE_GATE_TIMEOUT_MS;
+function terminalBusyResourceTimeout(options: RunAgentOptions): number {
+  const timeoutMs = options.terminalBusyResourceTimeoutMs ?? BUSY_RESOURCE_GATE_TIMEOUT_MS;
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
-    throw new Error(
-      `terminalBusyResourceTimeoutMs must be finite and > 0, got ${timeoutMs}`,
-    );
+    throw new Error(`terminalBusyResourceTimeoutMs must be finite and > 0, got ${timeoutMs}`);
   }
   return timeoutMs;
 }
 
-function terminalResumeInspectionTimeout(
-  options: RunAgentOptions,
-): number {
+function terminalResumeInspectionTimeout(options: RunAgentOptions): number {
   const timeoutMs =
-    options.terminalResumeInspectionTimeoutMs ??
-    TERMINAL_RESUME_INSPECTION_TIMEOUT_MS;
+    options.terminalResumeInspectionTimeoutMs ?? TERMINAL_RESUME_INSPECTION_TIMEOUT_MS;
   if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
-    throw new Error(
-      `terminalResumeInspectionTimeoutMs must be finite and > 0, got ${timeoutMs}`,
-    );
+    throw new Error(`terminalResumeInspectionTimeoutMs must be finite and > 0, got ${timeoutMs}`);
   }
   return timeoutMs;
 }
@@ -1869,18 +1675,12 @@ function createTerminalResumeInspectionGuard(
       );
     }
     if (current - startedAt >= timeoutMs) {
-      throw new Error(
-        `terminal resume inspection exceeded its ${timeoutMs}ms safety bound`,
-      );
+      throw new Error(`terminal resume inspection exceeded its ${timeoutMs}ms safety bound`);
     }
   };
 }
 
-function withTimeout<T>(
-  operation: Promise<T>,
-  timeoutMs: number,
-  label: string,
-): Promise<T> {
+function withTimeout<T>(operation: Promise<T>, timeoutMs: number, label: string): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const timer = setTimeout(() => {
       reject(new Error(`${label} did not settle within ${timeoutMs}ms`));
@@ -1898,26 +1698,20 @@ function withTimeout<T>(
   });
 }
 
-function formatDefects(
-  defects: readonly { code: string; message: string }[],
-): string {
+function formatDefects(defects: readonly { code: string; message: string }[]): string {
   return defects.map((defect) => `${defect.code}: ${defect.message}`).join('; ');
 }
 
 function formatCorrectionFindings(
   findings: readonly { requirement: string; problem: string }[],
 ): string {
-  return findings
-    .map((finding) => `${finding.requirement}: ${finding.problem}`)
-    .join('; ');
+  return findings.map((finding) => `${finding.requirement}: ${finding.problem}`).join('; ');
 }
 
 function formatIncompleteFindings(
   findings: readonly { requirement: string; assessment: string }[],
 ): string {
-  return findings
-    .map((finding) => `${finding.requirement}: ${finding.assessment}`)
-    .join('; ');
+  return findings.map((finding) => `${finding.requirement}: ${finding.assessment}`).join('; ');
 }
 
 /** Fixed harness-owned instruction attached to research findings only when
@@ -1928,9 +1722,7 @@ const RESEARCH_FINDING_INSTRUCTION =
   'sources or navigation; do not fabricate, pad, or weaken artifacts. If it remains genuinely ' +
   'unobtainable after the applicable fallbacks, report it truthfully in unresolved.';
 
-function renderFindingsForWorker(
-  findings: readonly CorrectionFinding[],
-): unknown[] {
+function renderFindingsForWorker(findings: readonly CorrectionFinding[]): unknown[] {
   return findings.map((finding) =>
     finding.kind === 'research'
       ? { ...finding, instruction: RESEARCH_FINDING_INSTRUCTION }
@@ -1942,12 +1734,8 @@ function sameRequirementSet(
   previous: readonly CorrectionFinding[],
   current: readonly CorrectionFinding[],
 ): boolean {
-  const previousRequirements = new Set(
-    previous.map((finding) => finding.requirement),
-  );
-  const currentRequirements = new Set(
-    current.map((finding) => finding.requirement),
-  );
+  const previousRequirements = new Set(previous.map((finding) => finding.requirement));
+  const currentRequirements = new Set(current.map((finding) => finding.requirement));
   if (previousRequirements.size !== currentRequirements.size) return false;
   for (const requirement of currentRequirements) {
     if (!previousRequirements.has(requirement)) return false;
@@ -1962,22 +1750,16 @@ function hasNewDistinctAttempt(
   current: FinishInput['unresolved'],
   previous: FinishInput['unresolved'],
 ): boolean {
-  const previousAttempts = new Set(
-    previous.flatMap((entry) => entry.attempts),
-  );
-  return current.some((entry) =>
-    entry.attempts.some((attempt) => !previousAttempts.has(attempt)),
-  );
+  const previousAttempts = new Set(previous.flatMap((entry) => entry.attempts));
+  return current.some((entry) => entry.attempts.some((attempt) => !previousAttempts.has(attempt)));
 }
 
 function collectSurfacedArtifacts(runDir: string): SurfacedArtifact[] {
-  return readManifest(runDir).artifacts
-    .filter(
+  return readManifest(runDir)
+    .artifacts.filter(
       (entry) =>
         entry.filename.startsWith('artifacts/') &&
-        entry.roles?.some(
-          (role) => role === 'requested_output' || role === 'evidence',
-        ) === true,
+        entry.roles?.some((role) => role === 'requested_output' || role === 'evidence') === true,
     )
     .map((entry) => ({
       filename: entry.filename,
@@ -1985,16 +1767,12 @@ function collectSurfacedArtifacts(runDir: string): SurfacedArtifact[] {
       roles: [...entry.roles!] as ('requested_output' | 'evidence')[],
       capturedAt: entry.capturedAt,
       ...(entry.sourceUrl === undefined ? {} : { sourceUrl: entry.sourceUrl }),
-      ...(entry.completionStatus === undefined
-        ? {}
-        : { completionStatus: entry.completionStatus }),
+      ...(entry.completionStatus === undefined ? {} : { completionStatus: entry.completionStatus }),
     }))
     .sort((left, right) => left.filename.localeCompare(right.filename));
 }
 
-function fingerprintSurfacedArtifacts(
-  artifacts: readonly SurfacedArtifact[],
-): string {
+function fingerprintSurfacedArtifacts(artifacts: readonly SurfacedArtifact[]): string {
   const stableEvidence = artifacts.map(
     ({ filename, sha256, sourceUrl, roles, completionStatus }) => ({
       filename,
@@ -2004,14 +1782,10 @@ function fingerprintSurfacedArtifacts(
       ...(completionStatus === undefined ? {} : { completionStatus }),
     }),
   );
-  return createHash('sha256')
-    .update(JSON.stringify(stableEvidence), 'utf8')
-    .digest('hex');
+  return createHash('sha256').update(JSON.stringify(stableEvidence), 'utf8').digest('hex');
 }
 
-function formatOutcomeForDiagnostic(
-  outcome: DurableTerminalOutcome,
-): string {
+function formatOutcomeForDiagnostic(outcome: DurableTerminalOutcome): string {
   if (outcome.status === 'verified') return 'verified';
   if (outcome.status === 'incomplete') {
     return `incomplete during ${outcome.during} (${outcome.reason}: ${outcome.detail})`;
@@ -2025,8 +1799,11 @@ function formatOutcomeForDiagnostic(
 function boundedDiagnostic(value: string): string {
   const maximum = 16_000;
   if (Buffer.byteLength(value, 'utf8') <= maximum) return value;
-  return Buffer.from(value, 'utf8').subarray(0, maximum - 64).toString('utf8') +
-    '\n[diagnostic truncated]';
+  return (
+    Buffer.from(value, 'utf8')
+      .subarray(0, maximum - 64)
+      .toString('utf8') + '\n[diagnostic truncated]'
+  );
 }
 
 function abortReason(error: unknown): string {
@@ -2038,14 +1815,10 @@ function wallDeadlineError(
   error: unknown,
   signal: AbortSignal,
 ): RoleBudgetExceededError | undefined {
-  if (
-    isRoleBudgetExceededError(error) &&
-    error.limit === 'wall_time'
-  ) {
+  if (isRoleBudgetExceededError(error) && error.limit === 'wall_time') {
     return error;
   }
-  return isRoleBudgetExceededError(signal.reason) &&
-    signal.reason.limit === 'wall_time'
+  return isRoleBudgetExceededError(signal.reason) && signal.reason.limit === 'wall_time'
     ? signal.reason
     : undefined;
 }
@@ -2055,9 +1828,7 @@ function verifierBudgetError(
   signal: AbortSignal,
 ): RoleBudgetExceededError | undefined {
   if (isRoleBudgetExceededError(error)) return error;
-  return isRoleBudgetExceededError(signal.reason)
-    ? signal.reason
-    : undefined;
+  return isRoleBudgetExceededError(signal.reason) ? signal.reason : undefined;
 }
 
 function isAbortError(error: unknown): boolean {

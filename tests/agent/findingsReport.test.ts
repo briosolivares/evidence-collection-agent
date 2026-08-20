@@ -1,10 +1,4 @@
-import {
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  statSync,
-} from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -27,9 +21,7 @@ import {
   type FindingsReportInput,
 } from '../../src/agent/findingsReport.js';
 
-function minimalInput(
-  overrides: Partial<FindingsReportInput> = {},
-): FindingsReportInput {
+function minimalInput(overrides: Partial<FindingsReportInput> = {}): FindingsReportInput {
   return {
     phase: 'ready_for_model',
     settledFacts: [],
@@ -187,9 +179,7 @@ describe('renderFindingsReport', () => {
   });
 
   it('renders surfaced artifacts as a table with filename, hash, roles, and source', () => {
-    const rendered = renderFindingsReport(
-      minimalInput({ surfacedArtifacts: [SURFACED_ARTIFACT] }),
-    );
+    const rendered = renderFindingsReport(minimalInput({ surfacedArtifacts: [SURFACED_ARTIFACT] }));
     expect(rendered).toContain('## Surfaced artifacts (1)');
     expect(rendered).toContain(
       `| ${SURFACED_ARTIFACT.filename} | ${SURFACED_ARTIFACT.sha256} | requested_output | ` +
@@ -235,12 +225,12 @@ describe('renderFindingsReport', () => {
   });
 
   it('renders prior verification cycles with their fingerprint and findings', () => {
-    const rendered = renderFindingsReport(
-      minimalInput({ verificationHistory: [HISTORY_ENTRY] }),
-    );
+    const rendered = renderFindingsReport(minimalInput({ verificationHistory: [HISTORY_ENTRY] }));
     expect(rendered).toContain('## Prior verification cycles (1)');
     expect(rendered).toContain('### Cycle 1');
-    expect(rendered).toContain(`Surfaced-evidence fingerprint: ${HISTORY_ENTRY.surfacedEvidenceFingerprint}`);
+    expect(rendered).toContain(
+      `Surfaced-evidence fingerprint: ${HISTORY_ENTRY.surfacedEvidenceFingerprint}`,
+    );
   });
 
   it('elides unresolved requirements beyond the shared list bound', () => {
@@ -482,7 +472,10 @@ describe('writeFindingsReport', () => {
 
   it('rebuilds the whole file atomically rather than appending on a second write', () => {
     writeFindingsReport(runDir, minimalInput({ completionReport: FINISH }));
-    const second = minimalInput({ phase: 'terminal', outcome: { status: 'verified', finalText: 'done' } });
+    const second = minimalInput({
+      phase: 'terminal',
+      outcome: { status: 'verified', finalText: 'done' },
+    });
     writeFindingsReport(runDir, second);
     const path = join(runDir, HARNESS_DIR, FINDINGS_REPORT_FILENAME);
     const content = readFileSync(path, 'utf8');

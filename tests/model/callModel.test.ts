@@ -95,7 +95,12 @@ const turnThreeHistory = frozen([
     role: 'assistant',
     content: [
       { type: 'text', text: 'Writing it now.' },
-      { type: 'tool_use', id: 'toolu_01A', name: 'write_file', input: { file_path: 'limerick.txt', content: 'x' } },
+      {
+        type: 'tool_use',
+        id: 'toolu_01A',
+        name: 'write_file',
+        input: { file_path: 'limerick.txt', content: 'x' },
+      },
     ],
   },
   {
@@ -147,9 +152,7 @@ describe('buildRequestParams', () => {
       // With no collapsed stubs in the view there is exactly one
       // message-level marker: 2 breakpoints per request total
       // (system + moving), within the API's max of 4.
-      const markers = contents
-        .flat()
-        .filter((block) => block.cache_control !== undefined);
+      const markers = contents.flat().filter((block) => block.cache_control !== undefined);
       expect(markers).toHaveLength(1);
     }
   });
@@ -171,9 +174,7 @@ describe('buildRequestParams', () => {
     expect(contents[2]?.[0]?.content).toContain(COLLAPSED_BROWSER_RESULT_MARKER);
     expect(contents[2]?.[0]?.cache_control).toEqual({ type: 'ephemeral' });
     expect(contents.at(-1)?.at(-1)?.cache_control).toEqual({ type: 'ephemeral' });
-    expect(
-      contents.flat().filter((block) => block.cache_control !== undefined),
-    ).toHaveLength(2);
+    expect(contents.flat().filter((block) => block.cache_control !== undefined)).toHaveLength(2);
     expect(JSON.stringify(history)).not.toContain(COLLAPSED_BROWSER_RESULT_MARKER);
     expect(JSON.stringify(history)).not.toContain('cache_control');
   });
@@ -186,7 +187,10 @@ describe('buildRequestParams', () => {
     // replay thinking blocks, so the model must not produce them.
     expect(defaulted.thinking).toEqual({ type: 'disabled' });
 
-    const overridden = buildRequestParams({ ...makeConfig(), model: 'claude-opus-5' }, turnOneHistory);
+    const overridden = buildRequestParams(
+      { ...makeConfig(), model: 'claude-opus-5' },
+      turnOneHistory,
+    );
     expect(overridden.model).toBe('claude-opus-5');
   });
 

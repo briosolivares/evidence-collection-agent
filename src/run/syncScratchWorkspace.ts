@@ -96,17 +96,10 @@ export function syncScratchWorkspace(
   const seen = new Set<string>();
 
   if (existsSync(workspaceDir)) {
-    for (const { absPath, relPath } of walkWorkspace(
-      workspaceDir,
-      options.checkActive,
-    )) {
+    for (const { absPath, relPath } of walkWorkspace(workspaceDir, options.checkActive)) {
       options.checkActive?.();
       seen.add(relPath);
-      const bytes = readRegularFileNoFollow(
-        absPath,
-        relPath,
-        options.checkActive,
-      );
+      const bytes = readRegularFileNoFollow(absPath, relPath, options.checkActive);
       const hash = createHash('sha256').update(bytes).digest('hex');
       const priorHash = priorHashes.get(relPath);
       if (priorHash === hash) continue; // unchanged: leave the existing entry alone
@@ -156,10 +149,7 @@ interface WalkedWorkspaceFile {
  * is `lstat`-checked explicitly before the walk ever opens
  * it.
  */
-function walkWorkspace(
-  workspaceDir: string,
-  checkActive?: () => void,
-): WalkedWorkspaceFile[] {
+function walkWorkspace(workspaceDir: string, checkActive?: () => void): WalkedWorkspaceFile[] {
   checkActive?.();
   const rootStat = lstatSync(workspaceDir);
   if (rootStat.isSymbolicLink()) {

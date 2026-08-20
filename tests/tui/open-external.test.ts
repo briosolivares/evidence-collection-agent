@@ -14,12 +14,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import {
-  openPath,
-  quickLookPath,
-  revealPath,
-  type SpawnFn,
-} from '../../src/tui/openExternal.js';
+import { openPath, quickLookPath, revealPath, type SpawnFn } from '../../src/tui/openExternal.js';
 
 // A real file on disk: the helpers stat the path before launching
 // anything (default `exists` seam), so the fixture must exist.
@@ -70,9 +65,7 @@ describe('on darwin', () => {
     const result = openPath(PATH, { spawn, platform: 'darwin' });
     children[0]!.emit('spawn');
     await expect(result).resolves.toEqual({ ok: true });
-    expect(calls).toEqual([
-      { command: 'open', args: [PATH], options: TTY_SAFE_OPTIONS },
-    ]);
+    expect(calls).toEqual([{ command: 'open', args: [PATH], options: TTY_SAFE_OPTIONS }]);
     expect(children[0]!.unrefCalls).toBe(1);
   });
 
@@ -81,9 +74,7 @@ describe('on darwin', () => {
     const result = revealPath(PATH, { spawn, platform: 'darwin' });
     children[0]!.emit('spawn');
     await expect(result).resolves.toEqual({ ok: true });
-    expect(calls).toEqual([
-      { command: 'open', args: ['-R', PATH], options: TTY_SAFE_OPTIONS },
-    ]);
+    expect(calls).toEqual([{ command: 'open', args: ['-R', PATH], options: TTY_SAFE_OPTIONS }]);
     expect(children[0]!.unrefCalls).toBe(1);
   });
 
@@ -92,9 +83,7 @@ describe('on darwin', () => {
     const result = quickLookPath(PATH, { spawn, platform: 'darwin', quickLookHelper: null });
     children[0]!.emit('spawn');
     await expect(result).resolves.toEqual({ ok: true });
-    expect(calls).toEqual([
-      { command: 'qlmanage', args: ['-p', PATH], options: TTY_SAFE_OPTIONS },
-    ]);
+    expect(calls).toEqual([{ command: 'qlmanage', args: ['-p', PATH], options: TTY_SAFE_OPTIONS }]);
     expect(children[0]!.unrefCalls).toBe(1);
   });
 });
@@ -105,9 +94,7 @@ describe('on linux', () => {
     const result = openPath(PATH, { spawn, platform: 'linux' });
     children[0]!.emit('spawn');
     await expect(result).resolves.toEqual({ ok: true });
-    expect(calls).toEqual([
-      { command: 'xdg-open', args: [PATH], options: TTY_SAFE_OPTIONS },
-    ]);
+    expect(calls).toEqual([{ command: 'xdg-open', args: [PATH], options: TTY_SAFE_OPTIONS }]);
     expect(children[0]!.unrefCalls).toBe(1);
   });
 
@@ -116,9 +103,7 @@ describe('on linux', () => {
     const result = quickLookPath(PATH, { spawn, platform: 'linux' });
     children[0]!.emit('spawn');
     await expect(result).resolves.toEqual({ ok: true });
-    expect(calls).toEqual([
-      { command: 'xdg-open', args: [PATH], options: TTY_SAFE_OPTIONS },
-    ]);
+    expect(calls).toEqual([{ command: 'xdg-open', args: [PATH], options: TTY_SAFE_OPTIONS }]);
   });
 
   it('revealPath reports not supported without spawning', async () => {
@@ -295,9 +280,7 @@ describe('the sherlock-ql helper chain (darwin Space)', () => {
     const result = quickLookPath(PATH, { spawn, platform: 'darwin', quickLookHelper: helper });
     children[0]!.emit('spawn');
     await expect(result).resolves.toEqual({ ok: true });
-    expect(calls).toEqual([
-      { command: helper, args: [PATH], options: TTY_SAFE_OPTIONS },
-    ]);
+    expect(calls).toEqual([{ command: helper, args: [PATH], options: TTY_SAFE_OPTIONS }]);
     expect(children[0]!.unrefCalls).toBe(1);
   });
 
@@ -310,9 +293,7 @@ describe('the sherlock-ql helper chain (darwin Space)', () => {
     });
     children[0]!.emit('spawn');
     await expect(result).resolves.toEqual({ ok: true });
-    expect(calls).toEqual([
-      { command: 'qlmanage', args: ['-p', PATH], options: TTY_SAFE_OPTIONS },
-    ]);
+    expect(calls).toEqual([{ command: 'qlmanage', args: ['-p', PATH], options: TTY_SAFE_OPTIONS }]);
   });
 
   it('the missing-file gate still beats the helper chain', async () => {

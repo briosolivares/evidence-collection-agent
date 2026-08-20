@@ -38,8 +38,7 @@ describe('cancellation artifacts', () => {
       }).slice(0, 3);
       sawDelta();
       await new Promise((_resolve, reject) => {
-        const abort = () =>
-          reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+        const abort = () => reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
         if (signal === undefined) return;
         if (signal.aborted) abort();
         else signal.addEventListener('abort', abort, { once: true });
@@ -68,8 +67,8 @@ describe('cancellation artifacts', () => {
     expect(manifest.task).toBe('a run to interrupt');
     expect(manifest.finishedAt).toBeDefined();
     expect(existsSync(join(runDir, 'metrics.json'))).toBe(true);
-    expect(
-      JSON.parse(readFileSync(join(runDir, 'metrics.json'), 'utf8')),
-    ).toMatchObject({ status: 'cancelled' });
+    expect(JSON.parse(readFileSync(join(runDir, 'metrics.json'), 'utf8'))).toMatchObject({
+      status: 'cancelled',
+    });
   });
 });

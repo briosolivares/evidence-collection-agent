@@ -21,13 +21,21 @@ export async function fetchWikipediaReference(
 ): Promise<WikipediaReferenceOracle> {
   const url = new URL('https://en.wikipedia.org/w/api.php');
   url.search = new URLSearchParams({
-    action: 'parse', page: PAGE_TITLE, prop: 'text', format: 'json', formatversion: '2',
+    action: 'parse',
+    page: PAGE_TITLE,
+    prop: 'text',
+    format: 'json',
+    formatversion: '2',
   }).toString();
-  const response = await fetchWithRetry(url.href, {
-    headers: { 'user-agent': 'evidence-collection-agent/0.1 (evaluation oracle)' },
-  }, deps);
+  const response = await fetchWithRetry(
+    url.href,
+    {
+      headers: { 'user-agent': 'evidence-collection-agent/0.1 (evaluation oracle)' },
+    },
+    deps,
+  );
   if (!response.ok) throw new Error(`Wikipedia oracle request failed: HTTP ${response.status}`);
-  const data = await response.json() as { parse?: { title?: unknown; text?: unknown } };
+  const data = (await response.json()) as { parse?: { title?: unknown; text?: unknown } };
   if (typeof data.parse?.text !== 'string' || typeof data.parse.title !== 'string') {
     throw new Error('Wikipedia parse API returned malformed page HTML');
   }
@@ -42,17 +50,24 @@ export function parseReferenceSourceHtml(
   pageTitle = PAGE_TITLE,
 ): WikipediaReferenceOracle {
   const html = rawHtml.replaceAll('&#95;', '_');
-  const referenceSup = [...html.matchAll(/<sup\b[^>]*class="[^"]*\breference\b[^"]*"[^>]*>[\s\S]*?<\/sup>/gi)]
-    .find((match) => htmlToText(match[0]).replace(/\s+/g, '') === `[${referenceNumber}]`)?.[0];
-  if (!referenceSup) throw new Error(`Wikipedia page has no displayed reference [${referenceNumber}]`);
+  const referenceSup = [
+    ...html.matchAll(/<sup\b[^>]*class="[^"]*\breference\b[^"]*"[^>]*>[\s\S]*?<\/sup>/gi),
+  ].find((match) => htmlToText(match[0]).replace(/\s+/g, '') === `[${referenceNumber}]`)?.[0];
+  if (!referenceSup)
+    throw new Error(`Wikipedia page has no displayed reference [${referenceNumber}]`);
   const referenceId = /href="#([^"]+)"/i.exec(referenceSup)?.[1];
   if (!referenceId) throw new Error(`Wikipedia reference [${referenceNumber}] has no target id`);
 
   const referenceItem = captureElementById(html, 'li', referenceId);
-  const referenceHtml = /<span\b[^>]*class="[^"]*\breference-text\b[^"]*"[^>]*>([\s\S]*?)<\/span>/i.exec(referenceItem)?.[1];
-  if (!referenceHtml) throw new Error(`Wikipedia reference [${referenceNumber}] has no reference-text span`);
+  const referenceHtml =
+    /<span\b[^>]*class="[^"]*\breference-text\b[^"]*"[^>]*>([\s\S]*?)<\/span>/i.exec(
+      referenceItem,
+    )?.[1];
+  if (!referenceHtml)
+    throw new Error(`Wikipedia reference [${referenceNumber}] has no reference-text span`);
   const sourceId = /href="#(CITEREF[^"]+)"/i.exec(referenceHtml)?.[1];
-  if (!sourceId) throw new Error(`Wikipedia reference [${referenceNumber}] does not link into Sources`);
+  if (!sourceId)
+    throw new Error(`Wikipedia reference [${referenceNumber}] does not link into Sources`);
 
   const sourceHtml = captureElementById(html, 'cite', sourceId);
   const sourceText = htmlToText(sourceHtml);
@@ -69,21 +84,33 @@ export function parseReferenceSourceHtml(
 
 function captureElementById(html: string, tag: string, id: string): string {
   const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const match = new RegExp(`<${tag}\\b[^>]*id="${escaped}"[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i').exec(html);
+  const match = new RegExp(`<${tag}\\b[^>]*id="${escaped}"[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i').exec(
+    html,
+  );
   if (!match) throw new Error(`Wikipedia page has no <${tag}> with id ${id}`);
   return match[1]!;
 }
 
 export function htmlToText(html: string): string {
-  return decodeEntities(html.replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
+  return decodeEntities(html.replace(/<[^>]*>/g, ' '))
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function decodeEntities(value: string): string {
   const named: Record<string, string> = {
-    amp: '&', apos: "'", gt: '>', lt: '<', nbsp: ' ', ndash: '–', mdash: '—', quot: '"',
+    amp: '&',
+    apos: "'",
+    gt: '>',
+    lt: '<',
+    nbsp: ' ',
+    ndash: '–',
+    mdash: '—',
+    quot: '"',
   };
   return value.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (entity, body: string) => {
-    if (body.startsWith('#x') || body.startsWith('#X')) return String.fromCodePoint(Number.parseInt(body.slice(2), 16));
+    if (body.startsWith('#x') || body.startsWith('#X'))
+      return String.fromCodePoint(Number.parseInt(body.slice(2), 16));
     if (body.startsWith('#')) return String.fromCodePoint(Number.parseInt(body.slice(1), 10));
     return named[body.toLowerCase()] ?? entity;
   });

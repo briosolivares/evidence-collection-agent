@@ -56,7 +56,15 @@ export function createDemoScript(baseAt: number): DemoStep[] {
         },
       },
     },
-    { delayMs: 1400, action: { type: 'tool_exec_end', id: 1, ok: true, result: 'Loaded techcrunch.com — Acme Corp raises $85M Series B' } },
+    {
+      delayMs: 1400,
+      action: {
+        type: 'tool_exec_end',
+        id: 1,
+        ok: true,
+        result: 'Loaded techcrunch.com — Acme Corp raises $85M Series B',
+      },
+    },
 
     // Turn 2 — read the article, capture the coverage as evidence.
     { delayMs: 300, action: { type: 'turn_start', turn: 2 } },
@@ -76,7 +84,15 @@ export function createDemoScript(baseAt: number): DemoStep[] {
         input: { code: "return await browser.accessibility({ filter: 'investor' });" },
       },
     },
-    { delayMs: 1200, action: { type: 'tool_exec_end', id: 2, ok: true, result: 'outline: article — "Acme Corp raises $85M Series B led by Meridian Growth"' } },
+    {
+      delayMs: 1200,
+      action: {
+        type: 'tool_exec_end',
+        id: 2,
+        ok: true,
+        result: 'outline: article — "Acme Corp raises $85M Series B led by Meridian Growth"',
+      },
+    },
     {
       delayMs: 150,
       action: {
@@ -107,7 +123,15 @@ export function createDemoScript(baseAt: number): DemoStep[] {
         toolExecId: 3,
       },
     },
-    { delayMs: 150, action: { type: 'tool_exec_end', id: 3, ok: true, result: 'Captured series-b-coverage.png (viewport)' } },
+    {
+      delayMs: 150,
+      action: {
+        type: 'tool_exec_end',
+        id: 3,
+        ok: true,
+        result: 'Captured series-b-coverage.png (viewport)',
+      },
+    },
 
     // Turn 3 — follow to the filing; one flaky click for texture.
     { delayMs: 300, action: { type: 'turn_start', turn: 3 } },
@@ -129,7 +153,15 @@ export function createDemoScript(baseAt: number): DemoStep[] {
         },
       },
     },
-    { delayMs: 1300, action: { type: 'tool_exec_end', id: 4, ok: true, result: 'Loaded sec.gov EDGAR company search' } },
+    {
+      delayMs: 1300,
+      action: {
+        type: 'tool_exec_end',
+        id: 4,
+        ok: true,
+        result: 'Loaded sec.gov EDGAR company search',
+      },
+    },
     {
       delayMs: 150,
       action: {
@@ -168,7 +200,15 @@ export function createDemoScript(baseAt: number): DemoStep[] {
         input: { code: "return await browser.accessibility({ filter: 'offering' });" },
       },
     },
-    { delayMs: 1000, action: { type: 'tool_exec_end', id: 6, ok: true, result: 'outline: Form D — Acme Corp, total offering $85,000,000' } },
+    {
+      delayMs: 1000,
+      action: {
+        type: 'tool_exec_end',
+        id: 6,
+        ok: true,
+        result: 'outline: Form D — Acme Corp, total offering $85,000,000',
+      },
+    },
     {
       delayMs: 150,
       action: {
@@ -197,7 +237,15 @@ export function createDemoScript(baseAt: number): DemoStep[] {
         toolExecId: 7,
       },
     },
-    { delayMs: 150, action: { type: 'tool_exec_end', id: 7, ok: true, result: 'Captured form-d-filing.png (full page)' } },
+    {
+      delayMs: 150,
+      action: {
+        type: 'tool_exec_end',
+        id: 7,
+        ok: true,
+        result: 'Captured form-d-filing.png (full page)',
+      },
+    },
     {
       delayMs: 150,
       action: {
@@ -227,7 +275,10 @@ export function createDemoScript(baseAt: number): DemoStep[] {
         toolExecId: 8,
       },
     },
-    { delayMs: 150, action: { type: 'tool_exec_end', id: 8, ok: true, result: 'Created investors.csv (3 rows)' } },
+    {
+      delayMs: 150,
+      action: { type: 'tool_exec_end', id: 8, ok: true, result: 'Created investors.csv (3 rows)' },
+    },
 
     // Turn 5 — conclude.
     { delayMs: 300, action: { type: 'turn_start', turn: 5 } },

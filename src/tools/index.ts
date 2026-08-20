@@ -70,9 +70,7 @@ export function createWorkerToolRegistry(deps: WorkerToolRegistryDeps): ToolRegi
     WORKER_TOOL_ORDER.map((name) => {
       const tool = runScopedTools.get(name) ?? STATIC_TOOLS.get(name);
       if (tool === undefined || tool.name !== name) {
-        throw new Error(
-          `tool registry invariant failed for ${JSON.stringify(name)}`,
-        );
+        throw new Error(`tool registry invariant failed for ${JSON.stringify(name)}`);
       }
       return tool;
     }),

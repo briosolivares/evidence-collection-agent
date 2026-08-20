@@ -76,7 +76,13 @@ describe('RunsList (list level)', () => {
   it('windows long lists and scrolls with the cursor', async () => {
     const entries = Array.from({ length: 12 }, (_, index) => entry(index));
     const { lastFrame, stdin, unmount } = render(
-      <RunsList entries={entries} onClose={() => {}} loadSummary={summaryFor} limit={4} now={now} />,
+      <RunsList
+        entries={entries}
+        onClose={() => {}}
+        loadSummary={summaryFor}
+        limit={4}
+        now={now}
+      />,
     );
     await tick();
     expect(lastFrame()).toContain('task number 0');
@@ -120,7 +126,12 @@ describe('RunsList (detail level)', () => {
   it("Enter opens the highlighted run's summary inside the overlay", async () => {
     const onClose = vi.fn();
     const { lastFrame, stdin, unmount } = render(
-      <RunsList entries={[entry(0), entry(1)]} onClose={onClose} loadSummary={summaryFor} now={now} />,
+      <RunsList
+        entries={[entry(0), entry(1)]}
+        onClose={onClose}
+        loadSummary={summaryFor}
+        now={now}
+      />,
     );
     await tick();
     stdin.write(DOWN);
@@ -156,7 +167,12 @@ describe('RunsList (detail level)', () => {
 
   it('← returns to the list with the cursor preserved', async () => {
     const { lastFrame, stdin, unmount } = render(
-      <RunsList entries={[entry(0), entry(1), entry(2)]} onClose={() => {}} loadSummary={summaryFor} now={now} />,
+      <RunsList
+        entries={[entry(0), entry(1), entry(2)]}
+        onClose={() => {}}
+        loadSummary={summaryFor}
+        now={now}
+      />,
     );
     await tick();
     stdin.write(DOWN);
@@ -175,7 +191,12 @@ describe('RunsList (detail level)', () => {
   it('Esc in detail returns to the list instead of closing', async () => {
     const onClose = vi.fn();
     const { lastFrame, stdin, unmount } = render(
-      <RunsList entries={[entry(0), entry(1)]} onClose={onClose} loadSummary={summaryFor} now={now} />,
+      <RunsList
+        entries={[entry(0), entry(1)]}
+        onClose={onClose}
+        loadSummary={summaryFor}
+        now={now}
+      />,
     );
     await tick();
     stdin.write(DOWN);
@@ -193,7 +214,12 @@ describe('RunsList (detail level)', () => {
 
   it("↑/↓ in detail jump to the previous/next run's detail, clamped at the ends", async () => {
     const { lastFrame, stdin, unmount } = render(
-      <RunsList entries={[entry(0), entry(1), entry(2)]} onClose={() => {}} loadSummary={summaryFor} now={now} />,
+      <RunsList
+        entries={[entry(0), entry(1), entry(2)]}
+        onClose={() => {}}
+        loadSummary={summaryFor}
+        now={now}
+      />,
     );
     await tick();
     stdin.write(ENTER);

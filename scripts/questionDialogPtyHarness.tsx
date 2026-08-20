@@ -12,10 +12,7 @@
 import { render } from 'ink';
 
 import type { RunHandle, RunOutcome } from '../src/tui/bridge/runSession.js';
-import type {
-  PermissionDecision,
-  PermissionRequest,
-} from '../src/tools/registry.js';
+import type { PermissionDecision, PermissionRequest } from '../src/tools/registry.js';
 import { App } from '../src/tui/components/App.js';
 import { createConfig } from '../src/tui/config.js';
 import type { UiEvent } from '../src/tui/store/state.js';
@@ -27,9 +24,7 @@ const runner = (
   onEvent: (event: UiEvent) => void,
   opts?: {
     startUrl?: string;
-    requestPermission?: (
-      request: PermissionRequest,
-    ) => Promise<PermissionDecision>;
+    requestPermission?: (request: PermissionRequest) => Promise<PermissionDecision>;
   },
 ): RunHandle => {
   let resolveDone!: (outcome: RunOutcome) => void;
@@ -49,8 +44,7 @@ const runner = (
     const decision = await opts!.requestPermission!({
       toolName: 'ask_user',
       input: {
-        question:
-          'Please complete the login in the browser window, then tell me.',
+        question: 'Please complete the login in the browser window, then tell me.',
         context: 'Sherlock is paused until the existing browser session is ready.',
         options: [
           { label: 'Done', description: 'I completed the login' },

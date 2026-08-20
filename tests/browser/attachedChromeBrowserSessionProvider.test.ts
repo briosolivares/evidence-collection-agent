@@ -105,9 +105,7 @@ function fakeBrowser(contexts: BrowserContext[]): {
     contexts: vi.fn(() => contexts),
     newBrowserCDPSession: vi.fn(async () => ({
       send: vi.fn(async (method: string) =>
-        method === 'Target.getBrowserContexts'
-          ? { browserContextIds: [] }
-          : {},
+        method === 'Target.getBrowserContexts' ? { browserContextIds: [] } : {},
       ),
       detach: vi.fn(async () => undefined),
     })),
@@ -153,22 +151,19 @@ describe('AttachedChromeBrowserSessionProvider endpoint boundary', () => {
     'http://127.0.0.1:9222',
     'http://localhost:9333/',
     'ws://127.0.0.1:9222/devtools/browser/discovery-token',
-  ])(
-    'connects to an accepted loopback endpoint unchanged: %s',
-    async (cdpEndpoint) => {
-      const { context } = fakeContext();
-      const { browser } = fakeBrowser([context]);
-      const connectOverCDP = vi.fn(async () => browser);
-      const attached = new AttachedChromeBrowserSessionProvider({
-        cdpEndpoint,
-        connectOverCDP,
-      });
+  ])('connects to an accepted loopback endpoint unchanged: %s', async (cdpEndpoint) => {
+    const { context } = fakeContext();
+    const { browser } = fakeBrowser([context]);
+    const connectOverCDP = vi.fn(async () => browser);
+    const attached = new AttachedChromeBrowserSessionProvider({
+      cdpEndpoint,
+      connectOverCDP,
+    });
 
-      await attached.createSession();
+    await attached.createSession();
 
-      expect(connectOverCDP).toHaveBeenCalledExactlyOnceWith(cdpEndpoint);
-    },
-  );
+    expect(connectOverCDP).toHaveBeenCalledExactlyOnceWith(cdpEndpoint);
+  });
 
   it.each([0, -1, 1.5, Number.POSITIVE_INFINITY])(
     'rejects an invalid connection timeout before connecting: %s',
@@ -227,10 +222,7 @@ describe('AttachedChromeBrowserSessionProvider page ownership', () => {
   it('disconnects once without closing the existing context or any user page', async () => {
     const first = fakePage('https://mail.example.test/');
     const second = fakePage('https://calendar.example.test/');
-    const { context, close: closeContext } = fakeContext([
-      first.page,
-      second.page,
-    ]);
+    const { context, close: closeContext } = fakeContext([first.page, second.page]);
     const { browser, close: disconnectClient } = fakeBrowser([context]);
     const controller = await provider(browser).createSession();
 

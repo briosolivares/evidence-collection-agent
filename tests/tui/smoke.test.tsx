@@ -53,9 +53,7 @@ describe('smoke: full scripted-run rendering contract', () => {
     expect(frame).toContain("▸ Find Acme Corp's Series B investors");
     expect(frame).toContain("I'll start with recent funding coverage");
     expect(frame).toContain('● Running a browser program');
-    expect(frame).toContain(
-      '◆ Publishing an artifact → artifacts/investors.csv',
-    );
+    expect(frame).toContain('◆ Publishing an artifact → artifacts/investors.csv');
     expect(frame).toContain('✓ Brewed in 42s · 18.7k tokens');
     // …and the passive completion panel sits above the composer.
     expect(frame).toContain('tab to browse artifacts');

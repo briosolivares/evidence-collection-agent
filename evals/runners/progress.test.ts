@@ -4,9 +4,9 @@ import { formatEvalProgress, trialLabel } from './progress.js';
 
 describe('eval CLI progress', () => {
   it('labels line-oriented lifecycle events with task and trial identity', () => {
-    expect(
-      formatEvalProgress('edgar', 2, 3, { type: 'turn_start', turn: 4 }),
-    ).toBe('[edgar 2/3] turn 4 started\n');
+    expect(formatEvalProgress('edgar', 2, 3, { type: 'turn_start', turn: 4 })).toBe(
+      '[edgar 2/3] turn 4 started\n',
+    );
     expect(
       formatEvalProgress('edgar', 2, 3, {
         type: 'tool_use_start',

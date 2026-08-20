@@ -27,9 +27,7 @@ export const grade: Grader = (runDirPath, oracleData) => {
     {
       name: `${expectedFile} exists`,
       passed: exists,
-      detail: exists
-        ? `${expectedFile} found in run dir`
-        : `${expectedFile} missing from run dir`,
+      detail: exists ? `${expectedFile} found in run dir` : `${expectedFile} missing from run dir`,
     },
     manifestHashAssertion(runDirPath, expectedFile),
   ];

@@ -47,9 +47,7 @@ export const DEFAULT_WORKING_WORDS: readonly string[] = [
   'Brewing',
 ];
 
-export function createConfig(
-  overrides: Partial<SherlockConfig> = {},
-): SherlockConfig {
+export function createConfig(overrides: Partial<SherlockConfig> = {}): SherlockConfig {
   return {
     completionVerb: 'Brewed',
     workingWords: DEFAULT_WORKING_WORDS,

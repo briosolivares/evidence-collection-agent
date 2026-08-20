@@ -199,16 +199,12 @@ export async function runForegroundCommand(
 
   let child: ChildProcess;
   try {
-    child = spawn(
-      shellPath,
-      ['-c', START_GATE_SCRIPT, shellPath, command],
-      {
-        cwd,
-        env,
-        stdio: ['ignore', 'pipe', 'pipe', 'pipe'],
-        detached: true,
-      },
-    );
+    child = spawn(shellPath, ['-c', START_GATE_SCRIPT, shellPath, command], {
+      cwd,
+      env,
+      stdio: ['ignore', 'pipe', 'pipe', 'pipe'],
+      detached: true,
+    });
   } catch (error) {
     await watchdog.disarm();
     throw error;
@@ -463,9 +459,7 @@ export async function runForegroundCommand(
         infrastructureError =
           error instanceof ParentDeathWatchdogError
             ? error
-            : new ParentDeathWatchdogError(
-                'parent-death watchdog failed while arming the command',
-              );
+            : new ParentDeathWatchdogError('parent-death watchdog failed while arming the command');
         startGate.destroy();
         triggerTermination('cancelled');
       },

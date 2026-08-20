@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  formatDuration,
-  formatTokens,
-  truncate,
-} from '../../src/tui/format.js';
+import { formatDuration, formatTokens, truncate } from '../../src/tui/format.js';
 
 describe('formatTokens', () => {
   it('renders sub-thousand counts verbatim', () => {

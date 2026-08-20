@@ -3,11 +3,7 @@ import { Box, Text } from 'ink';
 import { formatDuration, formatTokens, truncate } from '../format.js';
 import { NO_COMPLETION_REPORT_TEXT } from '../../run/runOutcome.js';
 import { orderArtifactsForSummary, type UiAction } from '../store/reducer.js';
-import type {
-  ArtifactUiState,
-  CompletedRunSummary,
-  PublishedArtifact,
-} from '../store/state.js';
+import type { ArtifactUiState, CompletedRunSummary, PublishedArtifact } from '../store/state.js';
 import { glyphs, theme } from '../theme.js';
 import { ArtifactDetail } from './ArtifactDetail.js';
 import { ArtifactRows, useArtifactKeys, type ExternalAction } from './ArtifactRows.js';

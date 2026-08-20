@@ -23,13 +23,27 @@ describe('scanRuns', () => {
       task: 'oldest, completed normally',
       startedAt: '2026-08-10T08:00:00.000Z',
       finishedAt: '2026-08-10T08:01:00.000Z',
-      metrics: { status: 'completed', turns: 3, inputTokens: 100, outputTokens: 50, cacheReadInputTokens: 0, wallClockMs: 60_000 },
+      metrics: {
+        status: 'completed',
+        turns: 3,
+        inputTokens: 100,
+        outputTokens: 50,
+        cacheReadInputTokens: 0,
+        wallClockMs: 60_000,
+      },
     });
     writeFixtureRun(baseDir, {
       id: '2026-08-11T09-00-00-000Z-bbb',
       task: 'terminal projection interrupted before manifest finalization',
       startedAt: '2026-08-11T09:00:00.000Z',
-      metrics: { status: 'verified', turns: 3, inputTokens: 100, outputTokens: 50, cacheReadInputTokens: 0, wallClockMs: 60_000 },
+      metrics: {
+        status: 'verified',
+        turns: 3,
+        inputTokens: 100,
+        outputTokens: 50,
+        cacheReadInputTokens: 0,
+        wallClockMs: 60_000,
+      },
     });
     writeFixtureRun(baseDir, {
       id: '2026-08-11T10-00-00-000Z-ccc',
@@ -44,11 +58,7 @@ describe('scanRuns', () => {
       '2026-08-11T09-00-00-000Z-bbb',
       '2026-08-10T08-00-00-000Z-aaa',
     ]);
-    expect(entries.map((entry) => entry.status)).toEqual([
-      'stopped',
-      'unfinished',
-      'complete',
-    ]);
+    expect(entries.map((entry) => entry.status)).toEqual(['stopped', 'unfinished', 'complete']);
   });
 
   it('never labels a cancelled run "crashed"', () => {
@@ -76,7 +86,14 @@ describe('scanRuns', () => {
       task: `${metricsStatus} run`,
       startedAt: '2026-08-11T10:00:00.000Z',
       finishedAt: '2026-08-11T10:00:18.000Z',
-      metrics: { status: metricsStatus, turns: 3, inputTokens: 100, outputTokens: 50, cacheReadInputTokens: 0, wallClockMs: 18_000 },
+      metrics: {
+        status: metricsStatus,
+        turns: 3,
+        inputTokens: 100,
+        outputTokens: 50,
+        cacheReadInputTokens: 0,
+        wallClockMs: 18_000,
+      },
     });
 
     expect(scanRuns(baseDir)[0]?.status).toBe(expected);
@@ -108,7 +125,14 @@ describe('loadRunSummary', () => {
       task: 'summarize me',
       startedAt: '2026-08-11T10:00:00.000Z',
       finishedAt: '2026-08-11T10:01:24.000Z',
-      metrics: { status: 'completed', turns: 5, inputTokens: 30_000, outputTokens: 1_200, cacheReadInputTokens: 9_000, wallClockMs: 84_000 },
+      metrics: {
+        status: 'completed',
+        turns: 5,
+        inputTokens: 30_000,
+        outputTokens: 1_200,
+        cacheReadInputTokens: 9_000,
+        wallClockMs: 84_000,
+      },
       artifacts: [
         {
           filename: 'top5.csv',

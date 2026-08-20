@@ -1,8 +1,4 @@
-import {
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-} from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -10,25 +6,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { BrowserController } from '../../src/browser/controller.js';
 import type { OutputContract } from '../../src/agent/initializer/outputContract.schema.js';
-import type {
-  Message,
-  ModelResponse,
-  Usage,
-} from '../../src/model/messages.js';
+import type { Message, ModelResponse, Usage } from '../../src/model/messages.js';
 import type { ProgressEvent } from '../../src/model/callModel.js';
-import {
-  readManifest,
-} from '../../src/run/artifacts.js';
+import { readManifest } from '../../src/run/artifacts.js';
 import type { RunTracing } from '../../src/tracing/runTracing.js';
 import type { ResumeTaskConfig } from '../../src/agent/runTask.js';
 import { readCheckpointConfiguration } from '../../src/agent/checkpoint.js';
 import { UNBOUNDED_CEILING } from '../../src/agent/checkpoint.schema.js';
 import { BROWSER_EXECUTE_POLICY_DENIED_MESSAGE } from '../../src/tools/browserExecute/browserExecute.js';
-import {
-  PRODUCTION_DEFAULTS,
-  resumeTask,
-  runTask,
-} from '../../src/agent/runTask.js';
+import { PRODUCTION_DEFAULTS, resumeTask, runTask } from '../../src/agent/runTask.js';
 
 const TASK =
   'Publish report.csv with exactly one name column and one data row. Do not take screenshots.';
@@ -89,15 +75,12 @@ describe('public runTask adapter', () => {
       status: 'verified',
       finalText: FINISH.summary,
     });
-    expect(readFileSync(join(run.result.runDir, 'artifacts/report.csv'), 'utf8')).toBe(
-      REPORT,
-    );
+    expect(readFileSync(join(run.result.runDir, 'artifacts/report.csv'), 'utf8')).toBe(REPORT);
     const configuration = readCheckpointConfiguration(run.result.runDir);
     expect(configuration).toMatchObject({
       maxOutputTokens: PRODUCTION_DEFAULTS.maxOutputTokens,
       maxContextTokens: PRODUCTION_DEFAULTS.maxContextTokens,
-      maxCompletionCheckFailures:
-        PRODUCTION_DEFAULTS.maxCompletionCheckFailures,
+      maxCompletionCheckFailures: PRODUCTION_DEFAULTS.maxCompletionCheckFailures,
       budgetLimits: {
         maxWorkerTurns: UNBOUNDED_CEILING,
         maxToolCalls: UNBOUNDED_CEILING,
@@ -107,14 +90,13 @@ describe('public runTask adapter', () => {
       },
     });
     expect(
-      Object.entries(PRODUCTION_DEFAULTS).every(
-        ([name, value]) =>
-          name === 'maxModelTokens' ||
-          name === 'maxWorkerTurns' ||
-          name === 'maxToolCalls' ||
-          name === 'maxVerifierCorrections'
-            ? value === Infinity
-            : Number.isFinite(value) && value > 0,
+      Object.entries(PRODUCTION_DEFAULTS).every(([name, value]) =>
+        name === 'maxModelTokens' ||
+        name === 'maxWorkerTurns' ||
+        name === 'maxToolCalls' ||
+        name === 'maxVerifierCorrections'
+          ? value === Infinity
+          : Number.isFinite(value) && value > 0,
       ),
     ).toBe(true);
 
@@ -141,9 +123,7 @@ describe('public runTask adapter', () => {
         .filter((event) => event.type === 'tool_call')
         .map((event) => (event.call as { name: string }).name),
     ).toEqual(['publish_artifact', 'finish']);
-    expect(transcript.some((event) => event.type === 'finish_requested')).toBe(
-      true,
-    );
+    expect(transcript.some((event) => event.type === 'finish_requested')).toBe(true);
 
     const manifest = readManifest(run.result.runDir);
     expect(manifest.finishedAt).toBeDefined();
@@ -180,13 +160,9 @@ describe('public runTask adapter', () => {
     expect(JSON.stringify(run.worker.requests[0])).toContain(
       'browser_execute is disabled in its entirety',
     );
-    expect(JSON.stringify(run.worker.requests[1])).toContain(
-      BROWSER_EXECUTE_POLICY_DENIED_MESSAGE,
-    );
+    expect(JSON.stringify(run.worker.requests[1])).toContain(BROWSER_EXECUTE_POLICY_DENIED_MESSAGE);
     expect(browser.openCommandSession).not.toHaveBeenCalled();
-    expect(readFileSync(join(run.result.runDir, 'artifacts/report.csv'), 'utf8')).toBe(
-      REPORT,
-    );
+    expect(readFileSync(join(run.result.runDir, 'artifacts/report.csv'), 'utf8')).toBe(REPORT);
   });
 
   it('returns an initializer outage as a truthful public incomplete outcome', async () => {
@@ -210,8 +186,7 @@ describe('public runTask adapter', () => {
       status: 'incomplete',
       reason: 'initializer_unavailable',
       detail: expect.stringContaining('initializer transport unavailable'),
-      finalText:
-        'The assistant stopped before it could prepare a final response.',
+      finalText: 'The assistant stopped before it could prepare a final response.',
       unresolved: [],
     });
     expect(readCheckpointConfiguration(result.runDir).taskText).toBe(
@@ -330,14 +305,12 @@ function fakeBrowser(): FakeBrowser {
 function scriptedCallModel(responses: readonly ModelResponse[]) {
   const remaining = [...responses];
   const requests: Array<readonly Message[]> = [];
-  const callModel = vi.fn(
-    async (messages: readonly Message[]): Promise<ModelResponse> => {
-      requests.push(structuredClone(messages));
-      const response = remaining.shift();
-      if (response === undefined) throw new Error('scripted model exhausted');
-      return structuredClone(response);
-    },
-  );
+  const callModel = vi.fn(async (messages: readonly Message[]): Promise<ModelResponse> => {
+    requests.push(structuredClone(messages));
+    const response = remaining.shift();
+    if (response === undefined) throw new Error('scripted model exhausted');
+    return structuredClone(response);
+  });
   return { callModel, requests };
 }
 
@@ -347,12 +320,7 @@ function unexpectedCallModel(message: string) {
   });
 }
 
-function toolResponse(
-  id: string,
-  name: string,
-  input: unknown,
-  usage: Usage,
-): ModelResponse {
+function toolResponse(id: string, name: string, input: unknown, usage: Usage): ModelResponse {
   return {
     content: [{ type: 'tool_use', id, name, input }],
     stop_reason: 'tool_use',
@@ -416,9 +384,7 @@ async function runVerified(options: {
     ...(options.javascriptPolicy === undefined
       ? {}
       : { javascriptPolicy: options.javascriptPolicy }),
-    ...(options.onProgress === undefined
-      ? {}
-      : { onProgress: options.onProgress }),
+    ...(options.onProgress === undefined ? {} : { onProgress: options.onProgress }),
     harness: {
       initializerCallModel: initializer.callModel,
       verifierCallModel: verifier.callModel,

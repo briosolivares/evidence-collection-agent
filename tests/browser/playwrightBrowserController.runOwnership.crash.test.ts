@@ -49,9 +49,7 @@ processDescribe('durable browser page ownership after process death', () => {
       fixture = startFixture(endpoint, ownershipId);
       const ready = await waitForMessage(fixture, (message) => message.type === 'ready');
       expect(ready.pageCount).toBe(2);
-      const nonUserPages = context
-        .pages()
-        .filter((page) => !userPages.includes(page));
+      const nonUserPages = context.pages().filter((page) => !userPages.includes(page));
       const titledNonUserPages = await Promise.all(
         nonUserPages.map(async (page) => ({ page, title: await page.title() })),
       );
@@ -125,10 +123,7 @@ processDescribe('durable browser page ownership after process death', () => {
       const ownershipId = 'real-sigkill-target-sentinel';
 
       fixture = startFixture(endpoint, ownershipId, 'committed-sentinel');
-      await waitForMessage(
-        fixture,
-        (message) => message.type === 'sentinel_committed',
-      );
+      await waitForMessage(fixture, (message) => message.type === 'sentinel_committed');
       const [sentinelPage] = await waitForNonUserPages(context, userPages, 1);
       expect(sentinelPage).toBeDefined();
       expect(sentinelPage!.url()).toMatch(
@@ -209,9 +204,7 @@ async function waitForNonUserPages(
     const pages = context.pages().filter((page) => !userPages.includes(page));
     if (pages.length === count) return pages;
     if (Date.now() >= deadline) {
-      throw new Error(
-        `Timed out waiting for ${count} non-user page(s); saw ${pages.length}.`,
-      );
+      throw new Error(`Timed out waiting for ${count} non-user page(s); saw ${pages.length}.`);
     }
     await new Promise((resolve) => setTimeout(resolve, 20));
   }
@@ -283,9 +276,7 @@ function waitForExit(
 
 async function attachedEndpoint(profileDir: string): Promise<string> {
   const port = Number(
-    (await readFile(join(profileDir, 'DevToolsActivePort'), 'utf8'))
-      .split('\n')[0]
-      ?.trim(),
+    (await readFile(join(profileDir, 'DevToolsActivePort'), 'utf8')).split('\n')[0]?.trim(),
   );
   if (!Number.isInteger(port) || port <= 0) {
     throw new Error('Chrome did not publish a usable loopback DevTools port.');

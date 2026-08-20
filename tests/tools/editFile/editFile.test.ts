@@ -1,22 +1,11 @@
 import { createHash } from 'node:crypto';
-import {
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  truncateSync,
-  writeFileSync,
-} from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, truncateSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import {
-  initManifest,
-  readManifest,
-  writeArtifact,
-} from '../../../src/run/artifacts.js';
+import { initManifest, readManifest, writeArtifact } from '../../../src/run/artifacts.js';
 import { executeToolCall } from '../../../src/tools/pipeline.js';
 import { createRegistry, type ToolCtx } from '../../../src/tools/registry.js';
 import { FILE_TOOL_MAX_BYTES } from '../../../src/tools/fileAccess.js';
@@ -36,11 +25,7 @@ afterEach(() => {
 const registry = createRegistry([editFileTool]);
 
 function call(name: 'edit_file', input: unknown, ctx: Partial<ToolCtx> = {}) {
-  return executeToolCall(
-    registry,
-    { id: `call-${name}`, name, input },
-    { runDir, ...ctx },
-  );
+  return executeToolCall(registry, { id: `call-${name}`, name, input }, { runDir, ...ctx });
 }
 
 function writeRaw(relativePath: string, bytes: string | Buffer): string {
@@ -53,10 +38,7 @@ function writeRaw(relativePath: string, bytes: string | Buffer): string {
 describe('edit_file', () => {
   it('preserves BOM, CRLF, trailing bytes, and manifest provenance', async () => {
     const bom = Buffer.from([0xef, 0xbb, 0xbf]);
-    const original = Buffer.concat([
-      bom,
-      Buffer.from('alpha\r\nold value  \r\nomega', 'utf8'),
-    ]);
+    const original = Buffer.concat([bom, Buffer.from('alpha\r\nold value  \r\nomega', 'utf8')]);
     writeArtifact(runDir, 'scratch/workspace/report.txt', original);
 
     const result = await call('edit_file', {
@@ -109,12 +91,9 @@ describe('edit_file', () => {
   });
 
   it('rejects published artifacts, missing/invalid files, empty anchors, and no-ops', async () => {
-    writeArtifact(
-      runDir,
-      'artifacts/published.txt',
-      Buffer.from('published'),
-      { roles: ['requested_output'] },
-    );
+    writeArtifact(runDir, 'artifacts/published.txt', Buffer.from('published'), {
+      roles: ['requested_output'],
+    });
     writeRaw('scratch/invalid.txt', Buffer.from([0x61, 0xff, 0x62]));
     writeArtifact(runDir, 'scratch/value.txt', Buffer.from('same'));
 

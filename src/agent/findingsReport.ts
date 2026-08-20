@@ -16,11 +16,7 @@ import type {
 } from './verifier/verificationResult.schema.js';
 import type { FinishInput } from '../tools/finish/finish.js';
 import { HARNESS_DIR } from './checkpoint.js';
-import type {
-  Checkpoint,
-  CheckpointPhase,
-  DurableTerminalOutcome,
-} from './checkpoint.schema.js';
+import type { Checkpoint, CheckpointPhase, DurableTerminalOutcome } from './checkpoint.schema.js';
 
 export const FINDINGS_REPORT_FILENAME = 'findings.md';
 export const FINDINGS_REPORT_PATH = `${HARNESS_DIR}/${FINDINGS_REPORT_FILENAME}`;
@@ -90,10 +86,7 @@ function escapeCell(value: string): string {
   return value.replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
 }
 
-function renderUnresolved(
-  entry: FinishInput['unresolved'][number],
-  index: number,
-): string {
+function renderUnresolved(entry: FinishInput['unresolved'][number], index: number): string {
   const { kept, omitted } = truncateList(entry.attempts, LIST_MAX_ITEMS);
   const attempts = kept.length > 0 ? kept.join('; ') : 'none recorded';
   const omittedNote = omitted > 0 ? ` (+${omitted} more, truncated)` : '';
@@ -191,9 +184,7 @@ export function renderFindingsReport(input: FindingsReportInput): string {
     lines.push(`- Outcome: ${input.outcome.status}`);
     if (input.outcome.status === 'incomplete') {
       lines.push(`- Reason: ${input.outcome.reason}`);
-      lines.push(
-        `- Detail: ${truncateBytes(input.outcome.detail, DIAGNOSTIC_FIELD_MAX_BYTES)}`,
-      );
+      lines.push(`- Detail: ${truncateBytes(input.outcome.detail, DIAGNOSTIC_FIELD_MAX_BYTES)}`);
     }
   } else {
     const cycleNote =
@@ -256,18 +247,10 @@ export function renderFindingsReport(input: FindingsReportInput): string {
     lines.push('No open verifier findings.', '');
   } else if (input.currentFindings.kind === 'correction') {
     const { kept, omitted } = truncateList(input.currentFindings.findings, LIST_MAX_ITEMS);
-    lines.push(
-      ...kept.map(renderCorrectionFinding),
-      ...elisionLine(omitted, 'finding(s)'),
-      '',
-    );
+    lines.push(...kept.map(renderCorrectionFinding), ...elisionLine(omitted, 'finding(s)'), '');
   } else {
     const { kept, omitted } = truncateList(input.currentFindings.findings, LIST_MAX_ITEMS);
-    lines.push(
-      ...kept.map(renderIncompleteFinding),
-      ...elisionLine(omitted, 'finding(s)'),
-      '',
-    );
+    lines.push(...kept.map(renderIncompleteFinding), ...elisionLine(omitted, 'finding(s)'), '');
   }
 
   const { kept: historyKept, omitted: historyOmitted } = truncateList(
@@ -290,10 +273,7 @@ export function renderFindingsReport(input: FindingsReportInput): string {
 /** Write the complete audit projection, rebuilding it atomically. Never
  * appends: a partial or torn write would misrepresent the run's durable
  * state, which this file only ever mirrors. */
-export function writeFindingsReport(
-  runDir: string,
-  input: FindingsReportInput,
-): void {
+export function writeFindingsReport(runDir: string, input: FindingsReportInput): void {
   const markdown = renderFindingsReport(input);
   writeFileDurablyAtomic(join(runDir, FINDINGS_REPORT_PATH), markdown, {
     fileMode: 0o600,
@@ -345,9 +325,7 @@ export function buildFindingsReportInputFromCheckpoint(
       : undefined;
   const facts = checkpoint.phase === 'verifying' ? checkpoint.pendingCheck.facts : undefined;
   const structuralFindings =
-    checkpoint.phase === 'verifying'
-      ? checkpoint.pendingCheck.structuralFindings ?? []
-      : [];
+    checkpoint.phase === 'verifying' ? (checkpoint.pendingCheck.structuralFindings ?? []) : [];
   const completionReport = pendingFinishInput ?? lastCycle?.completionReport;
 
   return {

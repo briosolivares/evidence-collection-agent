@@ -84,7 +84,9 @@ describe('acceptablePrsInWindow', () => {
     const boundaryPrs: GithubPullRequest[] = [
       { number: 1, title: 'At boundary', url: 'u1', createdAt: startedAt },
     ];
-    expect(acceptablePrsInWindow(boundaryPrs, startedAt, finishedAt).map((p) => p.number)).toEqual([1]);
+    expect(acceptablePrsInWindow(boundaryPrs, startedAt, finishedAt).map((p) => p.number)).toEqual([
+      1,
+    ]);
   });
 
   it('is inclusive of a PR created exactly at finishedAt', () => {

@@ -1,7 +1,4 @@
-import {
-  RoleBudgetExceededError,
-  type RunBudgetTracker,
-} from './runBudget.js';
+import { RoleBudgetExceededError, type RunBudgetTracker } from './runBudget.js';
 
 const MAX_TIMER_DELAY_MS = 2_147_483_647;
 
@@ -15,10 +12,7 @@ export interface RunDeadline {
 /** Combine optional user cancellation with the restored run budget's wall
  * deadline. Downtime is already included by the tracker, so a resumed run
  * whose deadline passed is aborted synchronously at construction. */
-export function createRunDeadline(
-  budget: RunBudgetTracker,
-  userSignal?: AbortSignal,
-): RunDeadline {
+export function createRunDeadline(budget: RunBudgetTracker, userSignal?: AbortSignal): RunDeadline {
   const controller = new AbortController();
   let timer: NodeJS.Timeout | undefined;
   let disposed = false;
@@ -43,10 +37,7 @@ export function createRunDeadline(
       abortFromWallTime();
       return;
     }
-    timer = setTimeout(
-      scheduleWallDeadline,
-      Math.min(remainingMs, MAX_TIMER_DELAY_MS),
-    );
+    timer = setTimeout(scheduleWallDeadline, Math.min(remainingMs, MAX_TIMER_DELAY_MS));
   };
 
   if (userSignal?.aborted === true) {

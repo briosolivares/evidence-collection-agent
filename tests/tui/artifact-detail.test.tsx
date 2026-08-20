@@ -17,10 +17,7 @@ const CAPTURED_AT = '2026-08-12T10:00:00.000Z';
 const DETAIL_HINT = 'space preview · o open · r reveal · esc back';
 
 function artifact(
-  overrides: {
-    entry?: Partial<PublishedArtifact['entry']>;
-    sizeBytes?: number | undefined;
-  } = {},
+  overrides: { entry?: Partial<PublishedArtifact['entry']>; sizeBytes?: number | undefined } = {},
 ): PublishedArtifact {
   return {
     entry: {

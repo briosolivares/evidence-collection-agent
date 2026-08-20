@@ -35,7 +35,11 @@ describe('createTuiEvalRuntime', () => {
       seenDeps.push(deps);
       return {
         cancel: vi.fn(),
-        done: Promise.resolve({ status: 'verified', finalText: '', runDir: '/runs/normal' } as const),
+        done: Promise.resolve({
+          status: 'verified',
+          finalText: '',
+          runDir: '/runs/normal',
+        } as const),
       };
     });
     const authenticatedRunner = vi.fn(() => ({
@@ -100,7 +104,11 @@ describe('createTuiEvalRuntime', () => {
       seenDeps.push(deps);
       return {
         cancel: vi.fn(),
-        done: Promise.resolve({ status: 'verified', finalText: '', runDir: '/runs/normal' } as const),
+        done: Promise.resolve({
+          status: 'verified',
+          finalText: '',
+          runDir: '/runs/normal',
+        } as const),
       };
     });
     const authenticatedRunner = vi.fn(() => ({

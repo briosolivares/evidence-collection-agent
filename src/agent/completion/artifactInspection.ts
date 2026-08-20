@@ -305,10 +305,7 @@ export function inspectManifest(
   for (const item of prepared) {
     options.checkActive?.();
     if (!item.pathInspectable) continue;
-    const metadata = inspectRegularFileMetadataNoFollow(
-      runDir,
-      item.canonicalPath,
-    );
+    const metadata = inspectRegularFileMetadataNoFollow(runDir, item.canonicalPath);
     if ('defect' in metadata) {
       defects.push(metadata.defect);
       item.valid = false;
@@ -400,7 +397,10 @@ export function inspectManifest(
       });
       continue;
     }
-    if (read.retentionExceeded && !defects.some((defect) => defect.code === 'published_inspection_bytes_exceeded')) {
+    if (
+      read.retentionExceeded &&
+      !defects.some((defect) => defect.code === 'published_inspection_bytes_exceeded')
+    ) {
       defects.push({
         code: 'published_inspection_bytes_exceeded',
         artifactPath: item.canonicalPath,
@@ -426,8 +426,7 @@ export function inspectManifest(
       byteLength: read.byteLength,
       ...(read.bytes === undefined ? {} : { bytes: read.bytes }),
       ...(read.contentPrefix === undefined ? {} : { contentPrefix: read.contentPrefix }),
-      integrityVerified:
-        item.valid && read.hash === item.entry.sha256,
+      integrityVerified: item.valid && read.hash === item.entry.sha256,
     });
   }
 
@@ -477,9 +476,7 @@ function inspectRegularFileMetadataNoFollow(
 function openRegularFileNoFollow(
   runDir: string,
   artifactPath: string,
-):
-  | { descriptor: number; byteLength: number }
-  | { defect: FinishDefect } {
+): { descriptor: number; byteLength: number } | { defect: FinishDefect } {
   let absolute: string;
   try {
     absolute = resolveRunPath(runDir, artifactPath);
@@ -520,9 +517,7 @@ function openRegularFileNoFollow(
   }
 
   const flags =
-    fsConstants.O_RDONLY |
-    (fsConstants.O_NOFOLLOW ?? 0) |
-    (fsConstants.O_NONBLOCK ?? 0);
+    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
   let descriptor: number;
   try {
     descriptor = openSync(absolute, flags);
@@ -660,9 +655,7 @@ function hashRegularFileNoFollow(
       ...(retainBytes && !retentionExceeded
         ? { bytes: Buffer.concat(retainedChunks, retainedForEntry) }
         : {}),
-      ...(prefixBytes > 0
-        ? { contentPrefix: Buffer.concat(prefixChunks, prefixed) }
-        : {}),
+      ...(prefixBytes > 0 ? { contentPrefix: Buffer.concat(prefixChunks, prefixed) } : {}),
       retentionExceeded,
     };
   } catch (error) {
@@ -686,9 +679,7 @@ function readManifestNoFollow(
   checkActive?: () => void,
 ): { raw: string } | { defect: FinishDefect } {
   const flags =
-    fsConstants.O_RDONLY |
-    (fsConstants.O_NOFOLLOW ?? 0) |
-    (fsConstants.O_NONBLOCK ?? 0);
+    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
   let descriptor: number;
   try {
     descriptor = openSync(manifestPath, flags);
@@ -760,15 +751,11 @@ function readManifestNoFollow(
   }
 }
 
-function validateTimestampOrder(
-  manifest: Manifest,
-  defects: FinishDefect[],
-): Set<number> {
+function validateTimestampOrder(manifest: Manifest, defects: FinishDefect[]): Set<number> {
   const invalidEntries = new Set<number>();
   const startedAt = Date.parse(manifest.startedAt);
-  const finishedAt = manifest.finishedAt === undefined
-    ? undefined
-    : Date.parse(manifest.finishedAt);
+  const finishedAt =
+    manifest.finishedAt === undefined ? undefined : Date.parse(manifest.finishedAt);
   if (finishedAt !== undefined && finishedAt < startedAt) {
     defects.push({
       code: 'invalid_manifest_timestamp_order',
@@ -823,10 +810,7 @@ function artifactTooLargeDefect(
   };
 }
 
-function manifestTooLargeDefect(
-  observedBytes: number,
-  maxBytes: number,
-): FinishDefect {
+function manifestTooLargeDefect(observedBytes: number, maxBytes: number): FinishDefect {
   return {
     code: 'manifest_bytes_limit_exceeded',
     message:
@@ -836,9 +820,7 @@ function manifestTooLargeDefect(
 }
 
 function safeAdd(left: number, right: number): number {
-  return left > Number.MAX_SAFE_INTEGER - right
-    ? Number.MAX_SAFE_INTEGER
-    : left + right;
+  return left > Number.MAX_SAFE_INTEGER - right ? Number.MAX_SAFE_INTEGER : left + right;
 }
 
 function isCanonicalUtcIsoTimestamp(value: string): boolean {
@@ -922,8 +904,7 @@ export function decodeUtf8(bytes: Uint8Array): string | undefined {
 
 function startsWith(bytes: Uint8Array, signature: readonly number[]): boolean {
   return (
-    bytes.length >= signature.length &&
-    signature.every((byte, index) => bytes[index] === byte)
+    bytes.length >= signature.length && signature.every((byte, index) => bytes[index] === byte)
   );
 }
 

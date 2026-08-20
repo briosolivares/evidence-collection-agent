@@ -34,9 +34,11 @@ function fakeCdpSession(sendImpl?: (method: string, params?: unknown) => Promise
   };
 }
 
-function fakeContext(options: {
-  cdp?: ReturnType<typeof fakeCdpSession>;
-} = {}): { context: BrowserContext; cdp: ReturnType<typeof fakeCdpSession>; page: Page } {
+function fakeContext(options: { cdp?: ReturnType<typeof fakeCdpSession> } = {}): {
+  context: BrowserContext;
+  cdp: ReturnType<typeof fakeCdpSession>;
+  page: Page;
+} {
   // Already 'about:blank' so prepareSessionPage's extra goto never fires; a
   // fake page with no `goto` method would surface that as a loud failure.
   const page = {
@@ -71,10 +73,9 @@ function fakeContext(options: {
   return { context: context as unknown as BrowserContext, cdp, page };
 }
 
-function fakeBrowser(options: {
-  contexts?: BrowserContext[];
-  closeImpl?: () => Promise<void>;
-} = {}): { browser: Browser; close: ReturnType<typeof vi.fn> } {
+function fakeBrowser(
+  options: { contexts?: BrowserContext[]; closeImpl?: () => Promise<void> } = {},
+): { browser: Browser; close: ReturnType<typeof vi.fn> } {
   const close = vi.fn(options.closeImpl ?? (async () => undefined));
   const browser = {
     contexts: vi.fn(() => options.contexts ?? []),
@@ -83,11 +84,13 @@ function fakeBrowser(options: {
   return { browser: browser as unknown as Browser, close };
 }
 
-function fakeClient(options: {
-  createImpl?: BrowserbaseClient['sessions']['create'];
-  updateImpl?: BrowserbaseClient['sessions']['update'];
-  debugImpl?: BrowserbaseClient['sessions']['debug'];
-} = {}): {
+function fakeClient(
+  options: {
+    createImpl?: BrowserbaseClient['sessions']['create'];
+    updateImpl?: BrowserbaseClient['sessions']['update'];
+    debugImpl?: BrowserbaseClient['sessions']['debug'];
+  } = {},
+): {
   client: BrowserbaseClient;
   create: ReturnType<typeof vi.fn>;
   update: ReturnType<typeof vi.fn>;
@@ -388,10 +391,18 @@ describe('BrowserbaseBrowserSessionProvider Live View', () => {
     // Status 400 keeps this non-retryable (see browserbaseRetry.ts), so the
     // rejection surfaces on the first attempt with no real-timer backoff.
     const debugError = Object.assign(new Error('debug endpoint unavailable'), { status: 400 });
-    const { client } = fakeClient({ debugImpl: async () => { throw debugError; } });
+    const { client } = fakeClient({
+      debugImpl: async () => {
+        throw debugError;
+      },
+    });
     const { browser } = fakeBrowser({ contexts: [fakeContext().context] });
     const warn = vi.fn<(message: string) => void>();
-    const provider = buildProvider({ client, connectOverCDP: async () => browser }, fakeTimers(), warn);
+    const provider = buildProvider(
+      { client, connectOverCDP: async () => browser },
+      fakeTimers(),
+      warn,
+    );
 
     const controller = await provider.createSession();
 

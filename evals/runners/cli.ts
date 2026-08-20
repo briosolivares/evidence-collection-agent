@@ -10,10 +10,7 @@
 import { appendFileSync, mkdirSync, rmSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
-import {
-  describeBrowserProvider,
-  resolveBrowserProviderKind,
-} from '../../src/browser/provider.js';
+import { describeBrowserProvider, resolveBrowserProviderKind } from '../../src/browser/provider.js';
 import { checkProfileLogins } from '../../src/cli/loginCheck.js';
 import { allLoggedIn, formatLoginState, loginServicesForIds } from '../../src/cli/loginProbe.js';
 import { chromeExecutablePath } from '../../src/config/paths.js';
@@ -141,7 +138,9 @@ async function main(): Promise<void> {
             })}\n`,
           );
         } catch (err: unknown) {
-          console.warn(`warning: could not persist partial grade: ${err instanceof Error ? err.message : err}`);
+          console.warn(
+            `warning: could not persist partial grade: ${err instanceof Error ? err.message : err}`,
+          );
         }
         if (grade.error !== undefined) {
           console.log(

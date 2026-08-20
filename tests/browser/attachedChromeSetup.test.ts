@@ -14,8 +14,7 @@ import {
   discoverAttachedChromeEndpoint,
 } from '../../src/browser/attachedChromeSetup.js';
 
-const DISCOVERED_ENDPOINT =
-  'ws://127.0.0.1:61545/devtools/browser/private-discovery-token';
+const DISCOVERED_ENDPOINT = 'ws://127.0.0.1:61545/devtools/browser/private-discovery-token';
 const controller = {} as BrowserController;
 
 function providerReturning(value: BrowserController = controller): BrowserSessionProvider {
@@ -32,8 +31,7 @@ describe('attached Chrome configuration and discovery', () => {
 
   it('reads only the explicit endpoint variable and trims it', () => {
     expect(attachedChromeEndpoint({})).toBeUndefined();
-    expect(attachedChromeEndpoint({ [ATTACHED_CHROME_ENDPOINT_ENV_VAR]: '   ' }))
-      .toBeUndefined();
+    expect(attachedChromeEndpoint({ [ATTACHED_CHROME_ENDPOINT_ENV_VAR]: '   ' })).toBeUndefined();
     expect(
       attachedChromeEndpoint({
         [ATTACHED_CHROME_ENDPOINT_ENV_VAR]: '  http://127.0.0.1:9222  ',
@@ -55,8 +53,7 @@ describe('attached Chrome configuration and discovery', () => {
         localAppData: 'C:\\Users\\test\\AppData\\Local',
       }),
     ).toBe('C:\\Users\\test\\AppData\\Local\\Google\\Chrome\\User Data');
-    expect(defaultChromeUserDataDir({ platform: 'aix', home: '/home/test' }))
-      .toBeUndefined();
+    expect(defaultChromeUserDataDir({ platform: 'aix', home: '/home/test' })).toBeUndefined();
   });
 
   it('reads a bounded DevToolsActivePort record and rejects malformed state', async () => {
@@ -71,9 +68,7 @@ describe('attached Chrome configuration and discovery', () => {
     expect(await discoverAttachedChromeEndpoint(tempDir, reachable)).toBe(DISCOVERED_ENDPOINT);
     expect(reachable).toHaveBeenCalledWith(61_545);
 
-    expect(
-      await discoverAttachedChromeEndpoint(tempDir, async () => false),
-    ).toBeUndefined();
+    expect(await discoverAttachedChromeEndpoint(tempDir, async () => false)).toBeUndefined();
 
     await writeFile(join(tempDir, 'DevToolsActivePort'), 'not-a-port\nsecret\n');
     expect(await discoverAttachedChromeEndpoint(tempDir, reachable)).toBeUndefined();
@@ -151,9 +146,7 @@ describe('AttachedChromeSetupBrowserSessionProvider', () => {
     expect(openSetupPage).toHaveBeenCalledOnce();
     expect(wait).toHaveBeenCalledOnce();
     expect(states).toContain(`Opening ${ATTACHED_CHROME_SETUP_URL} in Chrome.`);
-    expect(states.join('\n')).toContain(
-      'Allow remote debugging for this browser instance',
-    );
+    expect(states.join('\n')).toContain('Allow remote debugging for this browser instance');
     expect(states.join('\n')).not.toContain('private-discovery-token');
   });
 

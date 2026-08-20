@@ -194,9 +194,7 @@ export function writeArtifact(
     ...(meta.sourceUrl !== undefined ? { sourceUrl: meta.sourceUrl } : {}),
     ...(meta.roles !== undefined ? { roles: meta.roles } : {}),
     capturedAt: new Date().toISOString(),
-    ...(meta.completionStatus !== undefined
-      ? { completionStatus: meta.completionStatus }
-      : {}),
+    ...(meta.completionStatus !== undefined ? { completionStatus: meta.completionStatus } : {}),
   };
   commitArtifactWriteTransaction(runDir, entry, bytes);
   return entry;
@@ -222,11 +220,7 @@ export function finalizeManifest(runDir: string): void {
  * scratch/ (private — must carry none). The roles field's presence is the
  * published/private marker, so it can never contradict the file's location.
  */
-function assertWorkspacePartition(
-  filename: string,
-  relPath: string,
-  meta: ArtifactMeta,
-): void {
+function assertWorkspacePartition(filename: string, relPath: string, meta: ArtifactMeta): void {
   const published = filename.startsWith(`${ARTIFACTS_DIR}${sep}`);
   const scratch = filename.startsWith(`${SCRATCH_DIR}${sep}`);
   if (!published && !scratch) {
@@ -242,9 +236,7 @@ function assertWorkspacePartition(
     );
   }
   if (scratch && meta.roles !== undefined) {
-    throw new Error(
-      `scratch files are private and carry no roles: ${JSON.stringify(relPath)}`,
-    );
+    throw new Error(`scratch files are private and carry no roles: ${JSON.stringify(relPath)}`);
   }
 }
 

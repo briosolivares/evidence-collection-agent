@@ -1,9 +1,4 @@
-import {
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-} from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -135,15 +130,11 @@ describe('coordinator correction lifecycle', () => {
       status: 'verified',
       finalText: FINISH.summary,
     });
-    expect(readFileSync(join(runDir, 'artifacts/report.csv'), 'utf8')).toBe(
-      'name\nBob\n',
-    );
+    expect(readFileSync(join(runDir, 'artifacts/report.csv'), 'utf8')).toBe('name\nBob\n');
     expect(worker.generate).toHaveBeenCalledTimes(4);
     expect(verifier.generate).toHaveBeenCalledTimes(2);
     expect(JSON.stringify(worker.requests[2])).toContain('needs_correction');
-    expect(JSON.stringify(worker.requests[2])).toContain(
-      'Include Bob in the requested report.',
-    );
+    expect(JSON.stringify(worker.requests[2])).toContain('Include Bob in the requested report.');
     // The harness attaches its own fixed instruction to a research finding;
     // the verifier never dictates artifact contents and no free-form
     // model-authored nextAction is forwarded.
@@ -255,9 +246,7 @@ describe('coordinator correction lifecycle', () => {
 
     expect(outcome.status).toBe('verified');
     expect(verifier.generate).toHaveBeenCalledOnce();
-    expect(JSON.stringify(worker.requests[2])).toContain(
-      'deterministic_finish_checks',
-    );
+    expect(JSON.stringify(worker.requests[2])).toContain('deterministic_finish_checks');
     expect(JSON.stringify(worker.requests[2])).toContain('exact_row_count');
     expect(readCheckpoint()).toMatchObject({
       phase: 'terminal',
@@ -309,8 +298,7 @@ describe('coordinator correction lifecycle', () => {
     };
     const repeatedAttemptFinish: FinishInput = {
       ...firstAttemptFinish,
-      summary:
-        'Published the available report; Bob remains unconfirmed after another check.',
+      summary: 'Published the available report; Bob remains unconfirmed after another check.',
     };
     const verifier = scriptedDriver([
       verifierResponse('needs_correction'),
@@ -389,13 +377,9 @@ describe('coordinator correction lifecycle', () => {
     });
 
     expect(outcome.status).toBe('verified');
-    expect(readFileSync(join(runDir, 'artifacts/report.csv'), 'utf8')).toBe(
-      'name\nCarol\n',
-    );
+    expect(readFileSync(join(runDir, 'artifacts/report.csv'), 'utf8')).toBe('name\nCarol\n');
     expect(verifier.generate).toHaveBeenCalledOnce();
-    expect(JSON.stringify(worker.requests[2])).toContain(
-      'deterministic_finish_checks',
-    );
+    expect(JSON.stringify(worker.requests[2])).toContain('deterministic_finish_checks');
     expect(JSON.stringify(worker.requests[2])).toContain('exact_row_count');
     expect(readCheckpoint()).toMatchObject({
       phase: 'terminal',
@@ -440,9 +424,7 @@ describe('coordinator correction lifecycle', () => {
     expect(outcome.status).toBe('verified');
     expect(effectOrder).toEqual(['artifact-written', 'verifier-called']);
     expect(JSON.stringify(worker.requests[1])).toContain('was abandoned');
-    expect(readFileSync(join(runDir, 'artifacts/report.csv'), 'utf8')).toBe(
-      'name\nSettled\n',
-    );
+    expect(readFileSync(join(runDir, 'artifacts/report.csv'), 'utf8')).toBe('name\nSettled\n');
     expectBrowserLifecycle(browser);
   });
 
@@ -466,18 +448,10 @@ describe('coordinator correction lifecycle', () => {
         },
       ]),
       () => {
-        setTimeout(
-          () => {
-            abort.abort(
-              new DOMException(
-                'operator cancelled during finish gate',
-                'AbortError',
-              ),
-            );
-            setTimeout(releaseEffect, 10);
-          },
-          5,
-        );
+        setTimeout(() => {
+          abort.abort(new DOMException('operator cancelled during finish gate', 'AbortError'));
+          setTimeout(releaseEffect, 10);
+        }, 5);
         return finishResponse('finish-before-cancel');
       },
     ]);
@@ -547,14 +521,7 @@ describe('coordinator terminal lifecycle', () => {
     },
   ])(
     'interrupts a non-cooperative $label model at the whole-run wall deadline',
-    async ({
-      initializer,
-      worker,
-      verifier,
-      workerResponses,
-      verifierResponses,
-      deadlineMs,
-    }) => {
+    async ({ initializer, worker, verifier, workerResponses, verifierResponses, deadlineMs }) => {
       const browser = fakeBrowser();
       const outcome = await runCoordinator({
         initializer,
@@ -578,10 +545,7 @@ describe('coordinator terminal lifecycle', () => {
       expect(readManifest(runDir).finishedAt).toBeDefined();
       expect(browser.closeTaskPages).toHaveBeenCalledOnce();
       if (verifierResponses === 1) {
-        const results = toolResultsFor(
-          readCheckpoint(),
-          'finish-before-deadline',
-        );
+        const results = toolResultsFor(readCheckpoint(), 'finish-before-deadline');
         expect(results).toHaveLength(1);
         expect(results[0]).toMatchObject({ is_error: true });
         expect(results[0]?.content).toContain('"source":"run_budget"');
@@ -675,10 +639,7 @@ describe('coordinator terminal lifecycle', () => {
       reason: 'verification_incomplete',
     });
     expect(outcome).not.toMatchObject({ reason: 'verifier_unavailable' });
-    const results = toolResultsFor(
-      readCheckpoint(),
-      'finish-before-invalid-verdict',
-    );
+    const results = toolResultsFor(readCheckpoint(), 'finish-before-invalid-verdict');
     expect(results).toHaveLength(1);
     expect(results[0]).toMatchObject({ is_error: true });
     expect(results[0]?.content).toContain('"source":"verifier"');
@@ -766,10 +727,10 @@ describe('coordinator terminal lifecycle', () => {
     {
       label: 'aggregate model-token ceiling',
       limits: { maxModelTokens: 10 },
-      response: accepted(
-        [{ type: 'text', text: 'I am still working.' }],
-        { input_tokens: 5, output_tokens: 1 },
-      ),
+      response: accepted([{ type: 'text', text: 'I am still working.' }], {
+        input_tokens: 5,
+        output_tokens: 1,
+      }),
       detail: 'model_tokens',
     },
   ])(
@@ -958,13 +919,8 @@ describe('coordinator terminal lifecycle', () => {
       outcome: { status: 'failed' },
     });
     expect(readManifest(runDir).finishedAt).toBeDefined();
-    expect(readFileSync(join(runDir, 'metrics.json'), 'utf8')).toContain(
-      '"status": "failed"',
-    );
-    const results = toolResultsFor(
-      readCheckpoint(),
-      'finish-before-wedged-cleanup',
-    );
+    expect(readFileSync(join(runDir, 'metrics.json'), 'utf8')).toContain('"status": "failed"');
+    const results = toolResultsFor(readCheckpoint(), 'finish-before-wedged-cleanup');
     expect(results).toHaveLength(1);
     expect(results[0]).toMatchObject({ is_error: true });
     expect(results[0]?.content).toContain('"source":"run_terminal"');
@@ -998,10 +954,7 @@ describe('coordinator terminal lifecycle', () => {
       status: 'cancelled',
       reason: expect.stringContaining('operator cancelled during cleanup'),
     });
-    const results = toolResultsFor(
-      readCheckpoint(),
-      'finish-before-cleanup-cancel',
-    );
+    const results = toolResultsFor(readCheckpoint(), 'finish-before-cleanup-cancel');
     expect(results).toHaveLength(1);
     expect(results[0]?.content).toContain('"outcome":"cancelled"');
   });
@@ -1034,10 +987,7 @@ describe('coordinator terminal lifecycle', () => {
       reason: 'budget_exceeded',
       detail: expect.stringContaining('wall_time'),
     });
-    const results = toolResultsFor(
-      readCheckpoint(),
-      'finish-before-cleanup-deadline',
-    );
+    const results = toolResultsFor(readCheckpoint(), 'finish-before-cleanup-deadline');
     expect(results).toHaveLength(1);
     expect(results[0]?.content).toContain('"outcome":"incomplete"');
   });
@@ -1114,24 +1064,19 @@ function runCoordinator(inputs: RunInputs) {
     initializerModel: inputs.initializer,
     workerModel: inputs.worker,
     verifierModel: inputs.verifier,
-    registry:
-      inputs.registry ?? createRegistry([publishArtifactTool, finishTool]),
+    registry: inputs.registry ?? createRegistry([publishArtifactTool, finishTool]),
     browser: inputs.browser,
-    ...(inputs.busyRegistry === undefined
-      ? {}
-      : { busyRegistry: inputs.busyRegistry }),
+    ...(inputs.busyRegistry === undefined ? {} : { busyRegistry: inputs.busyRegistry }),
     ...(inputs.signal === undefined ? {} : { signal: inputs.signal }),
     ...(inputs.terminalBrowserCleanupTimeoutMs === undefined
       ? {}
       : {
-          terminalBrowserCleanupTimeoutMs:
-            inputs.terminalBrowserCleanupTimeoutMs,
+          terminalBrowserCleanupTimeoutMs: inputs.terminalBrowserCleanupTimeoutMs,
         }),
     ...(inputs.terminalBusyResourceTimeoutMs === undefined
       ? {}
       : {
-          terminalBusyResourceTimeoutMs:
-            inputs.terminalBusyResourceTimeoutMs,
+          terminalBusyResourceTimeoutMs: inputs.terminalBusyResourceTimeoutMs,
         }),
     ...(inputs.now === undefined ? {} : { now: inputs.now }),
   });
@@ -1148,10 +1093,7 @@ function initializerAccepted(): AcceptedModelResponse {
   ]);
 }
 
-function publishReport(
-  names: string | readonly string[],
-  id: string,
-): AcceptedModelResponse {
+function publishReport(names: string | readonly string[], id: string): AcceptedModelResponse {
   const rows = typeof names === 'string' ? [names] : names;
   return accepted([
     {
@@ -1169,10 +1111,7 @@ function publishReport(
   ]);
 }
 
-function finishResponse(
-  id: string,
-  input: FinishInput = FINISH,
-): AcceptedModelResponse {
+function finishResponse(id: string, input: FinishInput = FINISH): AcceptedModelResponse {
   return accepted([
     {
       type: 'tool_use',
@@ -1203,9 +1142,7 @@ function verifierIncompleteResponse(): AcceptedModelResponse {
   ]);
 }
 
-function verifierResponse(
-  status: 'verified' | 'needs_correction',
-): AcceptedModelResponse {
+function verifierResponse(status: 'verified' | 'needs_correction'): AcceptedModelResponse {
   return accepted([
     {
       type: 'tool_use',
@@ -1232,9 +1169,7 @@ function accepted(
   content: AcceptedModelResponse['response']['content'],
   usage: AcceptedModelResponse['usage'] = DEFAULT_USAGE,
 ): AcceptedModelResponse {
-  const stopReason = content.some((block) => block.type === 'tool_use')
-    ? 'tool_use'
-    : 'end_turn';
+  const stopReason = content.some((block) => block.type === 'tool_use') ? 'tool_use' : 'end_turn';
   return {
     response: { content, stop_reason: stopReason, usage },
     stopReason,
@@ -1246,9 +1181,7 @@ function accepted(
 type ScriptStep =
   | AcceptedModelResponse
   | Error
-  | ((
-      options: ModelGenerateOptions,
-    ) => AcceptedModelResponse | Promise<AcceptedModelResponse>);
+  | ((options: ModelGenerateOptions) => AcceptedModelResponse | Promise<AcceptedModelResponse>);
 
 function scriptedDriver(steps: ScriptStep[]): ModelDriver & {
   generate: ReturnType<typeof vi.fn>;
@@ -1322,11 +1255,7 @@ function fakeBrowser(
     }
   });
   const prepareTaskPage = vi.fn(
-    async (request: {
-      ownershipId: string;
-      startUrl?: string;
-      signal?: AbortSignal;
-    }) => {
+    async (request: { ownershipId: string; startUrl?: string; signal?: AbortSignal }) => {
       await initializeRunPageOwnership(request.ownershipId);
       await raceWithRunSignal(() => newTab(), request.signal);
       if (request.startUrl !== undefined) {
@@ -1363,9 +1292,7 @@ function fakeBrowser(
   };
 }
 
-function wallDeadlineConfiguration(
-  maxWallTimeMs: number,
-): DurableRunConfiguration {
+function wallDeadlineConfiguration(maxWallTimeMs: number): DurableRunConfiguration {
   return {
     ...CONFIGURATION,
     budgetLimits: {
@@ -1408,15 +1335,10 @@ function delayedPublishTool(
       } else {
         await delay;
       }
-      writeArtifact(
-        ctx.runDir,
-        'artifacts/report.csv',
-        Buffer.from('name\nSettled\n', 'utf8'),
-        {
-          roles: ['requested_output'],
-          sourceUrl: 'https://example.test/source',
-        },
-      );
+      writeArtifact(ctx.runDir, 'artifacts/report.csv', Buffer.from('name\nSettled\n', 'utf8'), {
+        roles: ['requested_output'],
+        sourceUrl: 'https://example.test/source',
+      });
       afterWrite();
       return { status: 'settled' };
     },
@@ -1425,12 +1347,7 @@ function delayedPublishTool(
 
 function readCheckpoint(): Checkpoint {
   return checkpointSchema.parse(
-    JSON.parse(
-      readFileSync(
-        join(runDir, HARNESS_DIR, RUN_CHECKPOINT_FILENAME),
-        'utf8',
-      ),
-    ),
+    JSON.parse(readFileSync(join(runDir, HARNESS_DIR, RUN_CHECKPOINT_FILENAME), 'utf8')),
   );
 }
 

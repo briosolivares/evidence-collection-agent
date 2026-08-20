@@ -50,16 +50,17 @@ function entryFor(index: number): ManifestEntry {
 function runningState(count: number, runDir: string | null = RUN_DIR): SessionState {
   const actions: StoreAction[] = [
     { type: 'run_started', task: 'investigate', at: 0 },
-    ...(runDir === null
-      ? []
-      : [{ type: 'run_dir', runDir } satisfies StoreAction]),
+    ...(runDir === null ? [] : [{ type: 'run_dir', runDir } satisfies StoreAction]),
     { type: 'turn_start', turn: 1 },
-    ...Array.from({ length: count }, (_, index): StoreAction => ({
-      type: 'artifact_published',
-      entry: entryFor(index),
-      sizeBytes: 2_048,
-      toolExecId: index + 1,
-    })),
+    ...Array.from(
+      { length: count },
+      (_, index): StoreAction => ({
+        type: 'artifact_published',
+        entry: entryFor(index),
+        sizeBytes: 2_048,
+        toolExecId: index + 1,
+      }),
+    ),
   ];
   return actions.reduce(reduce, createInitialState());
 }
@@ -152,9 +153,7 @@ describe('ArtifactRail (rows view)', () => {
   });
 
   it('windows long lists and scrolls with the cursor', async () => {
-    const { lastFrame, stdin, unmount } = render(
-      <Harness initial={runningState(12)} limit={4} />,
-    );
+    const { lastFrame, stdin, unmount } = render(<Harness initial={runningState(12)} limit={4} />);
     await tick();
     expect(lastFrame()).toContain('artifacts/file-0.png');
     expect(lastFrame()).not.toContain('artifacts/file-11.png');
@@ -286,11 +285,7 @@ describe('ArtifactRail (space/o/r external opens)', () => {
     const preview = recorder();
     const log: UiAction[] = [];
     const { stdin, unmount } = render(
-      <Harness
-        initial={runningState(1, null)}
-        log={log}
-        preview={preview.action}
-      />,
+      <Harness initial={runningState(1, null)} log={log} preview={preview.action} />,
     );
     await tick();
     stdin.write(' ');
@@ -312,12 +307,7 @@ describe('ArtifactRail while a question dialog owns the keys', () => {
     const log: UiAction[] = [];
     const preview = recorder();
     const { stdin, lastFrame, unmount } = render(
-      <Harness
-        initial={runningState(2)}
-        log={log}
-        preview={preview.action}
-        active={false}
-      />,
+      <Harness initial={runningState(2)} log={log} preview={preview.action} active={false} />,
     );
     await tick();
     expect(lastFrame()).toContain('artifacts/file-0.png');

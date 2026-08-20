@@ -45,12 +45,9 @@ const setOutputContractTool: ToolDef<{ contract: OutputContract }> = {
   },
 };
 
-export const CONTRACT_INITIALIZER_API_TOOL_DEFS: readonly ApiToolDef[] =
-  deepFreeze(
-    toApiToolDefs(
-      createRegistry([setOutputContractTool as ToolDef]),
-    ),
-  );
+export const CONTRACT_INITIALIZER_API_TOOL_DEFS: readonly ApiToolDef[] = deepFreeze(
+  toApiToolDefs(createRegistry([setOutputContractTool as ToolDef])),
+);
 
 export interface ContractInitializerModelConfig {
   model?: string;
@@ -75,9 +72,7 @@ export function createContractInitializerModelDriver(
     ...(config.maxTokensRetryOutputTokens === undefined
       ? {}
       : { maxTokensRetryOutputTokens: config.maxTokensRetryOutputTokens }),
-    ...(config.createStream === undefined
-      ? {}
-      : { createStream: config.createStream }),
+    ...(config.createStream === undefined ? {} : { createStream: config.createStream }),
   });
 }
 
@@ -100,13 +95,9 @@ export type ContractInitializerOutcome =
   | { ok: true; contract: OutputContract }
   | { ok: false; reason: string };
 
-export function createContractInitializerState(
-  taskText: string,
-): ContractInitializerState {
+export function createContractInitializerState(taskText: string): ContractInitializerState {
   return {
-    messages: [
-      { role: 'user', content: [{ type: 'text', text: taskText }] },
-    ],
+    messages: [{ role: 'user', content: [{ type: 'text', text: taskText }] }],
     attempts: 0,
   };
 }
@@ -132,10 +123,7 @@ export function restoreContractInitializerState(
   if (snapshot.messages.length === 0) {
     throw new Error('initializer messages must contain the original task');
   }
-  if (
-    snapshot.lastProblem !== undefined &&
-    snapshot.lastProblem.trim().length === 0
-  ) {
+  if (snapshot.lastProblem !== undefined && snapshot.lastProblem.trim().length === 0) {
     throw new Error('initializer lastProblem must be nonblank when present');
   }
   return structuredClone(snapshot);
@@ -165,10 +153,7 @@ export async function runContractInitializer(
     try {
       response = await callModel(state.messages);
     } catch (error) {
-      if (
-        isModelResponseRejectedError(error) &&
-        isProtocolCorrectableRejection(error.reason)
-      ) {
+      if (isModelResponseRejectedError(error) && isProtocolCorrectableRejection(error.reason)) {
         state.attempts += 1;
         state.lastProblem = error.protocolFeedback;
         if (state.attempts < INITIALIZER_MAX_ATTEMPTS) {
@@ -199,16 +184,13 @@ export async function runContractInitializer(
     const calls = response.content.filter(
       (block): block is ToolUseBlock => block.type === 'tool_use',
     );
-    const contractCalls = calls.filter(
-      (call) => call.name === SET_OUTPUT_CONTRACT,
-    );
+    const contractCalls = calls.filter((call) => call.name === SET_OUTPUT_CONTRACT);
 
     let problem: string;
     if (contractCalls.length === 0) {
       problem = `Your response made no ${SET_OUTPUT_CONTRACT} call. Prose is not read.`;
     } else if (contractCalls.length > 1 || calls.length > 1) {
-      problem =
-        `Respond with exactly one ${SET_OUTPUT_CONTRACT} call and no other tool calls.`;
+      problem = `Respond with exactly one ${SET_OUTPUT_CONTRACT} call and no other tool calls.`;
     } else {
       const validation = validateInitialContractCall(contractCalls[0]!.input);
       if (validation.ok) {
@@ -263,12 +245,8 @@ export function formatContractGuidance(contract: OutputContract): string {
   ].join('\n');
 }
 
-function contractCorrectionMessage(
-  problem: string,
-  calls: readonly ToolUseBlock[],
-): Message {
-  const instruction =
-    `${problem}\n\nRespond again with a single valid ${SET_OUTPUT_CONTRACT} call.`;
+function contractCorrectionMessage(problem: string, calls: readonly ToolUseBlock[]): Message {
+  const instruction = `${problem}\n\nRespond again with a single valid ${SET_OUTPUT_CONTRACT} call.`;
   if (calls.length === 0) {
     return { role: 'user', content: [{ type: 'text', text: instruction }] };
   }
@@ -296,9 +274,7 @@ function deepFreeze<T>(value: T): T {
   return value;
 }
 
-function validateInitialContractCall(
-  input: unknown,
-): ReturnType<typeof validateOutputContract> {
+function validateInitialContractCall(input: unknown): ReturnType<typeof validateOutputContract> {
   const parsed = setOutputContractInputSchema.safeParse(input);
   if (parsed.success) {
     const validation = validateOutputContract(parsed.data.contract);

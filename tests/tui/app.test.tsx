@@ -13,10 +13,7 @@ vi.setConfig({ testTimeout: 30_000 });
 
 const config = createConfig();
 
-async function submitLine(
-  stdin: { write: (data: string) => void },
-  line: string,
-): Promise<void> {
+async function submitLine(stdin: { write: (data: string) => void }, line: string): Promise<void> {
   await typeText(stdin, line);
   stdin.write(ENTER);
   await tick();
@@ -24,9 +21,7 @@ async function submitLine(
 
 describe('App slash routing and transcript', () => {
   it('appends submitted tasks and keeps earlier entries visible', async () => {
-    const { frames, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} />,
-    );
+    const { frames, stdin, unmount } = render(<App config={config} apiKeyPresent={true} />);
     await tick();
     await submitLine(stdin, 'first investigation');
     await submitLine(stdin, 'second investigation');
@@ -37,9 +32,7 @@ describe('App slash routing and transcript', () => {
   });
 
   it('/help renders the command list and keys', async () => {
-    const { frames, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} />,
-    );
+    const { frames, stdin, unmount } = render(<App config={config} apiKeyPresent={true} />);
     await tick();
     await submitLine(stdin, '/help');
     const output = frames.join('\n');
@@ -52,9 +45,7 @@ describe('App slash routing and transcript', () => {
   });
 
   it('unknown commands get a gentle notice', async () => {
-    const { frames, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} />,
-    );
+    const { frames, stdin, unmount } = render(<App config={config} apiKeyPresent={true} />);
     await tick();
     await submitLine(stdin, '/frobnicate');
     const output = frames.join('\n');
@@ -65,9 +56,7 @@ describe('App slash routing and transcript', () => {
 
   it('/exit exits through the app lifecycle', async () => {
     const onExit = vi.fn();
-    const { stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} onExit={onExit} />,
-    );
+    const { stdin, unmount } = render(<App config={config} apiKeyPresent={true} onExit={onExit} />);
     await tick();
     await submitLine(stdin, '/exit');
     expect(onExit).toHaveBeenCalledTimes(1);
@@ -142,9 +131,7 @@ describe('App run-session wiring', () => {
   });
 
   it('keeps --demo working without a runner', async () => {
-    const { frames, unmount } = render(
-      <App config={config} apiKeyPresent={true} demo={true} />,
-    );
+    const { frames, unmount } = render(<App config={config} apiKeyPresent={true} demo={true} />);
     await tick(750);
     expect(frames.join('\n')).toContain("▸ Find Acme Corp's Series B investors");
     unmount();
@@ -183,19 +170,22 @@ describe('App /runs browsing', () => {
         task: 'the newest investigation',
         startedAt: '2026-08-11T11:00:00.000Z',
         finishedAt: '2026-08-11T11:01:24.000Z',
-        metrics: { status: 'completed', turns: 4, inputTokens: 30_000, outputTokens: 1_200, cacheReadInputTokens: 0, wallClockMs: 84_000 },
-        artifacts: [
-          { filename: 'out.csv', content: 'a,b\n', sha256: 'feedfacedead0000' },
-        ],
+        metrics: {
+          status: 'completed',
+          turns: 4,
+          inputTokens: 30_000,
+          outputTokens: 1_200,
+          cacheReadInputTokens: 0,
+          wallClockMs: 84_000,
+        },
+        artifacts: [{ filename: 'out.csv', content: 'a,b\n', sha256: 'feedfacedead0000' }],
       });
       writeFixtureRun(baseDir, {
         id: '2026-08-11T10-00-00-000Z-old',
         task: 'the older investigation',
         startedAt: '2026-08-11T10:00:00.000Z',
         finishedAt: '2026-08-11T10:00:30.000Z',
-        artifacts: [
-          { filename: 'page.png', content: 'png-bytes', sha256: 'cafebabe12340000' },
-        ],
+        artifacts: [{ filename: 'page.png', content: 'png-bytes', sha256: 'cafebabe12340000' }],
       });
 
       const runsConfig = createConfig({ runsBaseDir: baseDir });
@@ -248,9 +238,7 @@ describe('App /runs browsing', () => {
 
   it('Esc closes the overlay without a summary', async () => {
     const runsConfig = createConfig({ runsBaseDir: '/nonexistent-runs-dir' });
-    const { lastFrame, stdin, unmount } = render(
-      <App config={runsConfig} apiKeyPresent={true} />,
-    );
+    const { lastFrame, stdin, unmount } = render(<App config={runsConfig} apiKeyPresent={true} />);
     await tick();
     await submitLine(stdin, '/runs');
     expect(lastFrame()).toContain('No runs yet');
@@ -277,29 +265,27 @@ describe('App /evals workflow', () => {
       // dir that does not exist.
       const evalsConfig = createConfig({ evalsDir: 'evals/datasets', evalResultsDir: resultsDir });
       const bridge = fakeRunner();
-      const runner = vi.fn(
-        (task: string, onEvent: (event: UiEvent) => void): RunHandle => {
-          onEvent({ type: 'run_started', task, at: 0 });
-          onEvent({ type: 'turn_start', turn: 1 });
-          onEvent({ type: 'text_delta', text: 'Investigating for the eval…' });
-          onEvent({ type: 'turn_end', usage: { input: 500, output: 100 } });
-          onEvent({
-            type: 'run_finished',
-            outcome: 'verified',
+      const runner = vi.fn((task: string, onEvent: (event: UiEvent) => void): RunHandle => {
+        onEvent({ type: 'run_started', task, at: 0 });
+        onEvent({ type: 'turn_start', turn: 1 });
+        onEvent({ type: 'text_delta', text: 'Investigating for the eval…' });
+        onEvent({ type: 'turn_end', usage: { input: 500, output: 100 } });
+        onEvent({
+          type: 'run_finished',
+          outcome: 'verified',
+          finalText: 'done',
+          runDir: '/runs/eval-trial',
+          at: 9_000,
+        });
+        return {
+          cancel: bridge.cancel,
+          done: Promise.resolve({
+            status: 'verified',
             finalText: 'done',
             runDir: '/runs/eval-trial',
-            at: 9_000,
-          });
-          return {
-            cancel: bridge.cancel,
-            done: Promise.resolve({
-              status: 'verified',
-              finalText: 'done',
-              runDir: '/runs/eval-trial',
-            }),
-          };
-        },
-      );
+          }),
+        };
+      });
 
       const { frames, lastFrame, stdin, unmount } = render(
         <App config={evalsConfig} apiKeyPresent={true} runner={runner} />,
@@ -328,10 +314,10 @@ describe('App /evals workflow', () => {
       await tick();
       expect(lastFrame()).toContain('concurrency: 3');
       stdin.write('\r'); // start k=1, concurrency=3
-      await vi.waitFor(
-        () => expect(frames.join('\n')).toContain('Eval report — k=1'),
-        { timeout: 10_000, interval: 25 },
-      );
+      await vi.waitFor(() => expect(frames.join('\n')).toContain('Eval report — k=1'), {
+        timeout: 10_000,
+        interval: 25,
+      });
 
       const output = frames.join('\n');
       // Parallel evals use keyed compact progress; raw prose is kept in
@@ -352,9 +338,7 @@ describe('App /evals workflow', () => {
   });
 
   it('/evals without a runner explains itself', async () => {
-    const { frames, stdin, unmount } = render(
-      <App config={config} apiKeyPresent={true} />,
-    );
+    const { frames, stdin, unmount } = render(<App config={config} apiKeyPresent={true} />);
     await tick();
     await submitLine(stdin, '/evals');
     expect(frames.join('\n')).toContain('not available in --demo');

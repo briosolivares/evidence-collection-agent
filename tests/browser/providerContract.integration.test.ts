@@ -25,9 +25,7 @@ import type {
   BrowserDownloadResult,
 } from '../../src/browser/controller.js';
 import { localDownloadReader } from '../../src/browser/downloadReader.js';
-import {
-  LocalChromeBrowserSessionProvider,
-} from '../../src/browser/playwrightBrowserController.js';
+import { LocalChromeBrowserSessionProvider } from '../../src/browser/playwrightBrowserController.js';
 import type { BrowserSessionDiagnostics } from '../../src/browser/sessionProvider.js';
 import { localUploadEncoder, remoteUploadEncoder } from '../../src/browser/uploadEncoder.js';
 
@@ -40,16 +38,13 @@ const BROWSERBASE_CONNECT_URL =
 const BROWSERBASE_SESSION_ID = 'provider-matrix-session';
 const BROWSERBASE_LIVE_VIEW_URL =
   'https://debug.browserbase.com/fullscreen/provider-matrix-session';
-const ATTACHED_CONNECT_URL =
-  'http://127.0.0.1:9222/provider-matrix-private-control-url';
+const ATTACHED_CONNECT_URL = 'http://127.0.0.1:9222/provider-matrix-private-control-url';
 
 type ProviderKind = 'managed-local' | 'attached-local' | 'browserbase-fake';
 type StrategyKind = 'local' | 'remote';
 type AsyncCloseMock = ReturnType<typeof vi.fn<() => Promise<void>>>;
 type BrowserbaseReleaseMock = ReturnType<
-  typeof vi.fn<
-    (id: string, params: { status: 'REQUEST_RELEASE' }) => Promise<unknown>
-  >
+  typeof vi.fn<(id: string, params: { status: 'REQUEST_RELEASE' }) => Promise<unknown>>
 >;
 
 interface ProviderContractCase {
@@ -344,9 +339,9 @@ async function createBrowserbaseHarness(): Promise<ProviderHarness> {
   let ownerBrowser: Browser | undefined;
   let controller: BrowserController | undefined;
   let clientClose: AsyncCloseMock | undefined;
-  const release = vi.fn<
-    (id: string, params: { status: 'REQUEST_RELEASE' }) => Promise<unknown>
-  >(async () => undefined);
+  const release = vi.fn<(id: string, params: { status: 'REQUEST_RELEASE' }) => Promise<unknown>>(
+    async () => undefined,
+  );
   const clearHeartbeat = vi.fn((_handle: NodeJS.Timeout) => undefined);
   const heartbeatHandle = { providerContractHeartbeat: true } as unknown as NodeJS.Timeout;
   const remoteDownloadRequests: string[] = [];
@@ -413,9 +408,7 @@ async function createBrowserbaseHarness(): Promise<ProviderHarness> {
   }
 }
 
-function browserbaseClient(
-  release: BrowserbaseReleaseMock,
-): BrowserbaseClient {
+function browserbaseClient(release: BrowserbaseReleaseMock): BrowserbaseClient {
   return {
     sessions: {
       create: vi.fn(async () => ({
@@ -456,10 +449,7 @@ async function interceptBrowserbaseDownloadSetup(
   });
 }
 
-function interceptDownloadBehavior(
-  session: CDPSession,
-  downloadDir: string,
-): CDPSession {
+function interceptDownloadBehavior(session: CDPSession, downloadDir: string): CDPSession {
   const send = session.send.bind(session) as unknown as (
     method: string,
     params?: Record<string, unknown>,
@@ -508,9 +498,7 @@ function browserbaseDownloadFetch(requests: string[]): typeof fetch {
     const url = String(input);
     requests.push(url);
     expect(url).not.toContain(BROWSERBASE_API_KEY);
-    expect((init?.headers as Record<string, string>)['x-bb-api-key']).toBe(
-      BROWSERBASE_API_KEY,
-    );
+    expect((init?.headers as Record<string, string>)['x-bb-api-key']).toBe(BROWSERBASE_API_KEY);
 
     if (url.includes('/v1/downloads?')) {
       return jsonResponse({
@@ -586,10 +574,7 @@ function uploadObservationExpression(): string {
   })`;
 }
 
-async function evaluateValue(
-  session: BrowserCommandSession,
-  expression: string,
-): Promise<unknown> {
+async function evaluateValue(session: BrowserCommandSession, expression: string): Promise<unknown> {
   const result = (await session.send('Runtime.evaluate', {
     expression,
     awaitPromise: true,
@@ -599,10 +584,7 @@ async function evaluateValue(
   return result.result?.value;
 }
 
-async function backendNodeId(
-  session: BrowserCommandSession,
-  selector: string,
-): Promise<number> {
+async function backendNodeId(session: BrowserCommandSession, selector: string): Promise<number> {
   const document = (await session.send('DOM.getDocument')) as {
     root?: { nodeId?: number };
   };

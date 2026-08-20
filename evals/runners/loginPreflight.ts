@@ -26,9 +26,7 @@ import type { EvalTask } from '../types.js';
  * @returns one entry per required service id, in first-appearance order;
  *   empty when no task in the batch needs a session
  */
-export function requiredLogins(
-  tasks: readonly EvalTask[],
-): { id: string; tasks: string[] }[] {
+export function requiredLogins(tasks: readonly EvalTask[]): { id: string; tasks: string[] }[] {
   const byId = new Map<string, string[]>();
   for (const task of tasks) {
     for (const id of task.requiresLogin) {
@@ -80,13 +78,15 @@ export function formatLoginPreflightFailure(
   // so Google's automation objection never applies there in the first place.
   const needsManual =
     provider === 'local' &&
-    statuses.some((status) => status.state !== 'logged-in' && status.service.id === 'google-sheets');
+    statuses.some(
+      (status) => status.state !== 'logged-in' && status.service.id === 'google-sheets',
+    );
   lines.push(
     '',
     needsManual
       ? 'Fix it with:  npm run login -- --manual\n' +
-        '(a plain Chrome opens on the same profile — Google only accepts its\n' +
-        ' sign-in flow there; sign in, quit Chrome, and it verifies itself)'
+          '(a plain Chrome opens on the same profile — Google only accepts its\n' +
+          ' sign-in flow there; sign in, quit Chrome, and it verifies itself)'
       : provider === 'local'
         ? 'Fix it with:  npm run login\n' +
           '(a Chrome window opens; sign in by hand, press Enter to verify)'

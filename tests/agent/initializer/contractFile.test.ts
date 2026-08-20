@@ -49,9 +49,7 @@ describe('immutable output contract file', () => {
     ensureOutputContractFile(runDir, CONTRACT);
 
     expect(readOutputContractFile(runDir)).toEqual(CONTRACT);
-    expect(statSync(join(runDir, OUTPUT_CONTRACT_PATH)).mode & 0o777).toBe(
-      0o600,
-    );
+    expect(statSync(join(runDir, OUTPUT_CONTRACT_PATH)).mode & 0o777).toBe(0o600);
   });
 
   it('is idempotent for the same contract and refuses a revision', () => {
@@ -74,8 +72,6 @@ describe('immutable output contract file', () => {
       mode: 0o600,
     });
 
-    expect(() => ensureOutputContractFile(runDir, CONTRACT)).toThrow(
-      /not valid JSON/i,
-    );
+    expect(() => ensureOutputContractFile(runDir, CONTRACT)).toThrow(/not valid JSON/i);
   });
 });

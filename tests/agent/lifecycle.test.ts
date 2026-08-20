@@ -23,11 +23,7 @@ import {
   type ModelDriver,
   type ModelGenerateOptions,
 } from '../../src/model/modelDriver.js';
-import {
-  initManifest,
-  readManifest,
-  writeArtifact,
-} from '../../src/run/artifacts.js';
+import { initManifest, readManifest, writeArtifact } from '../../src/run/artifacts.js';
 import {
   ARTIFACT_WRITE_JOURNAL_PATH,
   commitArtifactWriteTransaction,
@@ -112,11 +108,9 @@ describe('runAgent', () => {
     expect(checkpoint).toMatchObject({ phase: 'terminal', outcome });
     expect(readManifest(runDir).finishedAt).toBeDefined();
     expect(existsSync(join(runDir, OUTPUT_CONTRACT_PATH))).toBe(true);
-    expect(
-      JSON.stringify(
-        vi.mocked(models.worker.generate).mock.calls[0]?.[0].messages,
-      ),
-    ).toContain('JavaScript policy is allow for this run');
+    expect(JSON.stringify(vi.mocked(models.worker.generate).mock.calls[0]?.[0].messages)).toContain(
+      'JavaScript policy is allow for this run',
+    );
   });
 
   it('puts a deny decision in per-run guidance without changing the static prefix', async () => {
@@ -128,9 +122,7 @@ describe('runAgent', () => {
     });
 
     expect(outcome.status).toBe('verified');
-    const opening = JSON.stringify(
-      vi.mocked(models.worker.generate).mock.calls[0]?.[0].messages,
-    );
+    const opening = JSON.stringify(vi.mocked(models.worker.generate).mock.calls[0]?.[0].messages);
     expect(opening).toContain('browser_execute is disabled in its entirety');
     expect(opening).toContain('Do not call or retry browser_execute');
   });
@@ -252,10 +244,7 @@ describe('runAgent', () => {
     const worker = unexpectedDriver('worker');
     const verifier = unexpectedDriver('verifier');
 
-    const outcome = await run(
-      { initializer, worker, verifier },
-      { configuration },
-    );
+    const outcome = await run({ initializer, worker, verifier }, { configuration });
 
     expect(outcome).toMatchObject({
       status: 'incomplete',
@@ -312,18 +301,18 @@ describe('runAgent', () => {
     const closeTaskPages = vi.fn(async () => undefined);
     const browser = { closeTaskPages } as unknown as BrowserController;
 
-    await expect(
-      run({ initializer, worker, verifier }, { browser }),
-    ).resolves.toEqual(firstOutcome);
+    await expect(run({ initializer, worker, verifier }, { browser })).resolves.toEqual(
+      firstOutcome,
+    );
     expect(initializer.generate).not.toHaveBeenCalled();
     expect(worker.generate).not.toHaveBeenCalled();
     expect(verifier.generate).not.toHaveBeenCalled();
     expect(closeTaskPages).not.toHaveBeenCalled();
 
     writeFileSync(join(runDir, 'artifacts/report.csv'), 'name\nTampered\n');
-    await expect(
-      run({ initializer, worker, verifier }, { browser }),
-    ).rejects.toThrow(/manifest|hash|changed after/i);
+    await expect(run({ initializer, worker, verifier }, { browser })).rejects.toThrow(
+      /manifest|hash|changed after/i,
+    );
     expect(initializer.generate).not.toHaveBeenCalled();
     expect(worker.generate).not.toHaveBeenCalled();
     expect(verifier.generate).not.toHaveBeenCalled();
@@ -406,9 +395,7 @@ describe('runAgent', () => {
 
     expect(readManifest(runDir)).toMatchObject({
       finishedAt: expect.any(String),
-      artifacts: expect.arrayContaining([
-        expect.objectContaining({ filename }),
-      ]),
+      artifacts: expect.arrayContaining([expect.objectContaining({ filename })]),
     });
     expect(readdirSync(journalDir)).toEqual([]);
   });
@@ -421,10 +408,7 @@ describe('runAgent', () => {
     manifest.artifacts = manifest.artifacts.filter(
       (entry) => entry.filename !== 'artifacts/report.csv',
     );
-    writeFileSync(
-      join(runDir, 'manifest.json'),
-      `${JSON.stringify(manifest, null, 2)}\n`,
-    );
+    writeFileSync(join(runDir, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
 
     const initializer = unexpectedDriver('initializer');
     const worker = unexpectedDriver('worker');
@@ -454,11 +438,7 @@ describe('runAgent', () => {
     expect(readManifest(runDir).finishedAt).toBeUndefined();
     expect(terminalTranscriptEvents()).toHaveLength(0);
     expect(existsSync(join(runDir, 'metrics.json'))).toBe(false);
-    appendFileSync(
-      join(runDir, 'transcript.jsonl'),
-      '{"type":"v3_run_terminal"',
-      'utf8',
-    );
+    appendFileSync(join(runDir, 'transcript.jsonl'), '{"type":"v3_run_terminal"', 'utf8');
 
     const models = {
       initializer: unexpectedDriver('initializer'),
@@ -506,9 +486,7 @@ describe('runAgent', () => {
     const metricsPath = join(runDir, 'metrics.json');
     mkdirSync(metricsPath);
 
-    await expect(run(happyModels())).rejects.toThrow(
-      /terminal projection repair.*metrics/i,
-    );
+    await expect(run(happyModels())).rejects.toThrow(/terminal projection repair.*metrics/i);
     const durable = readCheckpoint();
     expect(durable).toMatchObject({
       phase: 'terminal',
@@ -538,9 +516,7 @@ describe('runAgent', () => {
 
     const outcome = await run(happyModels(), {
       afterCheckpoint: (checkpoint) => {
-        const contractFileExists = existsSync(
-          join(runDir, OUTPUT_CONTRACT_PATH),
-        );
+        const contractFileExists = existsSync(join(runDir, OUTPUT_CONTRACT_PATH));
         if (checkpoint.phase === 'initializing' && checkpoint.contract !== undefined) {
           acceptedFileVisibility.push(contractFileExists);
         }
@@ -584,8 +560,7 @@ describe('runAgent', () => {
       message.role === 'user'
         ? message.content.filter(
             (block): block is ToolResultBlock =>
-              block.type === 'tool_result' &&
-              block.tool_use_id === 'finish-report',
+              block.type === 'tool_result' && block.tool_use_id === 'finish-report',
           )
         : [],
     );
@@ -595,9 +570,7 @@ describe('runAgent', () => {
       tool_use_id: 'finish-report',
       is_error: true,
     });
-    expect(JSON.stringify(finishResults?.[0]?.content)).toContain(
-      'deterministic_finish_checks',
-    );
+    expect(JSON.stringify(finishResults?.[0]?.content)).toContain('deterministic_finish_checks');
     expect(checkpoint.worker?.messages.at(-1)?.role).toBe('user');
   });
 });
@@ -633,8 +606,7 @@ function run(
     ...(overrides.terminalResumeInspectionTimeoutMs === undefined
       ? {}
       : {
-          terminalResumeInspectionTimeoutMs:
-            overrides.terminalResumeInspectionTimeoutMs,
+          terminalResumeInspectionTimeoutMs: overrides.terminalResumeInspectionTimeoutMs,
         }),
   });
 }
@@ -680,9 +652,7 @@ function verifierAccepted(): AcceptedModelResponse {
   ]);
 }
 
-function accepted(
-  content: AcceptedModelResponse['response']['content'],
-): AcceptedModelResponse {
+function accepted(content: AcceptedModelResponse['response']['content']): AcceptedModelResponse {
   const usage = {
     input_tokens: 10,
     output_tokens: 4,
@@ -709,9 +679,7 @@ function scriptedDriver(
   return { generate };
 }
 
-function unexpectedDriver(
-  role: string,
-): ModelDriver & { generate: ReturnType<typeof vi.fn> } {
+function unexpectedDriver(role: string): ModelDriver & { generate: ReturnType<typeof vi.fn> } {
   return {
     generate: vi.fn(async () => {
       throw new Error(`${role} model must not be called`);
@@ -720,12 +688,9 @@ function unexpectedDriver(
 }
 
 function publishValidRunArtifacts(): void {
-  writeArtifact(
-    runDir,
-    'artifacts/report.csv',
-    Buffer.from('name\nAlice\n', 'utf8'),
-    { roles: ['requested_output'] },
-  );
+  writeArtifact(runDir, 'artifacts/report.csv', Buffer.from('name\nAlice\n', 'utf8'), {
+    roles: ['requested_output'],
+  });
   writeArtifact(
     runDir,
     'artifacts/evidence.png',
@@ -739,12 +704,7 @@ function publishValidRunArtifacts(): void {
 
 function readCheckpoint(): Checkpoint {
   return checkpointSchema.parse(
-    JSON.parse(
-      readFileSync(
-        join(runDir, HARNESS_DIR, RUN_CHECKPOINT_FILENAME),
-        'utf8',
-      ),
-    ),
+    JSON.parse(readFileSync(join(runDir, HARNESS_DIR, RUN_CHECKPOINT_FILENAME), 'utf8')),
   );
 }
 

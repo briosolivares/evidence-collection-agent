@@ -14,8 +14,16 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { initManifest, MANIFEST_FILENAME, writeArtifact, type Manifest } from '../../src/run/artifacts.js';
-import { SCRATCH_WORKSPACE_MAX_FILE_BYTES, syncScratchWorkspace } from '../../src/run/syncScratchWorkspace.js';
+import {
+  initManifest,
+  MANIFEST_FILENAME,
+  writeArtifact,
+  type Manifest,
+} from '../../src/run/artifacts.js';
+import {
+  SCRATCH_WORKSPACE_MAX_FILE_BYTES,
+  syncScratchWorkspace,
+} from '../../src/run/syncScratchWorkspace.js';
 
 // A temp dir stands in for the run directory; the suite stays hermetic —
 // same convention artifacts.test.ts uses.
@@ -167,11 +175,11 @@ describe('syncScratchWorkspace', () => {
     expect(syncScratchWorkspace(runDir)).toEqual([
       { path: 'scratch/workspace/a.txt', change: 'created' },
     ]);
-    expect(readManifestFile().artifacts.map((entry) => entry.filename).sort()).toEqual([
-      'artifacts/published.csv',
-      'scratch/private-note.txt',
-      'scratch/workspace/a.txt',
-    ]);
+    expect(
+      readManifestFile()
+        .artifacts.map((entry) => entry.filename)
+        .sort(),
+    ).toEqual(['artifacts/published.csv', 'scratch/private-note.txt', 'scratch/workspace/a.txt']);
   });
 
   it('rejects a symlink without following it or manifesting it', () => {
@@ -181,9 +189,9 @@ describe('syncScratchWorkspace', () => {
     symlinkSync(target, join(runDir, 'scratch/workspace/link.txt'));
 
     expect(() => syncScratchWorkspace(runDir)).toThrow(/symlink/);
-    expect(
-      readManifestFile().artifacts.some((entry) => entry.filename.includes('link.txt')),
-    ).toBe(false);
+    expect(readManifestFile().artifacts.some((entry) => entry.filename.includes('link.txt'))).toBe(
+      false,
+    );
   });
 
   it('rejects a FIFO without opening it or manifesting it', () => {

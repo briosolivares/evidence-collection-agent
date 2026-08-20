@@ -69,24 +69,16 @@ processDescribe('artifact write transaction real-process crash recovery', () => 
     const bytes = Buffer.from(Array.from({ length: 256 }, (_, value) => value));
     const beforeManifest = manifestBytes();
 
-    await runAndExpectSigkill(
-      'after_artifact',
-      'artifacts/capture.bin',
-      bytes,
-      {
-        roles: ['requested_output', 'evidence'],
-        sourceUrl: 'https://example.test/capture',
-      },
-    );
+    await runAndExpectSigkill('after_artifact', 'artifacts/capture.bin', bytes, {
+      roles: ['requested_output', 'evidence'],
+      sourceUrl: 'https://example.test/capture',
+    });
 
     expect(readFileSync(join(runDir, 'artifacts/capture.bin'))).toEqual(bytes);
     expect(manifestBytes()).toEqual(beforeManifest);
     expect(journalFiles()).toHaveLength(1);
     const intent = JSON.parse(
-      readFileSync(
-        join(runDir, ARTIFACT_WRITE_JOURNAL_PATH, journalFiles()[0]!),
-        'utf8',
-      ),
+      readFileSync(join(runDir, ARTIFACT_WRITE_JOURNAL_PATH, journalFiles()[0]!), 'utf8'),
     ) as Record<string, Record<string, unknown>>;
     expect(intent).toMatchObject({
       version: 1,
@@ -107,8 +99,7 @@ processDescribe('artifact write transaction real-process crash recovery', () => 
       },
     });
     expect(
-      statSync(join(runDir, ARTIFACT_WRITE_JOURNAL_PATH, journalFiles()[0]!)).mode &
-        0o777,
+      statSync(join(runDir, ARTIFACT_WRITE_JOURNAL_PATH, journalFiles()[0]!)).mode & 0o777,
     ).toBe(0o600);
 
     const recovered = recoverPendingArtifactWrites(runDir);
@@ -160,12 +151,9 @@ processDescribe('artifact write transaction real-process crash recovery', () => 
     });
     const beforeManifest = manifestBytes();
 
-    await runAndExpectSigkill(
-      'after_journal',
-      'artifacts/report.txt',
-      newBytes,
-      { roles: ['requested_output'] },
-    );
+    await runAndExpectSigkill('after_journal', 'artifacts/report.txt', newBytes, {
+      roles: ['requested_output'],
+    });
 
     expect(readFileSync(join(runDir, 'artifacts/report.txt'))).toEqual(oldBytes);
     expect(manifestBytes()).toEqual(beforeManifest);
@@ -178,54 +166,39 @@ processDescribe('artifact write transaction real-process crash recovery', () => 
     expect(journalFiles()).toEqual([]);
   });
 
-  it(
-    'never exposes torn bytes when killed after the staged file fsync',
-    async () => {
-      const oldBytes = Buffer.alloc(512 * 1024, 0x35);
-      const newBytes = Buffer.alloc(768 * 1024, 0xca);
-      writeArtifact(runDir, 'artifacts/large.bin', oldBytes, {
-        roles: ['requested_output'],
-      });
-      const beforeManifest = manifestBytes();
+  it('never exposes torn bytes when killed after the staged file fsync', async () => {
+    const oldBytes = Buffer.alloc(512 * 1024, 0x35);
+    const newBytes = Buffer.alloc(768 * 1024, 0xca);
+    writeArtifact(runDir, 'artifacts/large.bin', oldBytes, {
+      roles: ['requested_output'],
+    });
+    const beforeManifest = manifestBytes();
 
-      await runAndExpectSigkill(
-        'after_temp',
-        'artifacts/large.bin',
-        newBytes,
-        { roles: ['requested_output'] },
-      );
+    await runAndExpectSigkill('after_temp', 'artifacts/large.bin', newBytes, {
+      roles: ['requested_output'],
+    });
 
-      // The destination is still the complete old inode. The complete new
-      // inode is private staging state and is never visible at the target path.
-      expect(readFileSync(join(runDir, 'artifacts/large.bin'))).toEqual(oldBytes);
-      expect(manifestBytes()).toEqual(beforeManifest);
-      expect(artifactTempFiles('artifacts')).toHaveLength(1);
+    // The destination is still the complete old inode. The complete new
+    // inode is private staging state and is never visible at the target path.
+    expect(readFileSync(join(runDir, 'artifacts/large.bin'))).toEqual(oldBytes);
+    expect(manifestBytes()).toEqual(beforeManifest);
+    expect(artifactTempFiles('artifacts')).toHaveLength(1);
 
-      expect(recoverPendingArtifactWrites(runDir)).toMatchObject({
-        recoveredEntries: 0,
-        discardedIntents: 1,
-        removedArtifactTemps: 1,
-      });
-      expect(readFileSync(join(runDir, 'artifacts/large.bin'))).toEqual(oldBytes);
-      expect(manifestBytes()).toEqual(beforeManifest);
-      expect(artifactTempFiles('artifacts')).toEqual([]);
-    },
-    20_000,
-  );
+    expect(recoverPendingArtifactWrites(runDir)).toMatchObject({
+      recoveredEntries: 0,
+      discardedIntents: 1,
+      removedArtifactTemps: 1,
+    });
+    expect(readFileSync(join(runDir, 'artifacts/large.bin'))).toEqual(oldBytes);
+    expect(manifestBytes()).toEqual(beforeManifest);
+    expect(artifactTempFiles('artifacts')).toEqual([]);
+  }, 20_000);
 
   it('recovers multiple distinct pending journals without losing either entry', async () => {
-    const first = startCrashChild(
-      'after_artifact',
-      'artifacts/one.bin',
-      Buffer.from([1, 2, 3]),
-      { roles: ['requested_output'] },
-    );
-    const second = startCrashChild(
-      'after_artifact',
-      'scratch/two.bin',
-      Buffer.from([4, 5, 6]),
-      {},
-    );
+    const first = startCrashChild('after_artifact', 'artifacts/one.bin', Buffer.from([1, 2, 3]), {
+      roles: ['requested_output'],
+    });
+    const second = startCrashChild('after_artifact', 'scratch/two.bin', Buffer.from([4, 5, 6]), {});
     await Promise.all([expectSigkill(first), expectSigkill(second)]);
     expect(journalFiles()).toHaveLength(2);
 
@@ -233,22 +206,20 @@ processDescribe('artifact write transaction real-process crash recovery', () => 
       recoveredEntries: 2,
       discardedIntents: 0,
     });
-    expect(readManifest(runDir).artifacts.map((entry) => entry.filename).sort()).toEqual([
-      'artifacts/one.bin',
-      'scratch/two.bin',
-    ]);
+    expect(
+      readManifest(runDir)
+        .artifacts.map((entry) => entry.filename)
+        .sort(),
+    ).toEqual(['artifacts/one.bin', 'scratch/two.bin']);
   });
 
   it('does not follow a target symlink even when its referent has the intended bytes', async () => {
     const bytes = Buffer.from('matching bytes outside the run');
     const outsidePath = join(tempRoot, 'outside.bin');
     writeFileSync(outsidePath, bytes);
-    await runAndExpectSigkill(
-      'after_artifact',
-      'artifacts/link.bin',
-      bytes,
-      { roles: ['requested_output'] },
-    );
+    await runAndExpectSigkill('after_artifact', 'artifacts/link.bin', bytes, {
+      roles: ['requested_output'],
+    });
     unlinkSync(join(runDir, 'artifacts/link.bin'));
     symlinkSync(outsidePath, join(runDir, 'artifacts/link.bin'));
 
@@ -269,29 +240,19 @@ describe('artifact write transaction bounded recovery', () => {
     );
 
     expect(() => recoverPendingArtifactWrites(runDir)).toThrow(
-      new RegExp(
-        `${ARTIFACT_WRITE_MAX_MANIFEST_BYTES}-byte artifact transaction recovery limit`,
-      ),
+      new RegExp(`${ARTIFACT_WRITE_MAX_MANIFEST_BYTES}-byte artifact transaction recovery limit`),
     );
   });
 
   it('rejects an oversized private journal before parsing it', () => {
     writeArtifact(runDir, 'scratch/seed.txt', Buffer.from('seed'));
-    const journalPath = join(
-      runDir,
-      ARTIFACT_WRITE_JOURNAL_PATH,
-      'oversized.json',
-    );
-    writeFileSync(
-      journalPath,
-      Buffer.alloc(ARTIFACT_WRITE_MAX_JOURNAL_BYTES + 1, 0x20),
-      { mode: 0o600 },
-    );
+    const journalPath = join(runDir, ARTIFACT_WRITE_JOURNAL_PATH, 'oversized.json');
+    writeFileSync(journalPath, Buffer.alloc(ARTIFACT_WRITE_MAX_JOURNAL_BYTES + 1, 0x20), {
+      mode: 0o600,
+    });
 
     expect(() => recoverPendingArtifactWrites(runDir)).toThrow(
-      new RegExp(
-        `${ARTIFACT_WRITE_MAX_JOURNAL_BYTES}-byte artifact transaction recovery limit`,
-      ),
+      new RegExp(`${ARTIFACT_WRITE_MAX_JOURNAL_BYTES}-byte artifact transaction recovery limit`),
     );
     expect(existsSync(journalPath)).toBe(true);
   });
@@ -488,9 +449,7 @@ function waitForExit(
 
 function journalFiles(): string[] {
   const path = join(runDir, ARTIFACT_WRITE_JOURNAL_PATH);
-  return existsSync(path)
-    ? readdirSync(path).filter((name) => name.endsWith('.json'))
-    : [];
+  return existsSync(path) ? readdirSync(path).filter((name) => name.endsWith('.json')) : [];
 }
 
 function artifactTempFiles(workspace: 'artifacts' | 'scratch'): string[] {

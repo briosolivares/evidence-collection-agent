@@ -321,9 +321,7 @@ async function workspaceModulePath(workspacePath) {
   }
 
   const flags =
-    fsConstants.O_RDONLY |
-    (fsConstants.O_NOFOLLOW ?? 0) |
-    (fsConstants.O_NONBLOCK ?? 0);
+    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
   let handle;
   try {
     handle = await open(current, flags);
@@ -339,9 +337,7 @@ async function workspaceModulePath(workspacePath) {
       throw new Error('workspace module must be a regular file');
     }
     if (stats.size > MAX_WORKSPACE_MODULE_BYTES) {
-      throw new RangeError(
-        `workspace module exceeds ${MAX_WORKSPACE_MODULE_BYTES} bytes`,
-      );
+      throw new RangeError(`workspace module exceeds ${MAX_WORKSPACE_MODULE_BYTES} bytes`);
     }
   } finally {
     await handle.close();
@@ -397,7 +393,8 @@ export function createBrowserApi(requestCdp, requestHost, initialPageIdentity) {
     try {
       return await evaluate(expression);
     } catch (error) {
-      if (!(error instanceof Error) || !error.message.includes('Illegal return statement')) throw error;
+      if (!(error instanceof Error) || !error.message.includes('Illegal return statement'))
+        throw error;
       return evaluate(`(async()=>{${expression}\n})()`);
     }
   };
@@ -419,10 +416,7 @@ export function createBrowserApi(requestCdp, requestHost, initialPageIdentity) {
     if (!dimensions || typeof dimensions !== 'object') {
       throw new Error('pageInfo JavaScript returned a malformed value');
     }
-    const currentTargetId = boundedString(
-      targetResponse?.targetInfo?.targetId,
-      'current targetId',
-    );
+    const currentTargetId = boundedString(targetResponse?.targetInfo?.targetId, 'current targetId');
     if (currentTargetId !== initialPage.targetId) {
       throw new Error(
         `pageInfo target mismatch: command session is pinned to ${initialPage.targetId}, ` +
@@ -618,12 +612,7 @@ export function createBrowserApi(requestCdp, requestHost, initialPageIdentity) {
   };
 
   const upload = async (backendDOMNodeId, workspacePath) => {
-    boundedInteger(
-      backendDOMNodeId,
-      'upload backendDOMNodeId',
-      1,
-      2_147_483_647,
-    );
+    boundedInteger(backendDOMNodeId, 'upload backendDOMNodeId', 1, 2_147_483_647);
     boundedString(workspacePath, 'upload workspace path', {
       maxBytes: MAX_WORKSPACE_PATH_BYTES,
     });

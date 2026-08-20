@@ -34,11 +34,7 @@ import {
   PREVIEW_MAX_BYTES,
   capResult,
 } from '../../tools/capResult.js';
-import {
-  executeToolCall,
-  type ToolCall,
-  type ToolCallResult,
-} from '../../tools/pipeline.js';
+import { executeToolCall, type ToolCall, type ToolCallResult } from '../../tools/pipeline.js';
 import {
   createBusyResourceRegistry,
   type BusyResourceRegistry,
@@ -160,10 +156,7 @@ export interface WorkerHooks {
   beforeCall?(pending: PendingToolTurn): Promise<void>;
   afterDispatch?(pending: PendingToolTurn): Promise<void>;
   afterResult?(pending: PendingToolTurn): Promise<void>;
-  finishRequested?(event: {
-    session: WorkerSnapshot;
-    request: FinishRequest;
-  }): Promise<void>;
+  finishRequested?(event: { session: WorkerSnapshot; request: FinishRequest }): Promise<void>;
   finishResultAppended?(event: {
     session: WorkerSnapshot;
     request: FinishRequest;
@@ -179,10 +172,7 @@ export type WorkerGuardReason =
   | 'wall_time'
   | 'verifier_corrections';
 
-export type WorkerIncompleteReason =
-  | WorkerGuardReason
-  | 'model_rejected'
-  | 'model_rejection_limit';
+export type WorkerIncompleteReason = WorkerGuardReason | 'model_rejected' | 'model_rejection_limit';
 
 export type WorkerTurnOutcome =
   | { kind: 'working' }
@@ -194,16 +184,9 @@ export type WorkerTurnOutcome =
       detail?: string;
     };
 
-export type WorkerOutcome = Exclude<
-  WorkerTurnOutcome,
-  { kind: 'working' }
->;
+export type WorkerOutcome = Exclude<WorkerTurnOutcome, { kind: 'working' }>;
 
-export type WorkerMetricsStatus =
-  | 'verified'
-  | 'incomplete'
-  | 'failed'
-  | 'cancelled';
+export type WorkerMetricsStatus = 'verified' | 'incomplete' | 'failed' | 'cancelled';
 
 export interface WorkerMetrics {
   status: WorkerMetricsStatus;
@@ -253,9 +236,7 @@ export function createWorker(
   };
 }
 
-export function captureWorkerSnapshot(
-  session: Worker,
-): WorkerSnapshot {
+export function captureWorkerSnapshot(session: Worker): WorkerSnapshot {
   return {
     messages: structuredClone(session.state.messages),
     turnCount: session.state.turnCount,
@@ -286,10 +267,7 @@ export function restoreWorker(
   };
 }
 
-export function appendWorkerFeedback(
-  session: Worker,
-  feedback: string,
-): void {
+export function appendWorkerFeedback(session: Worker, feedback: string): void {
   session.state.messages.push({
     role: 'user',
     content: [{ type: 'text', text: feedback }],
@@ -299,10 +277,7 @@ export function appendWorkerFeedback(
 /** Remove only a trailing assistant turn whose tool uses have no answer. */
 export function dropUnansweredAssistantTurn(session: Worker): boolean {
   const last = session.state.messages.at(-1);
-  if (
-    last?.role !== 'assistant' ||
-    !last.content.some((block) => block.type === 'tool_use')
-  ) {
+  if (last?.role !== 'assistant' || !last.content.some((block) => block.type === 'tool_use')) {
     return false;
   }
   session.state.messages.pop();
@@ -310,9 +285,7 @@ export function dropUnansweredAssistantTurn(session: Worker): boolean {
 }
 
 /** Advance one strict model turn and, for ordinary calls, one serial batch. */
-export async function runWorkerTurn(
-  session: Worker,
-): Promise<WorkerTurnOutcome> {
+export async function runWorkerTurn(session: Worker): Promise<WorkerTurnOutcome> {
   throwIfAborted(session.deps.signal);
   const existingGuard = guardReason(session);
   if (existingGuard !== undefined) {
@@ -342,9 +315,7 @@ export async function runWorkerTurn(
       () =>
         session.deps.model.generate({
           messages: requestMessages,
-          ...(session.deps.signal === undefined
-            ? {}
-            : { signal: session.deps.signal }),
+          ...(session.deps.signal === undefined ? {} : { signal: session.deps.signal }),
           ...(session.deps.onModelEvent === undefined
             ? {}
             : { onEvent: session.deps.onModelEvent }),
@@ -415,10 +386,7 @@ export async function runWorkerTurn(
   recordAcceptedResponse(session, turn, response);
 
   const contextTokens = requestContextTokens(response.usage);
-  session.peakContextTokens = Math.max(
-    session.peakContextTokens,
-    contextTokens,
-  );
+  session.peakContextTokens = Math.max(session.peakContextTokens, contextTokens);
   if (turn >= 2 && (response.usage.cache_read_input_tokens ?? 0) === 0) {
     appendTranscriptEvent(session.deps.runDir, {
       type: 'cache_miss_warning',
@@ -530,20 +498,13 @@ export async function runWorkerTurn(
     return { kind: 'finish_requested', request };
   }
 
-  const results = await executeSequentialCalls(
-    session,
-    turn,
-    assistant,
-    calls,
-  );
+  const results = await executeSequentialCalls(session, turn, assistant, calls);
   appendToolResults(session, turn, calls, results);
   return afterTurnGuard(session, contextTokens);
 }
 
 /** Run until exclusive finish interception or a truthful incomplete outcome. */
-export async function runWorker(
-  session: Worker,
-): Promise<WorkerOutcome> {
+export async function runWorker(session: Worker): Promise<WorkerOutcome> {
   for (;;) {
     const outcome = await runWorkerTurn(session);
     if (outcome.kind !== 'working') return outcome;
@@ -626,26 +587,14 @@ export async function appendFinishResult(
         toolCallId: request.call.id,
         isError: true,
         errorKind: 'execution_error',
-        content: boundGeneratedContent(
-          session.deps.runDir,
-          FINISH_TOOL_NAME,
-          content,
-        ),
+        content: boundGeneratedContent(session.deps.runDir, FINISH_TOOL_NAME, content),
       }
     : {
         toolCallId: request.call.id,
         isError: false,
-        content: boundGeneratedContent(
-          session.deps.runDir,
-          FINISH_TOOL_NAME,
-          content,
-        ),
+        content: boundGeneratedContent(session.deps.runDir, FINISH_TOOL_NAME, content),
       };
-  const [bounded] = capCombinedResults(
-    session.deps.runDir,
-    [request.call],
-    [raw],
-  );
+  const [bounded] = capCombinedResults(session.deps.runDir, [request.call], [raw]);
   const block = toResultBlock(bounded!);
 
   session.state.messages.push({ role: 'user', content: [block] });
@@ -662,10 +611,7 @@ export async function appendFinishResult(
   });
 }
 
-export function readWorkerMetrics(
-  session: Worker,
-  status: WorkerMetricsStatus,
-): WorkerMetrics {
+export function readWorkerMetrics(session: Worker, status: WorkerMetricsStatus): WorkerMetrics {
   const roles = session.config.budget.roleUsage();
   const budget = captureRunBudgetSnapshot(session.config.budget);
   const totals = sumRoleUsage(roles);
@@ -682,10 +628,7 @@ export function readWorkerMetrics(
   };
 }
 
-export function writeWorkerMetrics(
-  session: Worker,
-  status: WorkerMetricsStatus,
-): void {
+export function writeWorkerMetrics(session: Worker, status: WorkerMetricsStatus): void {
   const metrics = readWorkerMetrics(session, status);
   writeFileSync(
     join(session.deps.runDir, METRICS_FILENAME),
@@ -694,10 +637,7 @@ export function writeWorkerMetrics(
   );
 }
 
-export function recordWorkerCrash(
-  session: Worker,
-  error: unknown,
-): void {
+export function recordWorkerCrash(session: Worker, error: unknown): void {
   if (session.deps.signal?.aborted === true || isAbortError(error)) return;
   appendTranscriptEvent(session.deps.runDir, {
     type: 'run_error',
@@ -768,41 +708,26 @@ async function continueSequentialCalls(
       throwIfAborted(session.deps.signal);
     }
 
-    completed = capCombinedResults(
-      session.deps.runDir,
-      calls.slice(0, index + 1),
-      [...completed, result],
-    );
+    completed = capCombinedResults(session.deps.runDir, calls.slice(0, index + 1), [
+      ...completed,
+      result,
+    ]);
     await session.deps.lifecycle?.afterResult?.(
-      pendingToolTurn(
-        turn,
-        assistant,
-        calls,
-        completed,
-        index + 1,
-        'not_started',
-      ),
+      pendingToolTurn(turn, assistant, calls, completed, index + 1, 'not_started'),
     );
   }
 
   return completed;
 }
 
-async function executeOneCall(
-  session: Worker,
-  call: ToolCall,
-): Promise<ToolCallResult> {
+async function executeOneCall(session: Worker, call: ToolCall): Promise<ToolCallResult> {
   const ctx: ToolCtx = {
     runDir: session.deps.runDir,
-    ...(session.deps.browser === undefined
-      ? {}
-      : { browser: session.deps.browser }),
+    ...(session.deps.browser === undefined ? {} : { browser: session.deps.browser }),
     ...(session.deps.requestPermission === undefined
       ? {}
       : { requestPermission: session.deps.requestPermission }),
-    ...(session.deps.signal === undefined
-      ? {}
-      : { abortSignal: session.deps.signal }),
+    ...(session.deps.signal === undefined ? {} : { abortSignal: session.deps.signal }),
     busyRegistry: session.busyRegistry,
   };
   try {
@@ -917,8 +842,7 @@ function generatedErrorResult(
   runDir: string,
   call: ToolCall,
   content: string,
-  errorKind: Extract<ToolCallResult, { isError: true }>['errorKind'] =
-    'execution_error',
+  errorKind: Extract<ToolCallResult, { isError: true }>['errorKind'] = 'execution_error',
 ): ToolCallResult {
   return {
     toolCallId: call.id,
@@ -928,17 +852,8 @@ function generatedErrorResult(
   };
 }
 
-function boundGeneratedContent(
-  runDir: string,
-  toolName: string,
-  content: string,
-): string {
-  const bounded = capResult(
-    runDir,
-    safeToolName(toolName),
-    content,
-    DEFAULT_MAX_RESULT_BYTES,
-  );
+function boundGeneratedContent(runDir: string, toolName: string, content: string): string {
+  const bounded = capResult(runDir, safeToolName(toolName), content, DEFAULT_MAX_RESULT_BYTES);
   return typeof bounded === 'string' ? bounded : JSON.stringify(bounded);
 }
 
@@ -958,11 +873,7 @@ function formatInvalidInput(
   return `Invalid input for tool "${toolName}":\n${details.join('\n')}`;
 }
 
-function recordAcceptedResponse(
-  session: Worker,
-  turn: number,
-  response: ModelResponse,
-): void {
+function recordAcceptedResponse(session: Worker, turn: number, response: ModelResponse): void {
   appendTranscriptEvent(session.deps.runDir, {
     type: 'model_response',
     turn,
@@ -986,14 +897,9 @@ async function recordWorkerModelAccounting(
   });
 }
 
-function afterTurnGuard(
-  session: Worker,
-  contextTokens: number,
-): WorkerTurnOutcome {
+function afterTurnGuard(session: Worker, contextTokens: number): WorkerTurnOutcome {
   const reason = guardReason(session, contextTokens);
-  return reason === undefined
-    ? { kind: 'working' }
-    : { kind: 'incomplete', reason };
+  return reason === undefined ? { kind: 'working' } : { kind: 'incomplete', reason };
 }
 
 function guardReason(
@@ -1003,10 +909,7 @@ function guardReason(
 ): WorkerGuardReason | undefined {
   const limit = session.config.budget.exceededLimit(ignoredLimits);
   if (limit !== undefined) return budgetReason(limit);
-  if (
-    contextTokens !== undefined &&
-    contextTokens > session.config.maxContextTokens
-  ) {
+  if (contextTokens !== undefined && contextTokens > session.config.maxContextTokens) {
     return 'context_budget';
   }
   return undefined;
@@ -1050,10 +953,7 @@ function toResultBlock(result: ToolCallResult): ToolResultBlock {
 }
 
 function fromResultBlock(block: ToolResultBlock): ToolCallResult {
-  const content =
-    typeof block.content === 'string'
-      ? block.content
-      : JSON.stringify(block.content);
+  const content = typeof block.content === 'string' ? block.content : JSON.stringify(block.content);
   return block.is_error === true
     ? {
         toolCallId: block.tool_use_id,
@@ -1072,20 +972,14 @@ function extractText(content: readonly AssistantContentBlock[]): string {
 }
 
 function resultBytes(results: readonly ToolCallResult[]): number {
-  return results.reduce(
-    (sum, result) => sum + Buffer.byteLength(result.content, 'utf8'),
-    0,
-  );
+  return results.reduce((sum, result) => sum + Buffer.byteLength(result.content, 'utf8'), 0);
 }
 
 function sumRoleUsage(
   roles: Partial<Record<string, RunRoleUsage>>,
 ): Pick<
   WorkerMetrics,
-  | 'inputTokens'
-  | 'outputTokens'
-  | 'cacheReadInputTokens'
-  | 'cacheCreationInputTokens'
+  'inputTokens' | 'outputTokens' | 'cacheReadInputTokens' | 'cacheCreationInputTokens'
 > {
   const totals = {
     inputTokens: 0,
@@ -1103,10 +997,7 @@ function sumRoleUsage(
   return totals;
 }
 
-function assertPendingFinishCall(
-  session: Worker,
-  request: FinishRequest,
-): void {
+function assertPendingFinishCall(session: Worker, request: FinishRequest): void {
   if (request.call.name !== FINISH_TOOL_NAME) {
     throw new Error(`expected a ${FINISH_TOOL_NAME} call, got ${request.call.name}`);
   }
@@ -1126,20 +1017,14 @@ function assertPendingFinishCall(
   }
 }
 
-function assertRestorablePendingTurn(
-  session: Worker,
-  pending: PendingToolTurn,
-): void {
+function assertRestorablePendingTurn(session: Worker, pending: PendingToolTurn): void {
   if (pending.turn !== session.state.turnCount) {
     throw new Error(
       `pending tool turn ${pending.turn} does not match session turn ${session.state.turnCount}`,
     );
   }
   const last = session.state.messages.at(-1);
-  if (
-    last?.role !== 'assistant' ||
-    JSON.stringify(last) !== JSON.stringify(pending.assistant)
-  ) {
+  if (last?.role !== 'assistant' || JSON.stringify(last) !== JSON.stringify(pending.assistant)) {
     throw new Error('pending tool turn assistant does not match session history');
   }
   if (
@@ -1154,10 +1039,7 @@ function assertRestorablePendingTurn(
       throw new Error('pending tool turn results are not in call order');
     }
   });
-  if (
-    pending.effect === 'uncertain' &&
-    pending.nextCallIndex >= pending.calls.length
-  ) {
+  if (pending.effect === 'uncertain' && pending.nextCallIndex >= pending.calls.length) {
     throw new Error('pending tool turn cannot be uncertain after its final call');
   }
 }

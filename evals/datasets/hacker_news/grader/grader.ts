@@ -2,7 +2,11 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { parseCsv } from '../../../grading/csv.js';
-import { findArtifactByExtension, readManifest, verifyManifestHashes } from '../../../grading/manifestVerification.js';
+import {
+  findArtifactByExtension,
+  readManifest,
+  verifyManifestHashes,
+} from '../../../grading/manifestVerification.js';
 import type { AssertionResult, Grader } from '../../../types.js';
 import { HN_TOP_STORY_COUNT, type HackerNewsOracle } from '../oracle/hackerNewsClient.js';
 
@@ -175,7 +179,9 @@ function columnSetAssertion(header: string[]): AssertionResult {
   const problems = [
     missing.length > 0 ? `missing: ${missing.join(', ')}` : null,
     extra.length > 0 ? `extra: ${extra.join(', ')}` : null,
-    missing.length === 0 && extra.length === 0 && !rightCardinality ? 'duplicate column name(s)' : null,
+    missing.length === 0 && extra.length === 0 && !rightCardinality
+      ? 'duplicate column name(s)'
+      : null,
   ].filter((p): p is string => p !== null);
 
   return {

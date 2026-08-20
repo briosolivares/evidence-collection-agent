@@ -29,8 +29,7 @@ const DOWN = '\u001b[B';
 const ENTER = '\r';
 
 const PASSIVE_HINT = 'tab to browse artifacts';
-const FOCUSED_HINT =
-  '↑↓ select · enter details · space preview · o open · r reveal · esc done';
+const FOCUSED_HINT = '↑↓ select · enter details · space preview · o open · r reveal · esc done';
 
 const SHA = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
 const RUN_DIR = '/runs/2026-08-12_investigate';
@@ -68,12 +67,14 @@ function publishes(): StoreAction[] {
 }
 
 /** Fold a whole completed run; optionally focus the panel afterwards. */
-function completedState(options: {
-  finalText?: string;
-  focused?: boolean;
-  publishCount?: number;
-  helperProposal?: boolean;
-} = {}): SessionState {
+function completedState(
+  options: {
+    finalText?: string;
+    focused?: boolean;
+    publishCount?: number;
+    helperProposal?: boolean;
+  } = {},
+): SessionState {
   const publishedActions = publishes().slice(0, options.publishCount ?? 3);
   if (options.helperProposal === true) {
     publishedActions.push({
@@ -101,9 +102,7 @@ function completedState(options: {
       runDir: RUN_DIR,
       at: 42_000,
     },
-    ...(options.focused === true
-      ? [{ type: 'artifacts_focus' } satisfies StoreAction]
-      : []),
+    ...(options.focused === true ? [{ type: 'artifacts_focus' } satisfies StoreAction] : []),
   ];
   return actions.reduce(reduce, createInitialState());
 }
@@ -175,28 +174,30 @@ describe('ArtifactsPanel (passive)', () => {
   });
 
   it('renders an incomplete worker response, unresolved requirements, and surviving artifacts', async () => {
-    const state = ([
-      { type: 'run_started', task: 'investigate', at: 0 },
-      { type: 'run_dir', runDir: RUN_DIR },
-      { type: 'turn_start', turn: 1 },
-      ...publishes(),
-      {
-        type: 'run_finished',
-        outcome: 'incomplete',
-        finalText: 'I saved the public records that were available.',
-        unresolved: [
-          {
-            requirement: 'Include the account-only records',
-            reason: 'The site required a login that was not available.',
-            attempts: ['Opened the account page'],
-          },
-        ],
-        reason: 'worker_incomplete',
-        detail: 'internal diagnostic that should stay hidden',
-        runDir: RUN_DIR,
-        at: 42_000,
-      },
-    ] satisfies StoreAction[]).reduce(reduce, createInitialState());
+    const state = (
+      [
+        { type: 'run_started', task: 'investigate', at: 0 },
+        { type: 'run_dir', runDir: RUN_DIR },
+        { type: 'turn_start', turn: 1 },
+        ...publishes(),
+        {
+          type: 'run_finished',
+          outcome: 'incomplete',
+          finalText: 'I saved the public records that were available.',
+          unresolved: [
+            {
+              requirement: 'Include the account-only records',
+              reason: 'The site required a login that was not available.',
+              attempts: ['Opened the account page'],
+            },
+          ],
+          reason: 'worker_incomplete',
+          detail: 'internal diagnostic that should stay hidden',
+          runDir: RUN_DIR,
+          at: 42_000,
+        },
+      ] satisfies StoreAction[]
+    ).reduce(reduce, createInitialState());
 
     const { lastFrame, unmount } = render(<Harness initial={state} />);
     await tick();
@@ -216,11 +217,9 @@ describe('ArtifactsPanel (passive)', () => {
     const { lastFrame, unmount } = render(<Harness initial={completedState()} />);
     await tick();
     const frame = lastFrame() ?? '';
-    const positions = [
-      'artifacts/top5.csv',
-      'artifacts/page.png',
-      'artifacts/filing.png',
-    ].map((name) => frame.indexOf(name));
+    const positions = ['artifacts/top5.csv', 'artifacts/page.png', 'artifacts/filing.png'].map(
+      (name) => frame.indexOf(name),
+    );
     expect(positions.every((index) => index >= 0)).toBe(true);
     expect(positions).toEqual([...positions].sort((a, b) => a - b));
     unmount();
@@ -271,9 +270,7 @@ describe('ArtifactsPanel (passive)', () => {
 
   it('clamps a long answer to a few lines with a trailing ellipsis', async () => {
     const finalText = ['one', 'two', 'three', 'four', 'five'].join('\n');
-    const { lastFrame, unmount } = render(
-      <Harness initial={completedState({ finalText })} />,
-    );
+    const { lastFrame, unmount } = render(<Harness initial={completedState({ finalText })} />);
     await tick();
     const frame = lastFrame() ?? '';
     expect(frame).toContain('one');
@@ -375,11 +372,7 @@ describe('ArtifactsPanel (focused)', () => {
     });
     const log: UiAction[] = [];
     const { stdin, unmount } = render(
-      <Harness
-        initial={completedState({ focused: true })}
-        log={log}
-        preview={preview.action}
-      />,
+      <Harness initial={completedState({ focused: true })} log={log} preview={preview.action} />,
     );
     await tick();
     stdin.write(' ');
@@ -410,9 +403,7 @@ describe('ArtifactsPanel (artifacts-only, no summary)', () => {
   }
 
   it('renders the artifacts-only header over the rows — no answer block', async () => {
-    const { lastFrame, unmount } = render(
-      <Harness initial={cancelledFocusedState()} />,
-    );
+    const { lastFrame, unmount } = render(<Harness initial={cancelledFocusedState()} />);
     await tick();
     const frame = lastFrame() ?? '';
     expect(frame).toContain('Artifacts');
@@ -452,9 +443,7 @@ describe('ArtifactsPanel (artifacts-only, no summary)', () => {
   });
 
   it('the detail card folds its position into the single header line', async () => {
-    const { lastFrame, stdin, unmount } = render(
-      <Harness initial={cancelledFocusedState()} />,
-    );
+    const { lastFrame, stdin, unmount } = render(<Harness initial={cancelledFocusedState()} />);
     await tick();
     stdin.write(ENTER);
     await tick();
@@ -478,10 +467,7 @@ describe('ArtifactsPanel (artifacts-only, no summary)', () => {
   });
 
   it('renders with zero overflow at 44 columns', async () => {
-    const { lastFrame, unmount } = renderAt(
-      44,
-      <Harness initial={cancelledFocusedState()} />,
-    );
+    const { lastFrame, unmount } = renderAt(44, <Harness initial={cancelledFocusedState()} />);
     await tick();
     const frame = lastFrame();
     expect(frame).toContain('› ◆ artifacts/top5.csv');

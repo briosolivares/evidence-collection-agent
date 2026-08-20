@@ -46,9 +46,14 @@ describe('edgar grader', () => {
       sourceUrl: ORACLE.documentUrl,
       roles: ['requested_output', 'evidence'],
     });
-    writeArtifact(runDir, 'artifacts/filing-page.png', Buffer.concat([PNG_MAGIC_BYTES, Buffer.from('fakepixels')]), {
-      roles: ['requested_output', 'evidence'],
-    });
+    writeArtifact(
+      runDir,
+      'artifacts/filing-page.png',
+      Buffer.concat([PNG_MAGIC_BYTES, Buffer.from('fakepixels')]),
+      {
+        roles: ['requested_output', 'evidence'],
+      },
+    );
 
     const results = await grade(runDir, ORACLE);
 
@@ -62,15 +67,20 @@ describe('edgar grader', () => {
     writeArtifact(runDir, 'artifacts/wrong-doc.htm', Buffer.from('not the filing'), {
       roles: ['requested_output', 'evidence'],
     });
-    writeArtifact(runDir, 'artifacts/filing-page.png', Buffer.concat([PNG_MAGIC_BYTES, Buffer.from('fakepixels')]), {
-      roles: ['requested_output', 'evidence'],
-    });
+    writeArtifact(
+      runDir,
+      'artifacts/filing-page.png',
+      Buffer.concat([PNG_MAGIC_BYTES, Buffer.from('fakepixels')]),
+      {
+        roles: ['requested_output', 'evidence'],
+      },
+    );
 
     const results = await grade(runDir, ORACLE);
 
-    expect(byName(results, "downloaded document hash-matches the accession's document").passed).toBe(
-      false,
-    );
+    expect(
+      byName(results, "downloaded document hash-matches the accession's document").passed,
+    ).toBe(false);
     expect(byName(results, 'screenshot artifact exists with a manifest entry').passed).toBe(true);
   });
 
@@ -82,9 +92,9 @@ describe('edgar grader', () => {
 
     const results = await grade(runDir, ORACLE);
 
-    expect(byName(results, "downloaded document hash-matches the accession's document").passed).toBe(
-      true,
-    );
+    expect(
+      byName(results, "downloaded document hash-matches the accession's document").passed,
+    ).toBe(true);
     expect(byName(results, 'screenshot artifact exists with a manifest entry').passed).toBe(false);
   });
 
@@ -109,9 +119,14 @@ describe('edgar grader', () => {
       sourceUrl: ORACLE.documentUrl,
       roles: ['requested_output', 'evidence'],
     });
-    writeArtifact(runDir, 'artifacts/filing-page.png', Buffer.concat([PNG_MAGIC_BYTES, Buffer.from('fakepixels')]), {
-      roles: ['requested_output', 'evidence'],
-    });
+    writeArtifact(
+      runDir,
+      'artifacts/filing-page.png',
+      Buffer.concat([PNG_MAGIC_BYTES, Buffer.from('fakepixels')]),
+      {
+        roles: ['requested_output', 'evidence'],
+      },
+    );
     // Tamper behind the manifest's back: the manifest still records the
     // correct (matching) hash, so the document-match assertion — which
     // trusts the manifest's recorded hash — still passes; only the standing
@@ -121,9 +136,9 @@ describe('edgar grader', () => {
     const results = await grade(runDir, ORACLE);
 
     expect(byName(results, 'manifest hashes verify').passed).toBe(false);
-    expect(byName(results, "downloaded document hash-matches the accession's document").passed).toBe(
-      true,
-    );
+    expect(
+      byName(results, "downloaded document hash-matches the accession's document").passed,
+    ).toBe(true);
   });
 
   it('throws on malformed oracle data — a harness bug, not a failed trial', async () => {

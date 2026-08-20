@@ -137,9 +137,7 @@ function parseSuccess(content: string): BrowserExecuteResult {
   return JSON.parse(content) as BrowserExecuteResult;
 }
 
-function exited(
-  overrides: Partial<BrowserProgramResult> = {},
-): BrowserProgramResult {
+function exited(overrides: Partial<BrowserProgramResult> = {}): BrowserProgramResult {
   return {
     status: 'exited',
     durationMs: 25,
@@ -195,9 +193,7 @@ describe('browser_execute tool', () => {
       stderr: 'program warning\n',
       pages: [PAGE],
       pending_dialogs: [],
-      changed_files: [
-        { path: 'scratch/workspace/notes.txt', change: 'created' },
-      ],
+      changed_files: [{ path: 'scratch/workspace/notes.txt', change: 'created' }],
     });
     expect(received).toMatchObject({
       cwd: join(runDir, 'scratch/workspace'),
@@ -214,14 +210,7 @@ describe('browser_execute tool', () => {
       73,
       join(runDir, 'scratch/workspace/notes.txt'),
     );
-    expect(fake.events).toEqual([
-      'open',
-      'run',
-      'close',
-      'refresh',
-      'pages',
-      'dialogs',
-    ]);
+    expect(fake.events).toEqual(['open', 'run', 'close', 'refresh', 'pages', 'dialogs']);
     expect(JSON.stringify(result)).not.toContain('configured-secret');
     expect(JSON.stringify(result)).not.toContain('tracing-secret');
     expect(JSON.stringify(result)).not.toContain('secret.example');
@@ -233,10 +222,7 @@ describe('browser_execute tool', () => {
       writeFileSync(join(options.cwd, 'real.csv'), 'name\nAda\n');
       symlinkSync('real.csv', join(options.cwd, 'linked.csv'));
       writeFileSync(join(options.cwd, 'oversized.bin'), '');
-      truncateSync(
-        join(options.cwd, 'oversized.bin'),
-        BROWSER_UPLOAD_MAX_FILE_BYTES + 1,
-      );
+      truncateSync(join(options.cwd, 'oversized.bin'), BROWSER_UPLOAD_MAX_FILE_BYTES + 1);
       const failures: string[] = [];
       for (const path of ['../outside.csv', 'linked.csv', 'oversized.bin']) {
         try {
@@ -291,9 +277,7 @@ describe('browser_execute tool', () => {
       },
       fake.browser,
       {
-        code:
-          `return browser.cdp('Runtime.evaluate', ` +
-          `{ expression: 'document.cookie' });`,
+        code: `return browser.cdp('Runtime.evaluate', ` + `{ expression: 'document.cookie' });`,
       },
       { abortSignal: abortController.signal, busyRegistry },
     );
@@ -302,9 +286,7 @@ describe('browser_execute tool', () => {
       toolCallId: 'browser-program-1',
       isError: true,
       errorKind: 'execution_error',
-      content:
-        `Tool "browser_execute" failed: ` +
-        BROWSER_EXECUTE_POLICY_DENIED_MESSAGE,
+      content: `Tool "browser_execute" failed: ` + BROWSER_EXECUTE_POLICY_DENIED_MESSAGE,
     });
     expect(existsSync(join(runDir, 'scratch/workspace'))).toBe(false);
     expect(busyRegistry.waitUntilFree).toHaveBeenCalledWith(
@@ -357,18 +339,14 @@ describe('browser_execute tool', () => {
       refreshError: new Error(
         'refresh failed at http://127.0.0.1:9222/devtools/browser/refresh-secret',
       ),
-      pagesError: new Error(
-        'list failed at https://api.browserbase.com/v1/sessions/page-secret',
-      ),
+      pagesError: new Error('list failed at https://api.browserbase.com/v1/sessions/page-secret'),
       dialogsError: new Error(
         'dialogs failed at wss://private.example/devtools/page/dialog-secret',
       ),
     });
     const runProgram = vi.fn(async () => {
       fake.events.push('run');
-      throw new Error(
-        'spawn failed at wss://private.example/devtools/browser/primary-secret',
-      );
+      throw new Error('spawn failed at wss://private.example/devtools/browser/primary-secret');
     });
 
     const result = await callTool(
@@ -387,14 +365,7 @@ describe('browser_execute tool', () => {
     expect(result.content).not.toContain('refresh-secret');
     expect(result.content).not.toContain('page-secret');
     expect(result.content).not.toContain('dialog-secret');
-    expect(fake.events).toEqual([
-      'open',
-      'run',
-      'close',
-      'refresh',
-      'pages',
-      'dialogs',
-    ]);
+    expect(fake.events).toEqual(['open', 'run', 'close', 'refresh', 'pages', 'dialogs']);
   });
 
   it('does not create a workspace, open a session, or spawn when already cancelled', async () => {

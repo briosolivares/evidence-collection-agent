@@ -54,9 +54,7 @@ export const bashInputSchema = z.strictObject({
     .refine((value) => value.trim().length > 0, {
       message: 'command must contain at least one non-whitespace character',
     })
-    .describe(
-      "Command run as `/bin/bash -c <command>` in this run's scratch/workspace directory.",
-    ),
+    .describe("Command run as `/bin/bash -c <command>` in this run's scratch/workspace directory."),
   timeout_ms: z
     .number()
     .int()
@@ -81,9 +79,7 @@ export interface BashResult {
   changed_files: ScratchWorkspaceChangedFile[];
 }
 
-type RunCommand = (
-  options: ForegroundCommandOptions,
-) => Promise<ForegroundCommandResult>;
+type RunCommand = (options: ForegroundCommandOptions) => Promise<ForegroundCommandResult>;
 
 export interface BashToolDeps {
   /** Exact names or prefixes removed from the child environment. */
@@ -138,10 +134,7 @@ async function executeBash(
     );
   }
 
-  const workspaceDir = resolveRunPath(
-    ctx.runDir,
-    `${SCRATCH_DIR}/workspace`,
-  );
+  const workspaceDir = resolveRunPath(ctx.runDir, `${SCRATCH_DIR}/workspace`);
   mkdirSync(workspaceDir, { recursive: true, mode: 0o700 });
 
   let commandResult: ForegroundCommandResult | undefined;
@@ -151,10 +144,7 @@ async function executeBash(
       shellPath: SHELL_PATH,
       command: input.command,
       cwd: workspaceDir,
-      env: buildChildEnvironment(
-        deps.environment(),
-        deps.secretEnvDenylist,
-      ),
+      env: buildChildEnvironment(deps.environment(), deps.secretEnvDenylist),
       timeoutMs: input.timeout_ms ?? DEFAULT_BASH_TIMEOUT_MS,
       maxOutputBytes: BASH_MAX_OUTPUT_BYTES,
       abortSignal: ctx.abortSignal,
@@ -173,9 +163,7 @@ async function executeBash(
 
   if (executionError !== undefined) {
     const cleanup =
-      syncError === undefined
-        ? ''
-        : ` (workspace sync also failed: ${safeMessage(syncError)})`;
+      syncError === undefined ? '' : ` (workspace sync also failed: ${safeMessage(syncError)})`;
     throw new Error(`bash failed to start or run: ${safeMessage(executionError)}${cleanup}`);
   }
 
@@ -225,11 +213,7 @@ function buildChildEnvironment(
       BROWSER_CAPABILITY_ENV_PREFIXES.some((prefix) => key.startsWith(prefix)) ||
       (value !== undefined && CDP_CAPABILITY_VALUE.test(value));
 
-    if (
-      deniedSecret ||
-      browserCapability ||
-      SHELL_STARTUP_HOOK_ENV_KEYS.has(key)
-    ) {
+    if (deniedSecret || browserCapability || SHELL_STARTUP_HOOK_ENV_KEYS.has(key)) {
       delete env[key];
     }
   }

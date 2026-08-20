@@ -1,14 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import type { Message } from '../../src/model/messages.js';
-import {
-  ModelGenerationFailedError,
-  type ModelDriver,
-} from '../../src/model/modelDriver.js';
-import {
-  RoleBudgetExceededError,
-  createRunBudgetTracker,
-} from '../../src/run/runBudget.js';
+import { ModelGenerationFailedError, type ModelDriver } from '../../src/model/modelDriver.js';
+import { RoleBudgetExceededError, createRunBudgetTracker } from '../../src/run/runBudget.js';
 import { createRunDeadline } from '../../src/run/runDeadline.js';
 import { createBudgetedCallModel } from '../../src/model/budgetedCall.js';
 
@@ -57,10 +51,10 @@ describe('createBudgetedCallModel', () => {
 
   it('charges a fatal call carrying known usage before preserving the failure', async () => {
     const tracker = budget();
-    const failure = new ModelGenerationFailedError(
-      new Error('replacement failed'),
-      { input_tokens: 8, output_tokens: 3 },
-    );
+    const failure = new ModelGenerationFailedError(new Error('replacement failed'), {
+      input_tokens: 8,
+      output_tokens: 3,
+    });
     const model: ModelDriver = {
       generate: vi.fn(async () => {
         throw failure;
@@ -146,9 +140,7 @@ describe('createBudgetedCallModel', () => {
       role: 'verifier',
     });
 
-    await expect(call(messages)).rejects.toBeInstanceOf(
-      RoleBudgetExceededError,
-    );
+    await expect(call(messages)).rejects.toBeInstanceOf(RoleBudgetExceededError);
     expect(tracker.totalModelTokens()).toBe(6);
   });
 
@@ -249,18 +241,20 @@ describe('createBudgetedCallModel', () => {
     });
     const deadline = createRunDeadline(tracker);
     const accounting = vi.fn(async () => undefined);
-    const failure = new ModelGenerationFailedError(
-      new Error('provider stopped at deadline'),
-      { input_tokens: 7, output_tokens: 2 },
-    );
+    const failure = new ModelGenerationFailedError(new Error('provider stopped at deadline'), {
+      input_tokens: 7,
+      output_tokens: 2,
+    });
     const call = createBudgetedCallModel({
       model: {
-        generate: vi.fn(async (options) =>
-          new Promise<never>((_resolve, reject) => {
-            options.signal?.addEventListener('abort', () => reject(failure), {
-              once: true,
-            });
-          })),
+        generate: vi.fn(
+          async (options) =>
+            new Promise<never>((_resolve, reject) => {
+              options.signal?.addEventListener('abort', () => reject(failure), {
+                once: true,
+              });
+            }),
+        ),
       },
       budget: tracker,
       role: 'verifier',

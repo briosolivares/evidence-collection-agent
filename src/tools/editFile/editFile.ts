@@ -13,17 +13,13 @@ import {
 export const editFileInputSchema = z.strictObject({
   file_path: z
     .string()
-    .describe(
-      'Path to an existing UTF-8 text file under scratch/, relative to the run directory',
-    ),
+    .describe('Path to an existing UTF-8 text file under scratch/, relative to the run directory'),
   old_string: z
     .string()
     .describe(
       'Exact non-empty text to replace. It must occur exactly once unless replace_all is true',
     ),
-  new_string: z
-    .string()
-    .describe('Exact replacement text, inserted verbatim'),
+  new_string: z.string().describe('Exact replacement text, inserted verbatim'),
   replace_all: z
     .boolean()
     .optional()
@@ -53,11 +49,7 @@ export const editFileTool: ToolDef<EditFileInput> = {
   execute(input, ctx): EditFileResult {
     assertNotAborted(ctx.abortSignal, 'edit_file');
     const target = resolveWorkerFile(ctx.runDir, input.file_path, 'write');
-    const original = readRegularFileNoFollow(
-      target.absolutePath,
-      input.file_path,
-      'edit_file',
-    );
+    const original = readRegularFileNoFollow(target.absolutePath, input.file_path, 'edit_file');
     const text = decodeEditableUtf8(original, input.file_path);
 
     if (input.old_string === '') {

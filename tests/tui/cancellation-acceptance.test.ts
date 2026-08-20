@@ -1,11 +1,5 @@
 import { createHash } from 'node:crypto';
-import {
-  existsSync,
-  mkdtempSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-} from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 
@@ -17,21 +11,14 @@ import type { CallModel, ModelResponse } from '../../src/model/messages.js';
 import { readManifest } from '../../src/run/artifacts.js';
 import type { RunTracing } from '../../src/tracing/runTracing.js';
 import { createTuiRuntime } from '../../src/tui/bridge/runtime.js';
-import {
-  startRun,
-  type RunHandle,
-  type RunSessionDeps,
-} from '../../src/tui/bridge/runSession.js';
+import { startRun, type RunHandle, type RunSessionDeps } from '../../src/tui/bridge/runSession.js';
 import type { UiEvent } from '../../src/tui/store/state.js';
 import {
   HARNESS_DIR,
   RUN_CHECKPOINT_FILENAME,
   RUN_LOCK_FILENAME,
 } from '../../src/agent/checkpoint.js';
-import {
-  scriptedResponse,
-  scriptedStreamFactory,
-} from './streamFixtures.js';
+import { scriptedResponse, scriptedStreamFactory } from './streamFixtures.js';
 
 const BROWSER_CANCELLATION_TASK =
   'Exercise browser cancellation without publishing the requested output.';
@@ -42,8 +29,7 @@ const RECOVERY_TASK =
 
 const PARTIAL_BROWSER_BYTES = 'browser prefix written before cancellation\n';
 const PARTIAL_BASH_BYTES = 'bash prefix written before cancellation\n';
-const SUCCESS_DOCUMENT =
-  '# Recovered\n\nThe reused TUI browser session returned 42.\n';
+const SUCCESS_DOCUMENT = '# Recovered\n\nThe reused TUI browser session returned 42.\n';
 const RUN_TIMEOUT_MS = 20_000;
 const MARKER_TIMEOUT_MS = 15_000;
 
@@ -239,8 +225,7 @@ function noopTracing(): RunTracing {
 
 function runDirFrom(events: readonly UiEvent[]): string | undefined {
   return events.find(
-    (event): event is Extract<UiEvent, { type: 'run_dir' }> =>
-      event.type === 'run_dir',
+    (event): event is Extract<UiEvent, { type: 'run_dir' }> => event.type === 'run_dir',
   )?.runDir;
 }
 
@@ -275,10 +260,7 @@ function processIsLive(pid: number): boolean {
   }
 }
 
-async function expectProcessesGone(
-  pids: readonly number[],
-  description: string,
-): Promise<void> {
+async function expectProcessesGone(pids: readonly number[], description: string): Promise<void> {
   await waitForValue(
     () => (pids.every((pid) => !processIsLive(pid)) ? true : undefined),
     `${description} process tree to exit`,
@@ -318,32 +300,23 @@ function expectWorkspaceFullyManifested(runDir: string): void {
   expect(entries.map((entry) => entry.filename)).toEqual(files);
   for (const entry of entries) {
     const bytes = readFileSync(join(runDir, entry.filename));
-    expect(entry.sha256).toBe(
-      createHash('sha256').update(bytes).digest('hex'),
-    );
+    expect(entry.sha256).toBe(createHash('sha256').update(bytes).digest('hex'));
     expect(entry.roles).toBeUndefined();
   }
   expect(manifest.finishedAt).toEqual(expect.any(String));
 }
 
 function expectCancelledRunFinalized(runDir: string): void {
+  expect(existsSync(join(runDir, HARNESS_DIR, RUN_LOCK_FILENAME))).toBe(false);
   expect(
-    existsSync(join(runDir, HARNESS_DIR, RUN_LOCK_FILENAME)),
-  ).toBe(false);
-  expect(
-    JSON.parse(
-      readFileSync(
-        join(runDir, HARNESS_DIR, RUN_CHECKPOINT_FILENAME),
-        'utf8',
-      ),
-    ),
+    JSON.parse(readFileSync(join(runDir, HARNESS_DIR, RUN_CHECKPOINT_FILENAME), 'utf8')),
   ).toMatchObject({
     phase: 'terminal',
     outcome: { status: 'cancelled' },
   });
-  expect(
-    JSON.parse(readFileSync(join(runDir, 'metrics.json'), 'utf8')),
-  ).toMatchObject({ status: 'cancelled' });
+  expect(JSON.parse(readFileSync(join(runDir, 'metrics.json'), 'utf8'))).toMatchObject({
+    status: 'cancelled',
+  });
   expectWorkspaceFullyManifested(runDir);
 }
 
@@ -351,12 +324,8 @@ describe('Sherlock cancellation acceptance', () => {
   it.skipIf(process.platform === 'win32')(
     'contains real browser and Bash process trees, finalizes their runs, and reuses the TUI session',
     async () => {
-      const runsBaseDir = mkdtempSync(
-        join(tmpdir(), 'sherlock-cancellation-runs-'),
-      );
-      const profileDir = mkdtempSync(
-        join(tmpdir(), 'sherlock-cancellation-chrome-'),
-      );
+      const runsBaseDir = mkdtempSync(join(tmpdir(), 'sherlock-cancellation-runs-'));
+      const profileDir = mkdtempSync(join(tmpdir(), 'sherlock-cancellation-chrome-'));
       const managedProvider = new LocalChromeBrowserSessionProvider({
         profileDir,
         headless: true,
@@ -372,14 +341,8 @@ describe('Sherlock cancellation acceptance', () => {
           BROWSER_CANCELLATION_TASK,
           scriptedStreamFactory([browserCancellationResponse()]).createStream,
         ],
-        [
-          BASH_CANCELLATION_TASK,
-          scriptedStreamFactory([bashCancellationResponse()]).createStream,
-        ],
-        [
-          RECOVERY_TASK,
-          scriptedStreamFactory(recoveryResponses()).createStream,
-        ],
+        [BASH_CANCELLATION_TASK, scriptedStreamFactory([bashCancellationResponse()]).createStream],
+        [RECOVERY_TASK, scriptedStreamFactory(recoveryResponses()).createStream],
       ]);
       const runtime = createTuiRuntime({
         browserSessionProvider: { createSession },
@@ -406,9 +369,8 @@ describe('Sherlock cancellation acceptance', () => {
       await runtime.start();
       try {
         const browserEvents: UiEvent[] = [];
-        const browserHandle = runtime.startRun(
-          BROWSER_CANCELLATION_TASK,
-          (event) => browserEvents.push(event),
+        const browserHandle = runtime.startRun(BROWSER_CANCELLATION_TASK, (event) =>
+          browserEvents.push(event),
         );
         handles.push(browserHandle);
         const browserRunDir = await waitForValue(
@@ -416,20 +378,12 @@ describe('Sherlock cancellation acceptance', () => {
           'the browser-cancellation run directory',
         );
         const browserPids = await waitForValue(() => {
-          const child = readPid(
-            join(browserRunDir, 'scratch/workspace/browser-child.pid'),
-          );
+          const child = readPid(join(browserRunDir, 'scratch/workspace/browser-child.pid'));
           const descendant = readPid(
             join(browserRunDir, 'scratch/workspace/browser-descendant.pid'),
           );
-          const pageMarker = join(
-            browserRunDir,
-            'scratch/workspace/browser-owned-page.json',
-          );
-          const partial = join(
-            browserRunDir,
-            'scratch/workspace/browser-partial.txt',
-          );
+          const pageMarker = join(browserRunDir, 'scratch/workspace/browser-owned-page.json');
+          const partial = join(browserRunDir, 'scratch/workspace/browser-partial.txt');
           if (
             child === undefined ||
             descendant === undefined ||
@@ -443,41 +397,31 @@ describe('Sherlock cancellation acceptance', () => {
 
         expect(browserPids.child).not.toBe(process.pid);
         expect(browserPids.descendant).not.toBe(browserPids.child);
-        expect(
-          JSON.parse(readFileSync(browserPids.pageMarker, 'utf8')),
-        ).toMatchObject({
+        expect(JSON.parse(readFileSync(browserPids.pageMarker, 'utf8'))).toMatchObject({
           targetId: expect.any(String),
           url: 'about:blank#cancel-owned',
         });
         expect(
           browserEvents.some(
-            (event) =>
-              event.type === 'tool_exec_start' &&
-              event.name === 'browser_execute',
+            (event) => event.type === 'tool_exec_start' && event.name === 'browser_execute',
           ),
         ).toBe(true);
         const sessionBrowser = browser;
         if (sessionBrowser === undefined) {
           throw new Error('managed browser did not start');
         }
-        expect(
-          (await sessionBrowser.pages()).map((page) => page.url).sort(),
-        ).toEqual(['about:blank', 'about:blank#cancel-owned'].sort());
+        expect((await sessionBrowser.pages()).map((page) => page.url).sort()).toEqual(
+          ['about:blank', 'about:blank#cancel-owned'].sort(),
+        );
 
         browserHandle.cancel();
         await expect(browserHandle.done).resolves.toEqual({
           status: 'cancelled',
         });
-        await expectProcessesGone(
-          [browserPids.child, browserPids.descendant],
-          'browser_execute',
-        );
+        await expectProcessesGone([browserPids.child, browserPids.descendant], 'browser_execute');
         expectCancelledRunFinalized(browserRunDir);
         expect(
-          readFileSync(
-            join(browserRunDir, 'scratch/workspace/browser-partial.txt'),
-            'utf8',
-          ),
+          readFileSync(join(browserRunDir, 'scratch/workspace/browser-partial.txt'), 'utf8'),
         ).toBe(PARTIAL_BROWSER_BYTES);
         expect(browserEvents.at(-1)).toMatchObject({
           type: 'run_cancelled',
@@ -485,9 +429,8 @@ describe('Sherlock cancellation acceptance', () => {
         expect(await sessionBrowser.pages()).toEqual([]);
 
         const bashEvents: UiEvent[] = [];
-        const bashHandle = runtime.startRun(
-          BASH_CANCELLATION_TASK,
-          (event) => bashEvents.push(event),
+        const bashHandle = runtime.startRun(BASH_CANCELLATION_TASK, (event) =>
+          bashEvents.push(event),
         );
         handles.push(bashHandle);
         const bashRunDir = await waitForValue(
@@ -495,21 +438,10 @@ describe('Sherlock cancellation acceptance', () => {
           'the Bash-cancellation run directory',
         );
         const bashPids = await waitForValue(() => {
-          const child = readPid(
-            join(bashRunDir, 'scratch/workspace/bash-child.pid'),
-          );
-          const descendant = readPid(
-            join(bashRunDir, 'scratch/workspace/bash-descendant.pid'),
-          );
-          const partial = join(
-            bashRunDir,
-            'scratch/workspace/bash-partial.txt',
-          );
-          if (
-            child === undefined ||
-            descendant === undefined ||
-            !existsSync(partial)
-          ) {
+          const child = readPid(join(bashRunDir, 'scratch/workspace/bash-child.pid'));
+          const descendant = readPid(join(bashRunDir, 'scratch/workspace/bash-descendant.pid'));
+          const partial = join(bashRunDir, 'scratch/workspace/bash-partial.txt');
+          if (child === undefined || descendant === undefined || !existsSync(partial)) {
             return undefined;
           }
           return { child, descendant };
@@ -518,53 +450,37 @@ describe('Sherlock cancellation acceptance', () => {
         expect(bashPids.child).not.toBe(process.pid);
         expect(bashPids.descendant).not.toBe(bashPids.child);
         expect(
-          bashEvents.some(
-            (event) =>
-              event.type === 'tool_exec_start' && event.name === 'bash',
-          ),
+          bashEvents.some((event) => event.type === 'tool_exec_start' && event.name === 'bash'),
         ).toBe(true);
 
         bashHandle.cancel();
         await expect(bashHandle.done).resolves.toEqual({
           status: 'cancelled',
         });
-        await expectProcessesGone(
-          [bashPids.child, bashPids.descendant],
-          'Bash',
-        );
+        await expectProcessesGone([bashPids.child, bashPids.descendant], 'Bash');
         expectCancelledRunFinalized(bashRunDir);
-        expect(
-          readFileSync(
-            join(bashRunDir, 'scratch/workspace/bash-partial.txt'),
-            'utf8',
-          ),
-        ).toBe(PARTIAL_BASH_BYTES);
+        expect(readFileSync(join(bashRunDir, 'scratch/workspace/bash-partial.txt'), 'utf8')).toBe(
+          PARTIAL_BASH_BYTES,
+        );
         expect(bashEvents.at(-1)).toMatchObject({ type: 'run_cancelled' });
         expect(await sessionBrowser.pages()).toEqual([]);
 
         const recoveryEvents: UiEvent[] = [];
-        const recoveryHandle = runtime.startRun(
-          RECOVERY_TASK,
-          (event) => recoveryEvents.push(event),
+        const recoveryHandle = runtime.startRun(RECOVERY_TASK, (event) =>
+          recoveryEvents.push(event),
         );
         handles.push(recoveryHandle);
         const recoveryOutcome = await recoveryHandle.done;
-        expect(
-          recoveryOutcome.status,
-          JSON.stringify(recoveryOutcome),
-        ).toBe('verified');
+        expect(recoveryOutcome.status, JSON.stringify(recoveryOutcome)).toBe('verified');
         if (recoveryOutcome.status !== 'verified') {
           throw new Error('recovery task did not verify');
         }
         expect(recoveryOutcome.finalText).toBe(
           'The same TUI browser session completed a later task.',
         );
-        expect(
-          readFileSync(
-            join(recoveryOutcome.runDir, 'artifacts/success.md'),
-            'utf8',
-          ),
-        ).toBe(SUCCESS_DOCUMENT);
+        expect(readFileSync(join(recoveryOutcome.runDir, 'artifacts/success.md'), 'utf8')).toBe(
+          SUCCESS_DOCUMENT,
+        );
         const recoveredBrowserResult = recoveryEvents.find(
           (event) =>
             event.type === 'tool_exec_end' &&
@@ -581,15 +497,9 @@ describe('Sherlock cancellation acceptance', () => {
             value: { answer: 42 },
           },
         });
-        expect(
-          existsSync(
-            join(
-              recoveryOutcome.runDir,
-              HARNESS_DIR,
-              RUN_LOCK_FILENAME,
-            ),
-          ),
-        ).toBe(false);
+        expect(existsSync(join(recoveryOutcome.runDir, HARNESS_DIR, RUN_LOCK_FILENAME))).toBe(
+          false,
+        );
         expect(await sessionBrowser.pages()).toEqual([]);
         expect(browser).toBe(sessionBrowser);
         expect(createSession).toHaveBeenCalledTimes(1);

@@ -56,14 +56,12 @@ describe('tool registry', () => {
   });
 
   it('serializes every real schema as a strict top-level object', () => {
-    expect(WORKER_API_TOOL_DEFS.map((definition) => definition.name)).toEqual(
-      exactOrder,
-    );
+    expect(WORKER_API_TOOL_DEFS.map((definition) => definition.name)).toEqual(exactOrder);
     for (const definition of WORKER_API_TOOL_DEFS) {
-      expect(
-        definition.input_schema,
-        `tool ${JSON.stringify(definition.name)}`,
-      ).toMatchObject({ type: 'object', additionalProperties: false });
+      expect(definition.input_schema, `tool ${JSON.stringify(definition.name)}`).toMatchObject({
+        type: 'object',
+        additionalProperties: false,
+      });
       expect(definition.input_schema).not.toHaveProperty('anyOf');
       expect(definition.input_schema).not.toHaveProperty('oneOf');
     }
@@ -71,9 +69,7 @@ describe('tool registry', () => {
     expect(WORKER_API_TOOL_DEFS[0]?.description).toContain(
       'small multi-line browser program, not a single browser action',
     );
-    expect(JSON.stringify(WORKER_API_TOOL_DEFS[0]?.input_schema)).toContain(
-      'items.slice(0, 20)',
-    );
+    expect(JSON.stringify(WORKER_API_TOOL_DEFS[0]?.input_schema)).toContain('items.slice(0, 20)');
   });
 
   it('produces byte-identical API definitions across policies, runs, and denylists', () => {
@@ -104,9 +100,7 @@ describe('tool registry', () => {
       createWorkerToolRegistry({
         secretEnvDenylist: [],
       }),
-    ).toThrow(
-      'browser_execute requires an explicit javascriptPolicy of "allow" or "deny".',
-    );
+    ).toThrow('browser_execute requires an explicit javascriptPolicy of "allow" or "deny".');
   });
 
   it('deep-freezes the shared process-wide API definitions', () => {

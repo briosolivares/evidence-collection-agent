@@ -1,10 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { createRunBudgetTracker } from '../../src/run/runBudget.js';
-import {
-  createRunDeadline,
-  raceWithRunSignal,
-} from '../../src/run/runDeadline.js';
+import { createRunDeadline, raceWithRunSignal } from '../../src/run/runDeadline.js';
 
 function budget(maxWallTimeMs: number) {
   return createRunBudgetTracker({
@@ -21,10 +18,7 @@ describe('whole-run deadline', () => {
     const deadline = createRunDeadline(budget(10));
     try {
       await expect(
-        raceWithRunSignal(
-          () => new Promise<never>(() => undefined),
-          deadline.signal,
-        ),
+        raceWithRunSignal(() => new Promise<never>(() => undefined), deadline.signal),
       ).rejects.toMatchObject({
         name: 'RoleBudgetExceededError',
         limit: 'wall_time',

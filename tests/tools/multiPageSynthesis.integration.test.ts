@@ -1,9 +1,5 @@
 import { createHash } from 'node:crypto';
-import {
-  copyFileSync,
-  mkdirSync,
-  readFileSync,
-} from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -20,14 +16,8 @@ import {
 } from '../../src/browser/playwrightBrowserController.js';
 import { initManifest, readManifest } from '../../src/run/artifacts.js';
 import { executeToolCall } from '../../src/tools/pipeline.js';
-import {
-  createBusyResourceRegistry,
-  createRegistry,
-} from '../../src/tools/registry.js';
-import {
-  startFixtureServer,
-  type FixtureServer,
-} from '../fixtures/server.js';
+import { createBusyResourceRegistry, createRegistry } from '../../src/tools/registry.js';
+import { startFixtureServer, type FixtureServer } from '../fixtures/server.js';
 import {
   createBrowserExecuteTool,
   type BrowserExecuteResult,
@@ -72,9 +62,8 @@ describe('Sherlock multi-page synthesis acceptance', () => {
           )}`,
         );
         const userCommandSession = await context.newCDPSession(userPage);
-        const ambientTargetId = (
-          await userCommandSession.send('Target.getTargetInfo')
-        ).targetInfo.targetId;
+        const ambientTargetId = (await userCommandSession.send('Target.getTargetInfo')).targetInfo
+          .targetId;
         await userCommandSession.detach();
         const preexistingPages = [...context.pages()];
         const targetControl = await createChromiumTargetControl({
@@ -103,10 +92,7 @@ describe('Sherlock multi-page synthesis acceptance', () => {
           javascriptPolicy: 'allow',
           secretEnvDenylist: [],
         });
-        const registry = createRegistry([
-          browserExecuteTool,
-          publishArtifactTool,
-        ]);
+        const registry = createRegistry([browserExecuteTool, publishArtifactTool]);
         const toolContext = { runDir, browser: controller };
 
         const mainExecution = await executeToolCall(
@@ -136,9 +122,7 @@ describe('Sherlock multi-page synthesis acceptance', () => {
           toolContext,
         );
         expect(mainExecution.isError, mainExecution.content).toBe(false);
-        const mainResult = JSON.parse(
-          mainExecution.content,
-        ) as BrowserExecuteResult;
+        const mainResult = JSON.parse(mainExecution.content) as BrowserExecuteResult;
         expect(mainResult).toMatchObject({
           status: 'exited',
           value: {
@@ -155,9 +139,7 @@ describe('Sherlock multi-page synthesis acceptance', () => {
             ambientCloseError: expect.stringMatching(/outside this run/i),
           },
         });
-        expect(
-          (mainResult.value as { inventory: unknown[] }).inventory,
-        ).toHaveLength(2);
+        expect((mainResult.value as { inventory: unknown[] }).inventory).toHaveLength(2);
         expect(JSON.stringify(mainResult.value)).not.toContain('User workspace');
         expect(JSON.stringify(mainResult.value)).not.toContain('user-marker');
         expect(mainResult.pages).toHaveLength(2);
@@ -184,9 +166,7 @@ describe('Sherlock multi-page synthesis acceptance', () => {
           toolContext,
         );
         expect(secondExecution.isError, secondExecution.content).toBe(false);
-        const secondResult = JSON.parse(
-          secondExecution.content,
-        ) as BrowserExecuteResult;
+        const secondResult = JSON.parse(secondExecution.content) as BrowserExecuteResult;
         expect(secondResult).toMatchObject({
           status: 'exited',
           value: {
@@ -214,11 +194,9 @@ describe('Sherlock multi-page synthesis acceptance', () => {
             url: popupUrl,
           },
         ];
-        expect(
-          JSON.parse(
-            readFileSync(join(workspace, 'synthesis-facts.json'), 'utf8'),
-          ),
-        ).toEqual(expectedFacts);
+        expect(JSON.parse(readFileSync(join(workspace, 'synthesis-facts.json'), 'utf8'))).toEqual(
+          expectedFacts,
+        );
 
         const published = await executeToolCall(
           registry,
@@ -253,10 +231,7 @@ describe('Sherlock multi-page synthesis acceptance', () => {
           '',
           '',
         ].join('\n');
-        const artifactPath = join(
-          runDir,
-          'artifacts/multi-page-synthesis.md',
-        );
+        const artifactPath = join(runDir, 'artifacts/multi-page-synthesis.md');
         const artifactBytes = readFileSync(artifactPath);
         expect(artifactBytes.toString('utf8')).toBe(expectedDocument);
 
@@ -266,16 +241,12 @@ describe('Sherlock multi-page synthesis acceptance', () => {
         expect(requestedOutputs).toEqual([
           expect.objectContaining({
             filename: 'artifacts/multi-page-synthesis.md',
-            sha256: createHash('sha256')
-              .update(artifactBytes)
-              .digest('hex'),
+            sha256: createHash('sha256').update(artifactBytes).digest('hex'),
             roles: ['requested_output'],
           }),
         ]);
 
-        const runOwnedPages = context.pages().filter(
-          (page) => !preexistingPages.includes(page),
-        );
+        const runOwnedPages = context.pages().filter((page) => !preexistingPages.includes(page));
         expect(runOwnedPages).toHaveLength(2);
         await controller.closeTaskPages();
 
@@ -284,9 +255,7 @@ describe('Sherlock multi-page synthesis acceptance', () => {
         for (const page of preexistingPages) expect(page.isClosed()).toBe(false);
         expect(context.pages()).toEqual(preexistingPages);
         expect(await userPage.title()).toBe('User workspace');
-        expect(await userPage.locator('#user-marker').textContent()).toBe(
-          'Leave me open',
-        );
+        expect(await userPage.locator('#user-marker').textContent()).toBe('Leave me open');
       } finally {
         await controller?.closeTaskPages().catch(() => undefined);
         if (controller !== undefined) {

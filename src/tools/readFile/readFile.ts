@@ -3,11 +3,7 @@ import { z } from 'zod';
 import { detectContentFormat, splitLines } from '../contentReader.js';
 import type { ToolDef } from '../registry.js';
 import { accessKey } from '../registry.js';
-import {
-  assertNotAborted,
-  readRegularFileNoFollow,
-  resolveWorkerFile,
-} from '../fileAccess.js';
+import { assertNotAborted, readRegularFileNoFollow, resolveWorkerFile } from '../fileAccess.js';
 
 const LINE_NUMBER_PAD = 6;
 
@@ -23,12 +19,7 @@ export const readFileInputSchema = z.strictObject({
     .min(1)
     .optional()
     .describe('The 1-based line number to start reading from'),
-  limit: z
-    .number()
-    .int()
-    .min(1)
-    .optional()
-    .describe('The maximum number of lines to return'),
+  limit: z.number().int().min(1).optional().describe('The maximum number of lines to return'),
 });
 
 export type ReadFileInput = z.infer<typeof readFileInputSchema>;
@@ -48,11 +39,7 @@ export const readFileTool: ToolDef<ReadFileInput> = {
   execute(input, ctx) {
     assertNotAborted(ctx.abortSignal, 'read_file');
     const target = resolveWorkerFile(ctx.runDir, input.file_path, 'read');
-    const bytes = readRegularFileNoFollow(
-      target.absolutePath,
-      input.file_path,
-      'read_file',
-    );
+    const bytes = readRegularFileNoFollow(target.absolutePath, input.file_path, 'read_file');
     const content = decodeReadableUtf8(bytes, input.file_path);
     if (content === '') {
       return 'Warning: the file exists but the contents are empty.';
@@ -70,10 +57,7 @@ export const readFileTool: ToolDef<ReadFileInput> = {
     const end = input.limit === undefined ? undefined : offset - 1 + input.limit;
     return lines
       .slice(offset - 1, end)
-      .map(
-        (line, index) =>
-          `${String(offset + index).padStart(LINE_NUMBER_PAD, ' ')}→${line}`,
-      )
+      .map((line, index) => `${String(offset + index).padStart(LINE_NUMBER_PAD, ' ')}→${line}`)
       .join('\n');
   },
 };
@@ -90,8 +74,6 @@ function decodeReadableUtf8(bytes: Buffer, filePath: string): string {
   try {
     return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
   } catch {
-    throw new Error(
-      `${filePath} is not valid UTF-8 text. read_file reads text files only.`,
-    );
+    throw new Error(`${filePath} is not valid UTF-8 text. read_file reads text files only.`);
   }
 }

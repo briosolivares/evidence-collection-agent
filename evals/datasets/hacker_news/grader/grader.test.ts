@@ -51,7 +51,8 @@ function writeCsvArtifact(csv: string): void {
 
 function byName(results: AssertionResult[], name: string): AssertionResult {
   const found = results.find((r) => r.name === name);
-  if (found === undefined) throw new Error(`no assertion named "${name}" in ${JSON.stringify(results)}`);
+  if (found === undefined)
+    throw new Error(`no assertion named "${name}" in ${JSON.stringify(results)}`);
   return found;
 }
 

@@ -19,11 +19,7 @@ import {
   durableFinishInputSchema,
   finishUnresolvedRequirementSchema,
 } from '../tools/finish/finish.js';
-import type {
-  FinishRequest,
-  PendingToolTurn,
-  WorkerSnapshot,
-} from './worker/worker.js';
+import type { FinishRequest, PendingToolTurn, WorkerSnapshot } from './worker/worker.js';
 
 // The durable checkpoint format: every Zod shape the coordinator persists to
 // and reads from harness/checkpoint.json, plus the types inferred from them.
@@ -45,10 +41,7 @@ const MAX_SAFE_DIAGNOSTIC_LENGTH = 16_000;
 const MAX_TASK_LENGTH = 1_000_000;
 
 type JsonPrimitive = string | number | boolean | null;
-export type CheckpointJson =
-  | JsonPrimitive
-  | CheckpointJson[]
-  | { [key: string]: CheckpointJson };
+export type CheckpointJson = JsonPrimitive | CheckpointJson[] | { [key: string]: CheckpointJson };
 
 const jsonValueSchema: z.ZodType<CheckpointJson> = z.lazy(() =>
   z.union([
@@ -61,12 +54,10 @@ const jsonValueSchema: z.ZodType<CheckpointJson> = z.lazy(() =>
   ]),
 );
 
-const isoTimestampSchema = z
-  .string()
-  .refine((value) => {
-    const timestamp = Date.parse(value);
-    return !Number.isNaN(timestamp) && new Date(timestamp).toISOString() === value;
-  }, 'must be a canonical ISO 8601 timestamp');
+const isoTimestampSchema = z.string().refine((value) => {
+  const timestamp = Date.parse(value);
+  return !Number.isNaN(timestamp) && new Date(timestamp).toISOString() === value;
+}, 'must be a canonical ISO 8601 timestamp');
 
 const nonBlankString = (maximum: number) =>
   z
@@ -175,9 +166,7 @@ export const durableRunConfigurationSchema = z.strictObject({
   }),
 });
 
-export type DurableRunConfiguration = z.infer<
-  typeof durableRunConfigurationSchema
->;
+export type DurableRunConfiguration = z.infer<typeof durableRunConfigurationSchema>;
 
 /** Initializer-only conversation state, absent before its first request. */
 export const initializerProgressSchema = z.strictObject({
@@ -188,14 +177,13 @@ export const initializerProgressSchema = z.strictObject({
 
 export type InitializerProgress = z.infer<typeof initializerProgressSchema>;
 
-export const workerSnapshotSchema: z.ZodType<WorkerSnapshot> =
-  z.strictObject({
-    messages: z.array(messageSchema).min(1),
-    turnCount: z.number().int().nonnegative(),
-    peakContextTokens: z.number().int().nonnegative(),
-    protocolCorrections: z.number().int().nonnegative(),
-    startedMs: z.number().finite().nonnegative(),
-  });
+export const workerSnapshotSchema: z.ZodType<WorkerSnapshot> = z.strictObject({
+  messages: z.array(messageSchema).min(1),
+  turnCount: z.number().int().nonnegative(),
+  peakContextTokens: z.number().int().nonnegative(),
+  protocolCorrections: z.number().int().nonnegative(),
+  startedMs: z.number().finite().nonnegative(),
+});
 
 const toolCallSchema = z.strictObject({
   id: z.string().min(1),
@@ -362,9 +350,7 @@ export const durableTerminalOutcomeSchema = z.discriminatedUnion('status', [
   }),
 ]);
 
-export type DurableTerminalOutcome = z.infer<
-  typeof durableTerminalOutcomeSchema
->;
+export type DurableTerminalOutcome = z.infer<typeof durableTerminalOutcomeSchema>;
 
 const checkpointCommonShape = {
   version: z.literal(CHECKPOINT_VERSION),
@@ -430,13 +416,12 @@ const durableCorrectionFindingSchema: z.ZodType<CorrectionFinding> = z.union([
 ]);
 
 /** Durable read compatibility for one verification-history entry. */
-const durableVerificationHistoryEntrySchema: z.ZodType<VerificationHistoryEntry> =
-  z.strictObject({
-    cycle: z.number().int().positive(),
-    completionReport: durableFinishInputSchema,
-    surfacedEvidenceFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
-    findings: z.array(durableCorrectionFindingSchema).min(1).max(50),
-  });
+const durableVerificationHistoryEntrySchema: z.ZodType<VerificationHistoryEntry> = z.strictObject({
+  cycle: z.number().int().positive(),
+  completionReport: durableFinishInputSchema,
+  surfacedEvidenceFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+  findings: z.array(durableCorrectionFindingSchema).min(1).max(50),
+});
 
 const activeCommonShape = {
   ...checkpointCommonShape,
@@ -623,10 +608,7 @@ export const checkpointSchema = z
       const trailingCalls = trailing?.content
         .filter((block) => block.type === 'tool_use')
         .map(({ id, name, input }) => ({ id, name, input }));
-      if (
-        canonicalJson(trailingCalls) !==
-        canonicalJson([checkpoint.pendingFinish.call])
-      ) {
+      if (canonicalJson(trailingCalls) !== canonicalJson([checkpoint.pendingFinish.call])) {
         ctx.addIssue({
           code: 'custom',
           path: ['pendingFinish', 'call'],

@@ -22,10 +22,7 @@ import {
   type ManifestEntry,
 } from '../../../src/run/artifacts.js';
 import { executeToolCall } from '../../../src/tools/pipeline.js';
-import {
-  createRegistry,
-  toApiToolDefs,
-} from '../../../src/tools/registry.js';
+import { createRegistry, toApiToolDefs } from '../../../src/tools/registry.js';
 import {
   MAX_PUBLISH_ARTIFACT_BYTES,
   publishArtifactTool,
@@ -90,9 +87,7 @@ function fakeBrowser(options: FakeBrowserOptions = {}) {
     bytes: options.downloadBytes ?? Buffer.from([0, 255, 12, 13]),
     suggestedFilename: 'final.bin',
   }));
-  const currentUrl = vi.fn(
-    () => options.sourceUrl ?? 'https://source.example.test/report',
-  );
+  const currentUrl = vi.fn(() => options.sourceUrl ?? 'https://source.example.test/report');
   const browser = {
     screenshot,
     download,
@@ -244,15 +239,10 @@ describe('publish_artifact file and text modes', () => {
   });
 
   it('rejects source symlinks, symlink ancestors, directories, and oversized files', async () => {
-    const externalDir = mkdtempSync(
-      join(tmpdir(), 'sherlock-publish-external-'),
-    );
+    const externalDir = mkdtempSync(join(tmpdir(), 'sherlock-publish-external-'));
     try {
       writeFileSync(join(externalDir, 'secret.bin'), 'secret');
-      symlinkSync(
-        join(externalDir, 'secret.bin'),
-        join(runDir, 'scratch/workspace/file-link.bin'),
-      );
+      symlinkSync(join(externalDir, 'secret.bin'), join(runDir, 'scratch/workspace/file-link.bin'));
       symlinkSync(externalDir, join(runDir, 'scratch/workspace/dir-link'));
       mkdirSync(join(runDir, 'scratch/workspace/a-directory'));
       const oversized = join(runDir, 'scratch/workspace/oversized.bin');
@@ -285,10 +275,7 @@ describe('publish_artifact file and text modes', () => {
     try {
       symlinkSync(external, join(runDir, 'artifacts/link.txt'));
       mkdirSync(join(runDir, 'artifacts/link-parent'));
-      symlinkSync(
-        tmpdir(),
-        join(runDir, 'artifacts/link-parent/child'),
-      );
+      symlinkSync(tmpdir(), join(runDir, 'artifacts/link-parent/child'));
       writeFileSync(join(runDir, 'artifacts/untracked.txt'), 'untracked');
 
       for (const artifactPath of [
@@ -308,9 +295,7 @@ describe('publish_artifact file and text modes', () => {
         expect(result.isError, artifactPath).toBe(true);
       }
       expect(readFileSync(external, 'utf8')).toBe('outside');
-      expect(readFileSync(join(runDir, 'artifacts/untracked.txt'), 'utf8')).toBe(
-        'untracked',
-      );
+      expect(readFileSync(join(runDir, 'artifacts/untracked.txt'), 'utf8')).toBe('untracked');
     } finally {
       rmSync(external, { force: true });
     }
@@ -387,9 +372,7 @@ describe('publish_artifact browser modes', () => {
       pageId: 'page-direct',
       url: 'https://files.example.test/start.bin',
     });
-    expect(readFileSync(join(runDir, directEntry.filename))).toEqual(
-      directBytes,
-    );
+    expect(readFileSync(join(runDir, directEntry.filename))).toEqual(directBytes);
     expect(directEntry.sourceUrl).toBe('https://files.example.test/final.bin');
 
     const generated = fakeBrowser({ finalUrl: 'blob:generated-download' });
@@ -403,9 +386,7 @@ describe('publish_artifact browser modes', () => {
       { browser: generated.browser },
     );
     expect(generated.download).toHaveBeenCalledWith({ backendNodeId: 73 });
-    expect(generatedEntry.sourceUrl).toBe(
-      'https://source.example.test/report',
-    );
+    expect(generatedEntry.sourceUrl).toBe('https://source.example.test/report');
   });
 
   it('rejects failed HTTP responses without publishing bytes', async () => {

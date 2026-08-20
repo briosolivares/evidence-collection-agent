@@ -115,10 +115,7 @@ describe('verifyDownloadIntegrity', () => {
       verifyDownloadIntegrity({ id: '1', filename: 'a.csv', checksum: `sha256:${hex}` }, bytes),
     ).not.toThrow();
     expect(() =>
-      verifyDownloadIntegrity(
-        { id: '1', filename: 'a.csv', checksum: hex.toUpperCase() },
-        bytes,
-      ),
+      verifyDownloadIntegrity({ id: '1', filename: 'a.csv', checksum: hex.toUpperCase() }, bytes),
     ).not.toThrow();
   });
 });

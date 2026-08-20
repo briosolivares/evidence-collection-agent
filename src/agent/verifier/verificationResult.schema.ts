@@ -57,21 +57,18 @@ export type CorrectionFinding = z.infer<typeof correctionFindingSchema>;
 export type IncompleteFinding = z.infer<typeof incompleteFindingSchema>;
 
 export const verificationResultSchema = z.discriminatedUnion('status', [
-  z
-    .strictObject({
-      status: z.literal('verified'),
-      findings: z.array(z.never()).max(0),
-    }),
-  z
-    .strictObject({
-      status: z.literal('needs_correction'),
-      findings: z.array(correctionFindingSchema).min(1).max(50),
-    }),
-  z
-    .strictObject({
-      status: z.literal('incomplete'),
-      findings: z.array(incompleteFindingSchema).min(1).max(50),
-    }),
+  z.strictObject({
+    status: z.literal('verified'),
+    findings: z.array(z.never()).max(0),
+  }),
+  z.strictObject({
+    status: z.literal('needs_correction'),
+    findings: z.array(correctionFindingSchema).min(1).max(50),
+  }),
+  z.strictObject({
+    status: z.literal('incomplete'),
+    findings: z.array(incompleteFindingSchema).min(1).max(50),
+  }),
 ]);
 
 export type VerificationResult = z.infer<typeof verificationResultSchema>;
@@ -80,7 +77,10 @@ export const surfacedArtifactSchema = z.strictObject({
   filename: boundedNonBlank(1_024),
   sha256: z.string().regex(/^[a-f0-9]{64}$/),
   sourceUrl: boundedNonBlank(8_192).optional(),
-  roles: z.array(z.enum(['requested_output', 'evidence'])).min(1).max(2),
+  roles: z
+    .array(z.enum(['requested_output', 'evidence']))
+    .min(1)
+    .max(2),
   capturedAt: boundedNonBlank(128),
   completionStatus: z.enum(['complete', 'partial']).optional(),
 });
@@ -94,6 +94,4 @@ export const verificationHistoryEntrySchema = z.strictObject({
   findings: z.array(correctionFindingSchema).min(1).max(50),
 });
 
-export type VerificationHistoryEntry = z.infer<
-  typeof verificationHistoryEntrySchema
->;
+export type VerificationHistoryEntry = z.infer<typeof verificationHistoryEntrySchema>;

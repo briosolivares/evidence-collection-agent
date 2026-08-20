@@ -50,9 +50,7 @@ export interface ResolvePathsOptions {
  * location: explicit env override, then dev checkout root, then the
  * data home under `~`.
  */
-export function resolveSherlockPaths(
-  options: ResolvePathsOptions = {},
-): SherlockPaths {
+export function resolveSherlockPaths(options: ResolvePathsOptions = {}): SherlockPaths {
   const env = options.env ?? process.env;
   const cwd = options.cwd ?? process.cwd();
   const home = options.home ?? homedir();
@@ -65,9 +63,7 @@ export function resolveSherlockPaths(
   // SHERLOCK_HOME is an explicit request for data-home behavior even
   // inside a checkout; only a plain dev checkout stays repo-anchored.
   const devRoot =
-    env.SHERLOCK_HOME !== undefined && env.SHERLOCK_HOME !== ''
-      ? undefined
-      : options.devRoot;
+    env.SHERLOCK_HOME !== undefined && env.SHERLOCK_HOME !== '' ? undefined : options.devRoot;
   const stateRoot = devRoot ?? dataHome;
 
   const runsBaseDir =

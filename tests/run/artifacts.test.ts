@@ -63,7 +63,10 @@ describe('writeArtifact', () => {
     expect(entry.sha256).toBe(SHA256_OF_ABC);
     const manifest = readManifestFile();
     expect(manifest.artifacts).toHaveLength(1);
-    expect(manifest.artifacts[0]).toMatchObject({ filename: 'artifacts/abc.txt', sha256: SHA256_OF_ABC });
+    expect(manifest.artifacts[0]).toMatchObject({
+      filename: 'artifacts/abc.txt',
+      sha256: SHA256_OF_ABC,
+    });
   });
 
   it('writes the exact bytes given, and re-hashing the file on disk matches the recorded hash', () => {
@@ -77,7 +80,9 @@ describe('writeArtifact', () => {
   });
 
   it('upserts: writing the same path twice yields one entry carrying the new hash', () => {
-    writeArtifact(runDir, 'artifacts/data.csv', Buffer.from('old contents'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/data.csv', Buffer.from('old contents'), {
+      roles: ['requested_output'],
+    });
     const second = Buffer.from('new contents');
     writeArtifact(runDir, 'artifacts/data.csv', second, { roles: ['requested_output'] });
 
@@ -87,8 +92,12 @@ describe('writeArtifact', () => {
   });
 
   it('upserts equivalent spellings of the same path into one entry', () => {
-    writeArtifact(runDir, 'artifacts/data.csv', Buffer.from('one'), { roles: ['requested_output'] });
-    writeArtifact(runDir, './artifacts/data.csv', Buffer.from('two'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/data.csv', Buffer.from('one'), {
+      roles: ['requested_output'],
+    });
+    writeArtifact(runDir, './artifacts/data.csv', Buffer.from('two'), {
+      roles: ['requested_output'],
+    });
 
     const manifest = readManifestFile();
     expect(manifest.artifacts).toHaveLength(1);
@@ -117,12 +126,9 @@ describe('writeArtifact', () => {
     symlinkSync(outside, join(runDir, 'artifacts', 'linked'));
 
     expect(() =>
-      writeArtifact(
-        runDir,
-        'artifacts/linked/escape.txt',
-        Buffer.from('must stay confined'),
-        { roles: ['requested_output'] },
-      ),
+      writeArtifact(runDir, 'artifacts/linked/escape.txt', Buffer.from('must stay confined'), {
+        roles: ['requested_output'],
+      }),
     ).toThrow(/symlink|real directory/);
     expect(existsSync(join(outside, 'escape.txt'))).toBe(false);
   });
@@ -140,7 +146,9 @@ describe('writeArtifact', () => {
   });
 
   it('records roles when provided — including both roles on one artifact — and omits the key otherwise', () => {
-    writeArtifact(runDir, 'artifacts/answer.csv', Buffer.from('a'), { roles: ['requested_output'] });
+    writeArtifact(runDir, 'artifacts/answer.csv', Buffer.from('a'), {
+      roles: ['requested_output'],
+    });
     writeArtifact(runDir, 'artifacts/proof.png', Buffer.from('b'), {
       roles: ['requested_output', 'evidence'],
     });
@@ -279,9 +287,7 @@ describe('manifest lifecycle', () => {
       const beforeFinalizeFd = openSync(join(runDir, MANIFEST_FILENAME), 'r');
       try {
         finalizeManifest(runDir);
-        const preFinalizeSnapshot = JSON.parse(
-          readFileSync(beforeFinalizeFd, 'utf8'),
-        ) as Manifest;
+        const preFinalizeSnapshot = JSON.parse(readFileSync(beforeFinalizeFd, 'utf8')) as Manifest;
         expect(preFinalizeSnapshot).not.toHaveProperty('finishedAt');
       } finally {
         closeSync(beforeFinalizeFd);
@@ -310,7 +316,9 @@ describe('manifest lifecycle', () => {
 
   it('writeArtifact before initManifest throws and writes no file', () => {
     expect(() =>
-      writeArtifact(runDir, 'artifacts/orphan.txt', Buffer.from('x'), { roles: ['requested_output'] }),
+      writeArtifact(runDir, 'artifacts/orphan.txt', Buffer.from('x'), {
+        roles: ['requested_output'],
+      }),
     ).toThrow(/manifest/);
     expect(existsSync(join(runDir, 'artifacts/orphan.txt'))).toBe(false);
   });
@@ -384,9 +392,7 @@ describe('removeScratchArtifactEntry', () => {
       roles: ['requested_output'],
     });
 
-    expect(() => removeScratchArtifactEntry(runDir, 'artifacts/published.csv')).toThrow(
-      /scratch/,
-    );
+    expect(() => removeScratchArtifactEntry(runDir, 'artifacts/published.csv')).toThrow(/scratch/);
     expect(readManifestFile().artifacts).toHaveLength(1);
   });
 

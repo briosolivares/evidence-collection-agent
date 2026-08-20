@@ -17,10 +17,7 @@ function field(input: unknown, key: string): string | undefined {
   return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
 
-export function deriveSemanticLine(
-  name: string,
-  input?: unknown,
-): SemanticLine {
+export function deriveSemanticLine(name: string, input?: unknown): SemanticLine {
   switch (name) {
     case 'browser_execute':
       return { line: 'Running a browser program', isEvidence: false };
@@ -34,20 +31,14 @@ export function deriveSemanticLine(
             ? 'Publishing a download'
             : 'Publishing an artifact';
       return {
-        line:
-          path === undefined
-            ? activity
-            : `${activity} → ${truncate(path, TEXT_MAX)}`,
+        line: path === undefined ? activity : `${activity} → ${truncate(path, TEXT_MAX)}`,
         isEvidence: true,
       };
     }
     case 'read_file': {
       const path = field(input, 'file_path');
       return {
-        line:
-          path === undefined
-            ? 'Reading a file'
-            : `Reading ${truncate(path, TEXT_MAX)}`,
+        line: path === undefined ? 'Reading a file' : `Reading ${truncate(path, TEXT_MAX)}`,
         isEvidence: false,
       };
     }
@@ -56,10 +47,7 @@ export function deriveSemanticLine(
       const path = field(input, 'file_path');
       const verb = name === 'edit_file' ? 'Editing' : 'Writing';
       return {
-        line:
-          path === undefined
-            ? `${verb} a private file`
-            : `${verb} ${truncate(path, TEXT_MAX)}`,
+        line: path === undefined ? `${verb} a private file` : `${verb} ${truncate(path, TEXT_MAX)}`,
         isEvidence: false,
       };
     }

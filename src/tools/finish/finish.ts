@@ -14,27 +14,16 @@ const nonBlankString = (maximum: number, description: string) =>
     .describe(description);
 
 export const finishUnresolvedRequirementSchema = z.strictObject({
-  requirement: nonBlankString(
-    2_000,
-    'The specific explicit requirement that remains unresolved',
-  ),
-  reason: nonBlankString(
-    4_000,
-    'Why the requirement could not be completed',
-  ),
+  requirement: nonBlankString(2_000, 'The specific explicit requirement that remains unresolved'),
+  reason: nonBlankString(4_000, 'Why the requirement could not be completed'),
   attempts: z
     .array(
-      nonBlankString(
-        2_000,
-        'A source, action, or approach already tried for this requirement',
-      ),
+      nonBlankString(2_000, 'A source, action, or approach already tried for this requirement'),
     )
     .max(20),
 });
 
-export type FinishUnresolvedRequirement = z.infer<
-  typeof finishUnresolvedRequirementSchema
->;
+export type FinishUnresolvedRequirement = z.infer<typeof finishUnresolvedRequirementSchema>;
 
 /**
  * Completion request produced by the worker. The loop validates this strict
@@ -49,9 +38,7 @@ export const finishInputSchema = z.strictObject({
   unresolved: z
     .array(finishUnresolvedRequirementSchema)
     .max(50)
-    .describe(
-      'Explicit requirements that remain unresolved; use [] when the request is complete',
-    ),
+    .describe('Explicit requirements that remain unresolved; use [] when the request is complete'),
 });
 
 export type FinishInput = z.infer<typeof finishInputSchema>;
@@ -62,14 +49,8 @@ export type FinishInput = z.infer<typeof finishInputSchema>;
  */
 export const legacyFinishInputSchema = z.strictObject({
   summary: finishInputSchema.shape.summary,
-  artifacts: z
-    .array(nonBlankString(1_024, 'Legacy artifact path'))
-    .max(100)
-    .optional(),
-  limitations: z
-    .array(nonBlankString(2_000, 'Legacy limitation'))
-    .max(100)
-    .optional(),
+  artifacts: z.array(nonBlankString(1_024, 'Legacy artifact path')).max(100).optional(),
+  limitations: z.array(nonBlankString(2_000, 'Legacy limitation')).max(100).optional(),
 });
 
 /** Read old checkpoint cargo, but expose and rewrite only the current shape. */
@@ -77,9 +58,7 @@ export const durableFinishInputSchema = z
   .union([finishInputSchema, legacyFinishInputSchema])
   .transform(
     (finish): FinishInput =>
-      'unresolved' in finish
-        ? finish
-        : { summary: finish.summary, unresolved: [] },
+      'unresolved' in finish ? finish : { summary: finish.summary, unresolved: [] },
   );
 
 /**

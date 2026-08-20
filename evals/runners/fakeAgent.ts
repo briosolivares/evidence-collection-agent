@@ -31,15 +31,10 @@ export function makeFakeRunTask(runsBaseDir: string): RunTaskFn {
       type: 'note',
       text: 'fake agent claims success; graders must never read this file',
     });
-    writeArtifact(
-      runDir,
-      FAKE_DELIVERABLE,
-      Buffer.from(`# Answer\n\nTask: ${taskText}\n`),
-      {
-        roles: ['requested_output'],
-        ...(opts.startUrl !== undefined ? { sourceUrl: opts.startUrl } : {}),
-      },
-    );
+    writeArtifact(runDir, FAKE_DELIVERABLE, Buffer.from(`# Answer\n\nTask: ${taskText}\n`), {
+      roles: ['requested_output'],
+      ...(opts.startUrl !== undefined ? { sourceUrl: opts.startUrl } : {}),
+    });
     finalizeManifest(runDir);
     return { runDir };
   };

@@ -7,10 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { readManifest } from '../../../src/run/artifacts.js';
 import { executeToolCall } from '../../../src/tools/pipeline.js';
 import { createRegistry } from '../../../src/tools/registry.js';
-import {
-  BROWSER_TEST_TIMEOUT_MS,
-  setupBrowserToolSuite,
-} from '../../helpers/browserToolSuite.js';
+import { BROWSER_TEST_TIMEOUT_MS, setupBrowserToolSuite } from '../../helpers/browserToolSuite.js';
 import {
   createBrowserExecuteTool,
   type BrowserExecuteResult,
@@ -65,8 +62,7 @@ describe('publish_artifact real-browser journeys', () => {
       );
       expect(inspected.isError, inspected.content).toBe(false);
       const inspectedResult = JSON.parse(inspected.content) as BrowserExecuteResult;
-      const backendNodeId = (inspectedResult.value as { backendNodeId: number })
-        .backendNodeId;
+      const backendNodeId = (inspectedResult.value as { backendNodeId: number }).backendNodeId;
 
       const published = await executeToolCall(
         registry,
@@ -85,9 +81,9 @@ describe('publish_artifact real-browser journeys', () => {
       expect(published.isError, published.content).toBe(false);
 
       const expected = Buffer.from('browser-native-download\n');
-      expect(
-        readFileSync(join(suite.runDir(), 'artifacts/browser-evidence.bin')),
-      ).toEqual(expected);
+      expect(readFileSync(join(suite.runDir(), 'artifacts/browser-evidence.bin'))).toEqual(
+        expected,
+      );
       expect(readManifest(suite.runDir()).artifacts).toEqual([
         expect.objectContaining({
           filename: 'artifacts/browser-evidence.bin',
@@ -103,8 +99,7 @@ describe('publish_artifact real-browser journeys', () => {
           id: 'check-marker-cleanup',
           name: 'browser_execute',
           input: {
-            code:
-              `return browser.js("document.querySelectorAll('[data-sherlock-backend-target]').length");`,
+            code: `return browser.js("document.querySelectorAll('[data-sherlock-backend-target]').length");`,
           },
         },
         context,
@@ -150,12 +145,8 @@ describe('publish_artifact real-browser journeys', () => {
       );
       expect(published.isError, published.content).toBe(false);
 
-      const bytes = readFileSync(
-        join(suite.runDir(), 'artifacts/page-evidence.png'),
-      );
-      expect(bytes.subarray(0, 8)).toEqual(
-        Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
-      );
+      const bytes = readFileSync(join(suite.runDir(), 'artifacts/page-evidence.png'));
+      expect(bytes.subarray(0, 8)).toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
       expect(bytes.byteLength).toBeGreaterThan(1_000);
       expect(readManifest(suite.runDir()).artifacts).toEqual([
         expect.objectContaining({

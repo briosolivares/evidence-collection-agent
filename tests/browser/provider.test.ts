@@ -220,11 +220,7 @@ describe('describeBrowserProvider', () => {
 
 describe('formatBrowserStartupError', () => {
   it('gives the exact Chrome permission path for attached mode', () => {
-    const formatted = formatBrowserStartupError(
-      'local',
-      'setup did not complete',
-      'attached',
-    );
+    const formatted = formatBrowserStartupError('local', 'setup did not complete', 'attached');
     expect(formatted).toContain('chrome://inspect/#remote-debugging');
     expect(formatted).toContain('Allow remote debugging for this browser instance');
   });
@@ -232,19 +228,15 @@ describe('formatBrowserStartupError', () => {
   it('includes Chrome-install guidance for a not-found-shaped local message', () => {
     const formatted = formatBrowserStartupError(
       'local',
-      'Executable doesn\'t exist at /no/chrome',
+      "Executable doesn't exist at /no/chrome",
       'managed',
     );
     expect(formatted).toMatch(/install/i);
-    expect(formatted).toContain('Executable doesn\'t exist at /no/chrome');
+    expect(formatted).toContain("Executable doesn't exist at /no/chrome");
   });
 
   it('omits install guidance for a local message that is not not-found-shaped', () => {
-    const formatted = formatBrowserStartupError(
-      'local',
-      'Chrome crashed unexpectedly',
-      'managed',
-    );
+    const formatted = formatBrowserStartupError('local', 'Chrome crashed unexpectedly', 'managed');
     expect(formatted).not.toMatch(/chrome\.com|playwright install/i);
     expect(formatted).toContain('Chrome crashed unexpectedly');
   });
@@ -259,11 +251,7 @@ describe('formatBrowserStartupError', () => {
   });
 
   it('mentions BROWSERBASE_API_KEY and the local fallback, never Chrome install, browserbase branch', () => {
-    const formatted = formatBrowserStartupError(
-      'browserbase',
-      'session limit reached',
-      'managed',
-    );
+    const formatted = formatBrowserStartupError('browserbase', 'session limit reached', 'managed');
     expect(formatted).toContain('BROWSERBASE_API_KEY');
     expect(formatted).toMatch(/local/);
     expect(formatted).not.toMatch(/install/i);

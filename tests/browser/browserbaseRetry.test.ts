@@ -29,10 +29,7 @@ function fakeSleep(): { sleep: (ms: number) => Promise<void>; calls: number[] } 
 
 /** Fails a fixed number of times before succeeding, so a test can name the
  * exact attempt where the operation starts working. */
-function failThenSucceed<T>(
-  failures: Error[],
-  result: T,
-): (attempt: number) => Promise<T> {
+function failThenSucceed<T>(failures: Error[], result: T): (attempt: number) => Promise<T> {
   let index = 0;
   return async () => {
     if (index < failures.length) {
@@ -56,15 +53,10 @@ describe('withBrowserbaseRetry', () => {
 
   it('retries a 429 and succeeds later, pinning the exponential schedule', async () => {
     const { sleep, calls } = fakeSleep();
-    const operation = failThenSucceed(
-      [httpError(429), httpError(429), httpError(429)],
-      'ok',
-    );
+    const operation = failThenSucceed([httpError(429), httpError(429), httpError(429)], 'ok');
 
     // Default maxAttempts is 4: three 429s, then a success on the fourth try.
-    await expect(withBrowserbaseRetry('list downloads', operation, { sleep })).resolves.toBe(
-      'ok',
-    );
+    await expect(withBrowserbaseRetry('list downloads', operation, { sleep })).resolves.toBe('ok');
     // 500ms, 1000ms, 2000ms — the doubling schedule, not merely "it waited".
     expect(calls).toEqual([500, 1000, 2000]);
   });
@@ -152,9 +144,9 @@ describe('withBrowserbaseRetry', () => {
       throw attempt === 1 ? first : last;
     });
 
-    await expect(
-      withBrowserbaseRetry('probe', operation, { sleep, maxAttempts: 3 }),
-    ).rejects.toBe(last);
+    await expect(withBrowserbaseRetry('probe', operation, { sleep, maxAttempts: 3 })).rejects.toBe(
+      last,
+    );
     expect(operation).toHaveBeenCalledTimes(3);
   });
 
@@ -217,9 +209,7 @@ describe('retryAfterMs', () => {
   });
 
   it('reads delay-seconds from a real Headers instance', () => {
-    expect(
-      retryAfterMs(httpError(429, new Headers({ 'retry-after': '2' })), now),
-    ).toBe(2_000);
+    expect(retryAfterMs(httpError(429, new Headers({ 'retry-after': '2' })), now)).toBe(2_000);
   });
 
   it('reads an HTTP-date from a plain-object headers bag', () => {

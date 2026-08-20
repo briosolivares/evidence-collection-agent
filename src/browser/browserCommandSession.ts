@@ -6,10 +6,7 @@ import type {
   BrowserNavigationResult,
 } from './controller.js';
 import { withBackendNodeLocator } from './backendNodeTarget.js';
-import {
-  localUploadEncoder,
-  type BrowserUploadEncoder,
-} from './uploadEncoder.js';
+import { localUploadEncoder, type BrowserUploadEncoder } from './uploadEncoder.js';
 
 /** Transport URLs are session-control capabilities. Even if a driver error
  * happens to echo one, it must stop at this controller-owned boundary. */
@@ -20,10 +17,7 @@ const MAX_NAVIGATION_TIMEOUT_MS = 120_000;
 const MAX_NAVIGATION_URL_BYTES = 256_000;
 const UPLOAD_TIMEOUT_MS = 5_000;
 
-type ArbitraryCdpSend = (
-  method: string,
-  params?: Record<string, unknown>,
-) => Promise<unknown>;
+type ArbitraryCdpSend = (method: string, params?: Record<string, unknown>) => Promise<unknown>;
 
 /**
  * Controller-owned authority policy for browser-scoped Target commands.
@@ -56,10 +50,7 @@ export interface PlaywrightCommandSessionHooks {
   trackUploadEffect?: (effect: Promise<void>) => void;
   /** Release the caller's session. The controller may take ownership of the
    * bounded detacher until a blocking dialog is answered. */
-  release?: (
-    detach: () => Promise<void>,
-    hadPendingCommands: boolean,
-  ) => Promise<void>;
+  release?: (detach: () => Promise<void>, hadPendingCommands: boolean) => Promise<void>;
 }
 
 async function uploadToBackendNode(
@@ -74,8 +65,7 @@ async function uploadToBackendNode(
   const encoded = await uploadEncoder.encode([absolutePath]);
   await withBackendNodeLocator(page, send, backendDOMNodeId, async (target) => {
     const isFileInput = await target.evaluate(
-      (element) =>
-        element instanceof HTMLInputElement && element.type === 'file',
+      (element) => element instanceof HTMLInputElement && element.type === 'file',
     );
     if (!isFileInput) {
       throw new TypeError('browser.upload target must be an input[type=file]');
@@ -117,10 +107,7 @@ async function detachWithoutHanging(session: CDPSession): Promise<void> {
   }
 }
 
-function validateNavigation(
-  url: string,
-  options: BrowserNavigationOptions,
-): void {
+function validateNavigation(url: string, options: BrowserNavigationOptions): void {
   if (
     typeof url !== 'string' ||
     url.length === 0 ||
@@ -140,9 +127,7 @@ function validateNavigation(
     );
   }
   if (options.waitUntil !== 'domcontentloaded' && options.waitUntil !== 'load') {
-    throw new TypeError(
-      'browser navigation waitUntil must be domcontentloaded or load',
-    );
+    throw new TypeError('browser navigation waitUntil must be domcontentloaded or load');
   }
 }
 
@@ -175,10 +160,7 @@ function responseTargetId(value: unknown, operation: string): string {
   return targetId;
 }
 
-function requiredTargetId(
-  params: Record<string, unknown>,
-  operation: string,
-): string {
+function requiredTargetId(params: Record<string, unknown>, operation: string): string {
   const targetId = params.targetId;
   if (typeof targetId !== 'string' || targetId.length === 0) {
     throw new TypeError(`${operation} requires a non-empty targetId.`);
@@ -210,9 +192,7 @@ function filteredTargetInventory(
   });
   return {
     ...response,
-    targetInfos: targetInfos.filter((target) =>
-      ownedTargetIds.has(target.targetId as string),
-    ),
+    targetInfos: targetInfos.filter((target) => ownedTargetIds.has(target.targetId as string)),
   };
 }
 
@@ -225,11 +205,14 @@ async function sendTargetCommand(
 ): Promise<unknown> {
   switch (method) {
     case 'Target.createTarget': {
-      const response = await policy.createTarget(
-        params,
-        (rawParams) => send('Target.createTarget', rawParams),
+      const response = await policy.createTarget(params, (rawParams) =>
+        send('Target.createTarget', rawParams),
       );
-      if (!isRecord(response) || typeof response.targetId !== 'string' || response.targetId.length === 0) {
+      if (
+        !isRecord(response) ||
+        typeof response.targetId !== 'string' ||
+        response.targetId.length === 0
+      ) {
         throw new Error('Target.createTarget returned an invalid response.');
       }
       await requireOwnedTarget(response.targetId, policy);
@@ -237,10 +220,7 @@ async function sendTargetCommand(
     }
     case 'Target.getTargets': {
       const ownedTargetIds = await policy.ownedTargetIds();
-      return filteredTargetInventory(
-        await send('Target.getTargets', params),
-        ownedTargetIds,
-      );
+      return filteredTargetInventory(await send('Target.getTargets', params), ownedTargetIds);
     }
     case 'Target.getTargetInfo': {
       if (!Object.hasOwn(params, 'targetId')) {
@@ -290,10 +270,7 @@ export async function openPlaywrightCommandSession(
   try {
     session = await context.newCDPSession(page);
   } catch (error) {
-    throw commandError(
-      `Could not attach a browser command session to pageId ${pageId}`,
-      error,
-    );
+    throw commandError(`Could not attach a browser command session to pageId ${pageId}`, error);
   }
 
   const send = arbitrarySend(session);
@@ -301,8 +278,7 @@ export async function openPlaywrightCommandSession(
   let targetId: string;
   try {
     const response = await send('Target.getTargetInfo');
-    const candidate = (response as { targetInfo?: { targetId?: unknown } })
-      .targetInfo?.targetId;
+    const candidate = (response as { targetInfo?: { targetId?: unknown } }).targetInfo?.targetId;
     if (typeof candidate !== 'string' || candidate.length === 0) {
       throw new Error('Target.getTargetInfo returned no target id');
     }
@@ -312,10 +288,7 @@ export async function openPlaywrightCommandSession(
     }
   } catch (error) {
     await detachWithoutHanging(session);
-    throw commandError(
-      `Could not resolve the browser target for pageId ${pageId}`,
-      error,
-    );
+    throw commandError(`Could not resolve the browser target for pageId ${pageId}`, error);
   }
 
   let closed = false;
@@ -355,8 +328,7 @@ export async function openPlaywrightCommandSession(
               hooks.targetPolicy,
             );
           }
-          return method === 'Page.handleJavaScriptDialog' &&
-            hooks.handleDialogCommand !== undefined
+          return method === 'Page.handleJavaScriptDialog' && hooks.handleDialogCommand !== undefined
             ? await hooks.handleDialogCommand(params ?? {})
             : await send(method, params);
         } catch (error) {
@@ -387,19 +359,14 @@ export async function openPlaywrightCommandSession(
           };
         } catch (error) {
           await stopNavigationWithoutHanging(send);
-          throw commandError(
-            `Browser navigation failed for pageId ${pageId}`,
-            error,
-          );
+          throw commandError(`Browser navigation failed for pageId ${pageId}`, error);
         }
       })();
       return trackCommand(operation);
     },
     upload(backendDOMNodeId, absolutePath) {
       if (closed) {
-        return Promise.reject(
-          new Error(`Browser command session for pageId ${pageId} is closed.`),
-        );
+        return Promise.reject(new Error(`Browser command session for pageId ${pageId} is closed.`));
       }
       const effect = uploadToBackendNode(
         page,
@@ -408,10 +375,7 @@ export async function openPlaywrightCommandSession(
         backendDOMNodeId,
         absolutePath,
       ).catch((error: unknown) => {
-        throw commandError(
-          `Browser upload failed for pageId ${pageId}`,
-          error,
-        );
+        throw commandError(`Browser upload failed for pageId ${pageId}`, error);
       });
       const settled = effect.then(
         () => undefined,

@@ -39,9 +39,7 @@ describe('finish schema', () => {
       expect(finishInputSchema.safeParse(invalid).success).toBe(false);
     }
 
-    expect(
-      finishInputSchema.safeParse({ summary: 'done', unresolved: [] }).success,
-    ).toBe(true);
+    expect(finishInputSchema.safeParse({ summary: 'done', unresolved: [] }).success).toBe(true);
     expect(
       finishInputSchema.safeParse({
         summary: 'Published useful partial work.',

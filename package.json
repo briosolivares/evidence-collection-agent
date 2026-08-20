@@ -22,6 +22,7 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
+    "format": "biome format --write .",
     "evals": "tsx --env-file-if-exists=.env evals/runners/cli.ts",
     "agent": "tsx src/cli/repl.ts",
     "login": "tsx src/cli/login.ts",
@@ -30,6 +31,7 @@
     "build:quicklook": "native/quicklook/build.sh"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.9",
     "@types/node": "^26.2.0",
     "@types/react": "^19.2.18",
     "ink-testing-library": "^4.0.0",

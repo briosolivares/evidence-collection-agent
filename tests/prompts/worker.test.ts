@@ -12,9 +12,7 @@ describe('workerPrompt', () => {
     expect(workerPrompt).toContain(
       "against what the page itself presents at the requirement's shape",
     );
-    expect(workerPrompt).toContain(
-      'never your own element count or your input echoed back',
-    );
+    expect(workerPrompt).toContain('never your own element count or your input echoed back');
     expect(workerPrompt).toContain('bounded multi-line browser program');
     expect(workerPrompt).toContain('batch of up to 20');
     expect(workerPrompt).toContain('incremental workspace saves');
@@ -26,14 +24,20 @@ describe('workerPrompt', () => {
     expect(workerPrompt).toContain("prefer the app's native import dialog");
     expect(workerPrompt).toContain('browser.upload a workspace file to its file input');
     expect(workerPrompt).toContain('fall back to clipboard paste only when no import path exists');
-    expect(workerPrompt).toContain('tabs and newlines only, so comma-separated text lands in one column');
+    expect(workerPrompt).toContain(
+      'tabs and newlines only, so comma-separated text lands in one column',
+    );
     expect(workerPrompt).toContain("app's own copy or export path");
     expect(workerPrompt).toContain('rather than DOM inspection');
-    expect(workerPrompt).toContain('structure included — e.g. a non-first-column cell is non-empty');
+    expect(workerPrompt).toContain(
+      'structure included — e.g. a non-first-column cell is non-empty',
+    );
   });
 
   it('teaches the external-action destination requirement', () => {
-    expect(workerPrompt).toContain('An external_action output means the user asked for an action on an external service');
+    expect(workerPrompt).toContain(
+      'An external_action output means the user asked for an action on an external service',
+    );
     expect(workerPrompt).toContain('perform that action at its real destination');
     expect(workerPrompt).toContain('A local file never satisfies an external destination');
     expect(workerPrompt).toContain('never quietly downgrade the deliverable');
@@ -58,7 +62,9 @@ describe('workerPrompt', () => {
   });
 
   it('teaches the blocked-research fallback ladder and blocker credibility standard', () => {
-    expect(workerPrompt).toContain('work the fallback ladder before reporting an unresolved requirement');
+    expect(workerPrompt).toContain(
+      'work the fallback ladder before reporting an unresolved requirement',
+    );
     expect(workerPrompt).toContain('retry the canonical page');
     expect(workerPrompt).toContain('alternate scheme or host');
     expect(workerPrompt).toContain(
@@ -72,20 +78,30 @@ describe('workerPrompt', () => {
     expect(workerPrompt).toContain(
       'Do not submit an unresolved requirement while a materially different applicable rung remains untried and budget remains',
     );
-    expect(workerPrompt).toContain('an unresolved entry is credible only when its attempts show the applicable rungs were walked');
+    expect(workerPrompt).toContain(
+      'an unresolved entry is credible only when its attempts show the applicable rungs were walked',
+    );
   });
 
   it('makes per-column coverage a pre-finish self-check', () => {
-    expect(workerPrompt).toContain('Before calling finish, measure nonblank coverage for every requested table column');
-    expect(workerPrompt).toContain('conspicuously sparse requested column with untried official profile or detail pages means the work is not done yet');
-    expect(workerPrompt).toContain('A structurally optional column may leave unavailable cells blank');
+    expect(workerPrompt).toContain(
+      'Before calling finish, measure nonblank coverage for every requested table column',
+    );
+    expect(workerPrompt).toContain(
+      'conspicuously sparse requested column with untried official profile or detail pages means the work is not done yet',
+    );
+    expect(workerPrompt).toContain(
+      'A structurally optional column may leave unavailable cells blank',
+    );
     expect(workerPrompt).toContain('does not make the requested field irrelevant');
     expect(workerPrompt).toContain('Never fabricate, pad, or add placeholder rows to fill gaps');
     expect(workerPrompt).toContain('report missing data truthfully in unresolved');
   });
 
   it('makes exact exclusive finish the only completion path', () => {
-    expect(workerPrompt).toContain('finish is the completion handoff and must be the only tool call');
+    expect(workerPrompt).toContain(
+      'finish is the completion handoff and must be the only tool call',
+    );
     expect(workerPrompt).toContain('summary is the human-facing response');
     expect(workerPrompt).toContain('unresolved array must list each specific unmet requirement');
     expect(workerPrompt).toContain('use [] only when you believe the request is complete');
@@ -169,8 +185,6 @@ describe('workerPrompt', () => {
         cache_control: { type: 'ephemeral' },
       },
     ]);
-    expect(JSON.stringify(first.messages)).not.toBe(
-      JSON.stringify(second.messages),
-    );
+    expect(JSON.stringify(first.messages)).not.toBe(JSON.stringify(second.messages));
   });
 });

@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  filterCommands,
-  findCommand,
-  SLASH_COMMANDS,
-} from '../../src/tui/store/commands.js';
+import { filterCommands, findCommand, SLASH_COMMANDS } from '../../src/tui/store/commands.js';
 import { HELP_TEXT, routeInput } from '../../src/tui/store/reducer.js';
 
 describe('SLASH_COMMANDS registry', () => {
@@ -34,14 +30,8 @@ describe('filterCommands (autosuggest filter)', () => {
   });
 
   it('prefix-filters case-insensitively', () => {
-    expect(filterCommands('/e').map((entry) => entry.name)).toEqual([
-      '/evals',
-      '/exit',
-    ]);
-    expect(filterCommands('/E').map((entry) => entry.name)).toEqual([
-      '/evals',
-      '/exit',
-    ]);
+    expect(filterCommands('/e').map((entry) => entry.name)).toEqual(['/evals', '/exit']);
+    expect(filterCommands('/E').map((entry) => entry.name)).toEqual(['/evals', '/exit']);
     expect(filterCommands('/ru').map((entry) => entry.name)).toEqual(['/runs']);
   });
 

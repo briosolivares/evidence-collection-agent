@@ -19,9 +19,9 @@ describe('parseEvalArgs', () => {
   });
 
   it('rejects the retired worker-contract selector', () => {
-    expect(() =>
-      parseEvalArgs(['--tasks', 'stub', '--contract-author', 'worker']),
-    ).toThrow(/unknown argument/);
+    expect(() => parseEvalArgs(['--tasks', 'stub', '--contract-author', 'worker'])).toThrow(
+      /unknown argument/,
+    );
   });
 
   it('defaults k to 1 when --k is absent', () => {

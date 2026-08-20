@@ -9,7 +9,9 @@ import type { ElonTweetsOracle } from '../oracle/oracle.js';
 import { grade } from './grader.js';
 
 const ORACLE: ElonTweetsOracle = {
-  accountHandle: 'elonmusk', minRows: 1, maxRows: 200,
+  accountHandle: 'elonmusk',
+  minRows: 1,
+  maxRows: 200,
   acceptedTimeZones: ['America/Los_Angeles', 'UTC'],
 };
 let runDir: string;
@@ -20,7 +22,9 @@ beforeEach(() => {
 });
 afterEach(() => rmSync(runDir, { recursive: true, force: true }));
 
-function writeCsv(body = 'text,likes,time_posted\nFirst tweet,"1,234",9:15 AM\nSecond tweet,2.5K,2h ago\n'): void {
+function writeCsv(
+  body = 'text,likes,time_posted\nFirst tweet,"1,234",9:15 AM\nSecond tweet,2.5K,2h ago\n',
+): void {
   writeArtifact(runDir, 'artifacts/tweets.csv', Buffer.from(body), { roles: ['requested_output'] });
 }
 function assertion(results: AssertionResult[], name: string): AssertionResult {
@@ -37,7 +41,10 @@ describe('elon_tweets grader', () => {
 
   it("accepts X's native rendered timestamp for the run's day, with or without year", async () => {
     const parts = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric',
+      timeZone: 'UTC',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
     }).formatToParts(new Date());
     const part = (type: Intl.DateTimeFormatPartTypes): string =>
       parts.find((p) => p.type === type)?.value ?? '';
@@ -48,34 +55,50 @@ describe('elon_tweets grader', () => {
         `B,2,"9:37 PM · ${monthDay}"\n`,
     );
     const results = await grade(runDir, ORACLE);
-    expect(assertion(results, "every time_posted cell is a plausible time from the run's day").passed).toBe(true);
+    expect(
+      assertion(results, "every time_posted cell is a plausible time from the run's day").passed,
+    ).toBe(true);
   });
 
   it("rejects X's native rendered timestamp for a different day", async () => {
     writeCsv('text,likes,time_posted\nA,1,"3:33 PM · Jan 1, 2001"\n');
     const results = await grade(runDir, ORACLE);
-    expect(assertion(results, "every time_posted cell is a plausible time from the run's day").passed).toBe(false);
+    expect(
+      assertion(results, "every time_posted cell is a plausible time from the run's day").passed,
+    ).toBe(false);
   });
 
   it('rejects duplicate text, a negative like count, and an old date independently', async () => {
     writeCsv('text,likes,time_posted\nSame,-2,2001-01-01T10:00:00Z\nSame,4,10:30 AM\n');
     const results = await grade(runDir, ORACLE);
-    expect(assertion(results, 'every text cell is non-empty and tweet texts are distinct').passed).toBe(false);
-    expect(assertion(results, 'every likes cell is a non-negative integer or compact X count').passed).toBe(false);
-    expect(assertion(results, "every time_posted cell is a plausible time from the run's day").passed).toBe(false);
+    expect(
+      assertion(results, 'every text cell is non-empty and tweet texts are distinct').passed,
+    ).toBe(false);
+    expect(
+      assertion(results, 'every likes cell is a non-negative integer or compact X count').passed,
+    ).toBe(false);
+    expect(
+      assertion(results, "every time_posted cell is a plausible time from the run's day").passed,
+    ).toBe(false);
   });
 
   it('enforces the exact three-column schema', async () => {
     writeCsv('text,likes,time_posted,url\nA,1,now,https://x.com/elonmusk/status/1\n');
     const results = await grade(runDir, ORACLE);
-    expect(assertion(results, 'CSV has exactly the columns text, likes, time_posted (no more, no fewer)').passed).toBe(false);
+    expect(
+      assertion(results, 'CSV has exactly the columns text, likes, time_posted (no more, no fewer)')
+        .passed,
+    ).toBe(false);
   });
 
   it('fails content assertions when the CSV is absent and detects tampering', async () => {
     const missing = await grade(runDir, ORACLE);
     expect(assertion(missing, 'CSV artifact exists').passed).toBe(false);
     writeCsv();
-    writeFileSync(join(runDir, 'artifacts', 'tweets.csv'), 'text,likes,time_posted\nChanged,1,now\n');
+    writeFileSync(
+      join(runDir, 'artifacts', 'tweets.csv'),
+      'text,likes,time_posted\nChanged,1,now\n',
+    );
     expect(assertion(await grade(runDir, ORACLE), 'manifest hashes verify').passed).toBe(false);
   });
 

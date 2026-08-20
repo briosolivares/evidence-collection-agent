@@ -3,10 +3,7 @@
 
 import { vi } from 'vitest';
 
-import type {
-  BrowserController,
-  BrowserPage,
-} from '../../src/browser/controller.js';
+import type { BrowserController, BrowserPage } from '../../src/browser/controller.js';
 
 /** The single page every stub identity method reports. */
 function stubPage(pageId = 'page-stub'): BrowserPage {

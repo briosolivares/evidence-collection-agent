@@ -223,12 +223,8 @@ export function selectRecord(
   consumed: ReadonlySet<string>,
 ): BrowserbaseDownloadRecord | undefined {
   const available = records.filter((record) => !consumed.has(record.id));
-  const newestFirst = [...available].sort(
-    (left, right) => createdAtMs(right) - createdAtMs(left),
-  );
-  return (
-    newestFirst.find((record) => record.filename === suggestedFilename) ?? newestFirst[0]
-  );
+  const newestFirst = [...available].sort((left, right) => createdAtMs(right) - createdAtMs(left));
+  return newestFirst.find((record) => record.filename === suggestedFilename) ?? newestFirst[0];
 }
 
 function createdAtMs(record: BrowserbaseDownloadRecord): number {
@@ -261,7 +257,10 @@ export function verifyDownloadIntegrity(
     );
   }
 
-  const expected = record.checksum?.trim().replace(/^sha-?256[:=]/i, '').toLowerCase();
+  const expected = record.checksum
+    ?.trim()
+    .replace(/^sha-?256[:=]/i, '')
+    .toLowerCase();
   if (expected === undefined || expected === '') {
     throw new Error(
       `Browserbase reported no checksum for download ${record.filename}, so its bytes cannot ` +

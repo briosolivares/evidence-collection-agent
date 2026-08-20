@@ -23,14 +23,15 @@ const USAGE = {
   cache_creation_input_tokens: 0,
 };
 
-function response(
-  content: ModelResponse['content'],
-  stopReason: string | null,
-): ModelResponse {
+function response(content: ModelResponse['content'], stopReason: string | null): ModelResponse {
   return { content, stop_reason: stopReason, usage: USAGE };
 }
 
-function toolUse(id: string, name = 'read_file', input: unknown = {}): {
+function toolUse(
+  id: string,
+  name = 'read_file',
+  input: unknown = {},
+): {
   type: 'tool_use';
   id: string;
   name: string;
@@ -205,7 +206,10 @@ describe('createAnthropicModelDriver construction', () => {
 describe('createAnthropicModelDriver.generate', () => {
   it('accepts a complete response and reports attempt events in order', async () => {
     const factory = streamFactory([scriptedStream('Answer.', 'end_turn')]);
-    const driver = createAnthropicModelDriver({ ...DRIVER_BASE, createStream: factory.createStream });
+    const driver = createAnthropicModelDriver({
+      ...DRIVER_BASE,
+      createStream: factory.createStream,
+    });
     const events: ModelAttemptEvent[] = [];
 
     const accepted = await driver.generate({
@@ -282,7 +286,10 @@ describe('createAnthropicModelDriver.generate', () => {
       scriptedStream('cut again', 'max_tokens'),
       scriptedStream('never requested', 'end_turn'),
     ]);
-    const driver = createAnthropicModelDriver({ ...DRIVER_BASE, createStream: factory.createStream });
+    const driver = createAnthropicModelDriver({
+      ...DRIVER_BASE,
+      createStream: factory.createStream,
+    });
 
     await expect(
       driver.generate({ messages: [{ role: 'user', content: [{ type: 'text', text: 'q' }] }] }),
@@ -331,7 +338,10 @@ describe('createAnthropicModelDriver.generate', () => {
       scriptedStream('cannot help', 'refusal'),
       scriptedStream('never requested', 'end_turn'),
     ]);
-    const driver = createAnthropicModelDriver({ ...DRIVER_BASE, createStream: factory.createStream });
+    const driver = createAnthropicModelDriver({
+      ...DRIVER_BASE,
+      createStream: factory.createStream,
+    });
     const events: ModelAttemptEvent[] = [];
 
     await expect(
@@ -348,7 +358,10 @@ describe('createAnthropicModelDriver.generate', () => {
     const complete = scriptedStream('Recovered.', 'end_turn');
     const truncated = complete.slice(0, 3); // dies mid-text, no terminal events
     const factory = streamFactory([truncated, complete]);
-    const driver = createAnthropicModelDriver({ ...DRIVER_BASE, createStream: factory.createStream });
+    const driver = createAnthropicModelDriver({
+      ...DRIVER_BASE,
+      createStream: factory.createStream,
+    });
     const events: ModelAttemptEvent[] = [];
 
     const accepted = await driver.generate({

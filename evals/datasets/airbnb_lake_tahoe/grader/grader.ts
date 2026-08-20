@@ -1,16 +1,22 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { findRequestedOutputByName, readManifest, verifyManifestHashes } from '../../../grading/manifestVerification.js';
+import {
+  findRequestedOutputByName,
+  readManifest,
+  verifyManifestHashes,
+} from '../../../grading/manifestVerification.js';
 import type { AssertionResult, Grader } from '../../../types.js';
 import type { AirbnbLakeTahoeOracle } from '../oracle/oracle.js';
 
 const ANSWER_FILENAME = 'answer.md';
 const LIST_ASSERTION_NAME = 'answer has a numbered list containing exactly items 1 through 30';
 const URL_ASSERTION_NAME = 'all 30 items contain distinct Airbnb room URLs';
-const ITEM_ASSERTION_NAME = 'all 30 items identify a place and contain a substantive listing-specific summary';
+const ITEM_ASSERTION_NAME =
+  'all 30 items identify a place and contain a substantive listing-specific summary';
 const DATE_ASSERTION_NAME = 'answer states a seven-night date range beginning next week';
-const OVERALL_ASSERTION_NAME = 'answer contains a substantive overall summary and identifies Lake Tahoe';
+const OVERALL_ASSERTION_NAME =
+  'answer contains a substantive overall summary and identifies Lake Tahoe';
 
 interface NumberedSection {
   number: number;
@@ -25,17 +31,24 @@ export const grade: Grader = (runDirPath, oracleData) => {
   const oracle = asOracle(oracleData);
   const manifest = readManifest(runDirPath);
   const answerEntry = findRequestedOutputByName(manifest, ANSWER_FILENAME);
-  const answerExists = answerEntry !== undefined && existsSync(join(runDirPath, answerEntry.filename));
-  const assertions: AssertionResult[] = [{
-    name: `${ANSWER_FILENAME} exists with a manifest entry`,
-    passed: answerExists,
-    detail: answerExists
-      ? `${answerEntry!.filename} found and manifested`
-      : `${ANSWER_FILENAME} missing or not published as a requested output`,
-  }];
+  const answerExists =
+    answerEntry !== undefined && existsSync(join(runDirPath, answerEntry.filename));
+  const assertions: AssertionResult[] = [
+    {
+      name: `${ANSWER_FILENAME} exists with a manifest entry`,
+      passed: answerExists,
+      detail: answerExists
+        ? `${answerEntry!.filename} found and manifested`
+        : `${ANSWER_FILENAME} missing or not published as a requested output`,
+    },
+  ];
 
   if (!answerExists) {
-    return [...assertions, ...failedContent(`${ANSWER_FILENAME} is unavailable`), verifyManifestHashes(runDirPath, manifest)];
+    return [
+      ...assertions,
+      ...failedContent(`${ANSWER_FILENAME} is unavailable`),
+      verifyManifestHashes(runDirPath, manifest),
+    ];
   }
 
   const answer = readFileSync(join(runDirPath, answerEntry!.filename), 'utf8');
@@ -60,23 +73,36 @@ export function parseNumberedSections(markdown: string): NumberedSection[] {
   }));
 }
 
-function listAssertion(sections: NumberedSection[], oracle: AirbnbLakeTahoeOracle): AssertionResult {
+function listAssertion(
+  sections: NumberedSection[],
+  oracle: AirbnbLakeTahoeOracle,
+): AssertionResult {
   const expected = Array.from({ length: oracle.listingCount }, (_, index) => index + 1);
   const actual = sections.map((section) => section.number);
-  const passed = actual.length === expected.length && actual.every((number, index) => number === expected[index]);
+  const passed =
+    actual.length === expected.length &&
+    actual.every((number, index) => number === expected[index]);
   return {
     name: LIST_ASSERTION_NAME,
     passed,
-    detail: passed ? `found the ordered sequence 1–${oracle.listingCount}` : `number sequence: ${actual.join(', ') || '(none)'}`,
+    detail: passed
+      ? `found the ordered sequence 1–${oracle.listingCount}`
+      : `number sequence: ${actual.join(', ') || '(none)'}`,
   };
 }
 
 function urlAssertion(sections: NumberedSection[], oracle: AirbnbLakeTahoeOracle): AssertionResult {
-  const parsed = sections.map((section) => ({ section, listing: firstAirbnbListing(section.text) }));
-  const missing = parsed.filter(({ listing }) => listing === undefined).map(({ section }) => section.number);
-  const ids = parsed.flatMap(({ listing }) => listing ? [listing.id] : []);
+  const parsed = sections.map((section) => ({
+    section,
+    listing: firstAirbnbListing(section.text),
+  }));
+  const missing = parsed
+    .filter(({ listing }) => listing === undefined)
+    .map(({ section }) => section.number);
+  const ids = parsed.flatMap(({ listing }) => (listing ? [listing.id] : []));
   const duplicateCount = ids.length - new Set(ids).size;
-  const passed = sections.length === oracle.listingCount && missing.length === 0 && duplicateCount === 0;
+  const passed =
+    sections.length === oracle.listingCount && missing.length === 0 && duplicateCount === 0;
   const problems = [
     missing.length ? `missing/invalid URL in item(s) ${missing.join(', ')}` : '',
     duplicateCount ? `${duplicateCount} duplicate listing id(s)` : '',
@@ -102,20 +128,35 @@ function firstAirbnbListing(text: string): { id: string; url: URL } | undefined 
   return undefined;
 }
 
-function itemAssertion(sections: NumberedSection[], oracle: AirbnbLakeTahoeOracle): AssertionResult {
-  const bad = sections.filter((section) => {
-    const title = section.title.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').trim();
-    const withoutUrls = section.text.replace(/https?:\/\/[^\s)>\]}]+/gi, '').replace(/[#*_`|\-]/g, ' ').replace(/\s+/g, ' ').trim();
-    return title.length < 3 || withoutUrls.length < 70;
-  }).map((section) => section.number);
+function itemAssertion(
+  sections: NumberedSection[],
+  oracle: AirbnbLakeTahoeOracle,
+): AssertionResult {
+  const bad = sections
+    .filter((section) => {
+      const title = section.title.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').trim();
+      const withoutUrls = section.text
+        .replace(/https?:\/\/[^\s)>\]}]+/gi, '')
+        .replace(/[#*_`|\-]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      return title.length < 3 || withoutUrls.length < 70;
+    })
+    .map((section) => section.number);
   return {
     name: ITEM_ASSERTION_NAME,
     passed: sections.length === oracle.listingCount && bad.length === 0,
-    detail: bad.length ? `too little identity/summary detail in item(s) ${bad.join(', ')}` : `${sections.length} substantive item(s)`,
+    detail: bad.length
+      ? `too little identity/summary detail in item(s) ${bad.join(', ')}`
+      : `${sections.length} substantive item(s)`,
   };
 }
 
-function dateAssertion(answer: string, startedAt: string, oracle: AirbnbLakeTahoeOracle): AssertionResult {
+function dateAssertion(
+  answer: string,
+  startedAt: string,
+  oracle: AirbnbLakeTahoeOracle,
+): AssertionResult {
   const dates = extractDates(answer);
   const runDate = startOfUtcDay(new Date(startedAt));
   let match: { checkIn: Date; checkOut: Date } | undefined;
@@ -123,8 +164,11 @@ function dateAssertion(answer: string, startedAt: string, oracle: AirbnbLakeTaho
     for (let j = i + 1; j < dates.length; j++) {
       const nights = dayDifference(dates[i]!, dates[j]!);
       const daysAfterRun = dayDifference(runDate, dates[i]!);
-      if (nights === oracle.stayNights && daysAfterRun >= oracle.earliestCheckInDaysAfterRun &&
-          daysAfterRun <= oracle.latestCheckInDaysAfterRun) {
+      if (
+        nights === oracle.stayNights &&
+        daysAfterRun >= oracle.earliestCheckInDaysAfterRun &&
+        daysAfterRun <= oracle.latestCheckInDaysAfterRun
+      ) {
         match = { checkIn: dates[i]!, checkOut: dates[j]! };
         break;
       }
@@ -143,13 +187,18 @@ function dateAssertion(answer: string, startedAt: string, oracle: AirbnbLakeTaho
 function extractDates(text: string): Date[] {
   const candidates = [
     ...(text.match(/\b\d{4}-\d{2}-\d{2}\b/g) ?? []),
-    ...(text.match(/\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2},?\s+\d{4}\b/gi) ?? []),
+    ...(text.match(
+      /\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2},?\s+\d{4}\b/gi,
+    ) ?? []),
     ...(text.match(/\b\d{1,2}\/\d{1,2}\/\d{4}\b/g) ?? []),
   ];
   const unique = new Map<number, Date>();
   for (const candidate of candidates) {
-    const value = /^\d{4}-/.test(candidate) ? new Date(`${candidate}T00:00:00Z`) : new Date(candidate);
-    if (!Number.isNaN(value.getTime())) unique.set(startOfUtcDay(value).getTime(), startOfUtcDay(value));
+    const value = /^\d{4}-/.test(candidate)
+      ? new Date(`${candidate}T00:00:00Z`)
+      : new Date(candidate);
+    if (!Number.isNaN(value.getTime()))
+      unique.set(startOfUtcDay(value).getTime(), startOfUtcDay(value));
   }
   return [...unique.values()].sort((a, b) => a.getTime() - b.getTime());
 }
@@ -177,15 +226,26 @@ function formatDate(date: Date): string {
 }
 
 function failedContent(detail: string): AssertionResult[] {
-  return [LIST_ASSERTION_NAME, URL_ASSERTION_NAME, ITEM_ASSERTION_NAME, DATE_ASSERTION_NAME, OVERALL_ASSERTION_NAME]
-    .map((name) => ({ name, passed: false, detail }));
+  return [
+    LIST_ASSERTION_NAME,
+    URL_ASSERTION_NAME,
+    ITEM_ASSERTION_NAME,
+    DATE_ASSERTION_NAME,
+    OVERALL_ASSERTION_NAME,
+  ].map((name) => ({ name, passed: false, detail }));
 }
 
 function asOracle(data: unknown): AirbnbLakeTahoeOracle {
   const value = data as Partial<AirbnbLakeTahoeOracle> | null;
-  if (!value || !Array.isArray(value.locationTerms) || !value.locationTerms.every((term) => typeof term === 'string') ||
-      value.listingCount !== 30 || value.stayNights !== 7 || typeof value.earliestCheckInDaysAfterRun !== 'number' ||
-      typeof value.latestCheckInDaysAfterRun !== 'number') {
+  if (
+    !value ||
+    !Array.isArray(value.locationTerms) ||
+    !value.locationTerms.every((term) => typeof term === 'string') ||
+    value.listingCount !== 30 ||
+    value.stayNights !== 7 ||
+    typeof value.earliestCheckInDaysAfterRun !== 'number' ||
+    typeof value.latestCheckInDaysAfterRun !== 'number'
+  ) {
     throw new Error('airbnb_lake_tahoe grader was handed malformed oracle data');
   }
   return value as AirbnbLakeTahoeOracle;

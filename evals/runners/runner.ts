@@ -119,11 +119,7 @@ export async function runEvals(
     await deps.onTrialGraded?.(job, grade);
   };
 
-  const erroredGrade = (
-    error: unknown,
-    latencyMs: number,
-    runDir?: string,
-  ): TrialGrade => ({
+  const erroredGrade = (error: unknown, latencyMs: number, runDir?: string): TrialGrade => ({
     ...(runDir === undefined ? {} : { runDir }),
     assertions: [],
     latencyMs,
@@ -137,12 +133,7 @@ export async function runEvals(
     });
   };
 
-  const scheduleGrade = (
-    task: EvalTask,
-    job: EvalTrialJob,
-    runDir: string,
-    latencyMs: number,
-  ) => {
+  const scheduleGrade = (task: EvalTask, job: EvalTrialJob, runDir: string, latencyMs: number) => {
     gradingTail = gradingTail.then(async () => {
       if (controller.signal.aborted) return;
       try {
@@ -190,16 +181,11 @@ export async function runEvals(
       }
     };
 
-    await Promise.all(
-      Array.from({ length: Math.min(size, queue.length) }, () => worker()),
-    );
+    await Promise.all(Array.from({ length: Math.min(size, queue.length) }, () => worker()));
   };
 
   try {
-    await Promise.all([
-      runPool(headlessJobs, deps.concurrency),
-      runPool(headedJobs, 1),
-    ]);
+    await Promise.all([runPool(headlessJobs, deps.concurrency), runPool(headedJobs, 1)]);
     await gradingTail;
 
     // The controller aborts for exactly one reason — cancellation, from

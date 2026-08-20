@@ -1,20 +1,11 @@
-import {
-  existsSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-} from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { ToolResultBlock, ToolUseBlock } from '../../../src/model/messages.js';
-import {
-  MANIFEST_FILENAME,
-  initManifest,
-  writeArtifact,
-} from '../../../src/run/artifacts.js';
+import { MANIFEST_FILENAME, initManifest, writeArtifact } from '../../../src/run/artifacts.js';
 import {
   VERIFIER_MAX_IMAGE_BYTES,
   VERIFIER_MAX_IMAGE_DIMENSION_PX,
@@ -68,9 +59,7 @@ async function readPublishedImage(
 
 function jpegHeader(width: number, height: number): Buffer {
   const bytes = Buffer.from([
-    0xff, 0xd8,
-    0xff, 0xc0, 0x00, 0x0b, 0x08, 0x00, 0x00, 0x00, 0x00,
-    0x01, 0x01, 0x11, 0x00,
+    0xff, 0xd8, 0xff, 0xc0, 0x00, 0x0b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x11, 0x00,
   ]);
   bytes.writeUInt16BE(height, 7);
   bytes.writeUInt16BE(width, 9);
@@ -125,20 +114,14 @@ describe('verifier inspection', () => {
     const [manifestResult, omittedResult] = await inspect(
       [
         use('read_file', { file_path: MANIFEST_FILENAME }, 'read-manifest'),
-        use(
-          'read_file',
-          { file_path: 'artifacts/unpublished-to-judge.txt' },
-          'read-omitted',
-        ),
+        use('read_file', { file_path: 'artifacts/unpublished-to-judge.txt' }, 'read-omitted'),
       ],
       [],
     );
 
     expect(manifestResult).toMatchObject({ is_error: true });
     expect(omittedResult).toMatchObject({ is_error: true });
-    expect(JSON.stringify([manifestResult, omittedResult])).toMatch(
-      /outside verifier scope/i,
-    );
+    expect(JSON.stringify([manifestResult, omittedResult])).toMatch(/outside verifier scope/i);
   });
 
   it('uses bounded literal grep instead of evaluating model-supplied regex', async () => {
@@ -164,11 +147,7 @@ describe('verifier inspection', () => {
     controller.abort();
 
     await expect(
-      inspect(
-        [use('grep', { pattern: 'anything' })],
-        [],
-        controller.signal,
-      ),
+      inspect([use('grep', { pattern: 'anything' })], [], controller.signal),
     ).rejects.toMatchObject({ name: 'AbortError' });
   });
 
@@ -190,9 +169,7 @@ describe('verifier inspection', () => {
     expect(result?.is_error).not.toBe(true);
     expect(Array.isArray(result?.content)).toBe(true);
     expect(result?.content).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ type: 'image' }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ type: 'image' })]),
     );
   });
 
@@ -202,32 +179,22 @@ describe('verifier inspection', () => {
     const result = await readPublishedImage('oversized.png', bytes);
 
     expect(result).toMatchObject({ is_error: true });
-    expect(result?.content).toContain(
-      `is ${VERIFIER_MAX_IMAGE_BYTES + 1} bytes`,
-    );
+    expect(result?.content).toContain(`is ${VERIFIER_MAX_IMAGE_BYTES + 1} bytes`);
     expect(result?.content).toContain(`limit ${VERIFIER_MAX_IMAGE_BYTES}`);
   });
 
   it('rejects a JPEG whose header declares an over-limit dimension', async () => {
     const width = VERIFIER_MAX_IMAGE_DIMENSION_PX + 1;
 
-    const result = await readPublishedImage(
-      'too-wide.jpg',
-      jpegHeader(width, 1),
-    );
+    const result = await readPublishedImage('too-wide.jpg', jpegHeader(width, 1));
 
     expect(result).toMatchObject({ is_error: true });
     expect(result?.content).toContain(`${width}x1 pixels`);
-    expect(result?.content).toContain(
-      `limit ${VERIFIER_MAX_IMAGE_DIMENSION_PX} per dimension`,
-    );
+    expect(result?.content).toContain(`limit ${VERIFIER_MAX_IMAGE_DIMENSION_PX} per dimension`);
   });
 
   it('rejects malformed image headers before creating an image block', async () => {
-    const result = await readPublishedImage(
-      'malformed.png',
-      Buffer.from('not a PNG', 'utf8'),
-    );
+    const result = await readPublishedImage('malformed.png', Buffer.from('not a PNG', 'utf8'));
 
     expect(result).toMatchObject({
       content: expect.stringContaining('Not a readable image/png image'),

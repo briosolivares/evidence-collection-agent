@@ -1,19 +1,11 @@
-import {
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-} from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
-import type {
-  Message,
-  ToolResultBlock,
-  Usage,
-} from '../../../src/model/messages.js';
+import type { Message, ToolResultBlock, Usage } from '../../../src/model/messages.js';
 import {
   ModelGenerationFailedError,
   ModelResponseRejectedError,
@@ -27,11 +19,7 @@ import {
   createRunBudgetTracker,
   type RunBudgetConfig,
 } from '../../../src/run/runBudget.js';
-import {
-  createRegistry,
-  type ToolCtx,
-  type ToolDef,
-} from '../../../src/tools/registry.js';
+import { createRegistry, type ToolCtx, type ToolDef } from '../../../src/tools/registry.js';
 import { finishTool, type FinishInput } from '../../../src/tools/finish/finish.js';
 import {
   MAX_PROTOCOL_CORRECTIONS,
@@ -165,9 +153,7 @@ function session(
 function lastResults(worker: Worker): ToolResultBlock[] {
   const message = worker.state.messages.at(-1);
   if (message?.role !== 'user') throw new Error('expected trailing user result message');
-  return message.content.filter(
-    (block): block is ToolResultBlock => block.type === 'tool_result',
-  );
+  return message.content.filter((block): block is ToolResultBlock => block.type === 'tool_result');
 }
 
 function transcript(): Array<Record<string, unknown>> {
@@ -219,25 +205,13 @@ describe('ordinary response execution', () => {
 
     await expect(runWorkerTurn(worker)).resolves.toEqual({ kind: 'working' });
 
-    expect(events).toEqual([
-      'explode',
-      'start:two',
-      'end:two',
-      'start:three',
-      'end:three',
-    ]);
+    expect(events).toEqual(['explode', 'start:two', 'end:two', 'start:three', 'end:three']);
     const results = lastResults(worker);
-    expect(results.map((result) => result.tool_use_id)).toEqual([
-      'one',
-      'two',
-      'three',
-    ]);
+    expect(results.map((result) => result.tool_use_id)).toEqual(['one', 'two', 'three']);
     expect(results[0]).toMatchObject({ is_error: true });
     expect(results[1]?.content).toBe('result:two');
     expect(results[2]?.content).toBe('result:three');
-    expect(
-      transcript().filter((event) => event.type === 'tool_result'),
-    ).toHaveLength(3);
+    expect(transcript().filter((event) => event.type === 'tool_result')).toHaveLength(3);
   });
 
   it('treats a prose-only response as working even when stop_reason says tool_use', async () => {
@@ -282,16 +256,10 @@ describe('finish protocol', () => {
 
     expect(execute).not.toHaveBeenCalled();
     const results = lastResults(worker);
-    expect(results.map((result) => result.tool_use_id)).toEqual([
-      'before',
-      'finish',
-      'after',
-    ]);
+    expect(results.map((result) => result.tool_use_id)).toEqual(['before', 'finish', 'after']);
     expect(results.every((result) => result.is_error === true)).toBe(true);
     expect(results[1]?.content).toContain('finish must be the only tool call');
-    expect(
-      transcript().filter((event) => event.type === 'tool_call'),
-    ).toHaveLength(3);
+    expect(transcript().filter((event) => event.type === 'tool_call')).toHaveLength(3);
     const budget = captureRunBudgetSnapshot(worker.config.budget);
     expect(budget.toolCalls).toBe(3);
     expect(budget.toolResultBytes).toBeGreaterThan(0);
@@ -350,11 +318,7 @@ describe('finish protocol', () => {
     });
     if (outcome.kind !== 'finish_requested') throw new Error('expected finish');
 
-    await appendFinishResult(
-      worker,
-      outcome.request,
-      'Verifier found one missing source URL.',
-    );
+    await appendFinishResult(worker, outcome.request, 'Verifier found one missing source URL.');
 
     expect(lastResults(worker)).toEqual([
       {
@@ -366,9 +330,7 @@ describe('finish protocol', () => {
     ]);
     expect(captureRunBudgetSnapshot(worker.config.budget)).toMatchObject({
       toolCalls: 1,
-      toolResultBytes: Buffer.byteLength(
-        'Verifier found one missing source URL.',
-      ),
+      toolResultBytes: Buffer.byteLength('Verifier found one missing source URL.'),
     });
   });
 
@@ -416,9 +378,7 @@ describe('finish protocol', () => {
       reason: entry.reason,
     });
     expect(finishRequested).not.toHaveBeenCalled();
-    expect(
-      transcript().filter((event) => event.type === 'finish_requested'),
-    ).toHaveLength(0);
+    expect(transcript().filter((event) => event.type === 'finish_requested')).toHaveLength(0);
     expect(lastResults(worker)).toEqual([
       expect.objectContaining({
         tool_use_id: 'finish-over-budget',
@@ -458,10 +418,10 @@ describe('finish protocol', () => {
 
 describe('rejection and guards', () => {
   it('charges known usage on a fatal retry failure without accepting content', async () => {
-    const fatal = new ModelGenerationFailedError(
-      new Error('replacement transport failed'),
-      { input_tokens: 7, output_tokens: 3 },
-    );
+    const fatal = new ModelGenerationFailedError(new Error('replacement transport failed'), {
+      input_tokens: 7,
+      output_tokens: 3,
+    });
     const worker = session(scriptedDriver([fatal]));
 
     await expect(runWorkerTurn(worker)).rejects.toBe(fatal);
@@ -498,9 +458,7 @@ describe('rejection and guards', () => {
     expect(worker.protocolCorrections).toBe(MAX_PROTOCOL_CORRECTIONS);
     expect(worker.state.messages).toHaveLength(1 + MAX_PROTOCOL_CORRECTIONS);
     expect(worker.config.budget.roleUsage().worker?.turns).toBe(4);
-    expect(
-      worker.state.messages.some((message) => message.role === 'assistant'),
-    ).toBe(false);
+    expect(worker.state.messages.some((message) => message.role === 'assistant')).toBe(false);
   });
 
   it.each([
@@ -527,9 +485,7 @@ describe('rejection and guards', () => {
     },
   ])('enforces the $name guard after an accepted no-tool turn', async (entry) => {
     const worker = session(
-      scriptedDriver([
-        accepted([{ type: 'text', text: 'continuing' }], { usage: entry.usage }),
-      ]),
+      scriptedDriver([accepted([{ type: 'text', text: 'continuing' }], { usage: entry.usage })]),
       [],
       {
         budget: entry.budget,
@@ -545,9 +501,7 @@ describe('rejection and guards', () => {
 
   it('returns every result before enforcing the tool-call ceiling', async () => {
     const worker = session(
-      scriptedDriver([
-        accepted([{ type: 'tool_use', id: 'call', name: 'small', input: {} }]),
-      ]),
+      scriptedDriver([accepted([{ type: 'tool_use', id: 'call', name: 'small', input: {} }])]),
       [tool('small', () => 'one result')],
       { budget: { maxToolCalls: 0 } },
     );
@@ -637,10 +591,10 @@ describe('result bounds, cancellation, and lifecycle', () => {
   it('charges and checkpoints error-carried usage before cancellation wins', async () => {
     const controller = new AbortController();
     const accounting = vi.fn(async () => {});
-    const failure = new ModelGenerationFailedError(
-      new Error('replacement transport failed'),
-      { input_tokens: 7, output_tokens: 3 },
-    );
+    const failure = new ModelGenerationFailedError(new Error('replacement transport failed'), {
+      input_tokens: 7,
+      output_tokens: 3,
+    });
     const worker = session(
       scriptedDriver([
         () => {
@@ -681,9 +635,7 @@ describe('result bounds, cancellation, and lifecycle', () => {
       rejectAccounting = reject;
     });
     const worker = session(
-      scriptedDriver([
-        accepted([{ type: 'text', text: 'must remain unaccepted' }]),
-      ]),
+      scriptedDriver([accepted([{ type: 'text', text: 'must remain unaccepted' }])]),
       [],
       {
         deps: {
@@ -706,9 +658,7 @@ describe('result bounds, cancellation, and lifecycle', () => {
     rejectAccounting(new Error('checkpoint write failed'));
     await expect(running).rejects.toThrow('checkpoint write failed');
     expect(worker.state.messages).toHaveLength(1);
-    expect(
-      transcript().filter((event) => event.type === 'model_response'),
-    ).toHaveLength(0);
+    expect(transcript().filter((event) => event.type === 'model_response')).toHaveLength(0);
   });
 
   it('freezes both per-result and combined offloads in stored history', async () => {
@@ -731,17 +681,11 @@ describe('result bounds, cancellation, and lifecycle', () => {
     expect(results).toHaveLength(6);
     expect(
       results.filter(
-        (result) =>
-          typeof result.content === 'string' &&
-          result.content.includes('"offloadedTo"'),
+        (result) => typeof result.content === 'string' && result.content.includes('"offloadedTo"'),
       ).length,
     ).toBeGreaterThanOrEqual(2);
     expect(
-      results.reduce(
-        (sum, result) =>
-          sum + Buffer.byteLength(result.content as string, 'utf8'),
-        0,
-      ),
+      results.reduce((sum, result) => sum + Buffer.byteLength(result.content as string, 'utf8'), 0),
     ).toBeLessThanOrEqual(200_000);
     expect(
       readManifest(runDir).artifacts.filter((entry) =>
@@ -764,11 +708,9 @@ describe('result bounds, cancellation, and lifecycle', () => {
       receivedToolSignal = ctx.abortSignal;
       startTool();
       await new Promise<never>((_resolve, reject) => {
-        ctx.abortSignal?.addEventListener(
-          'abort',
-          () => reject(ctx.abortSignal?.reason),
-          { once: true },
-        );
+        ctx.abortSignal?.addEventListener('abort', () => reject(ctx.abortSignal?.reason), {
+          once: true,
+        });
       });
     });
     const later = vi.fn(() => 'later');
@@ -906,14 +848,11 @@ describe('result bounds, cancellation, and lifecycle', () => {
       worker.config,
     );
 
-    await expect(
-      resumePendingToolTurn(restored, savedPending!),
-    ).resolves.toEqual({ kind: 'working' });
+    await expect(resumePendingToolTurn(restored, savedPending!)).resolves.toEqual({
+      kind: 'working',
+    });
     expect(executed).toEqual(['one', 'two']);
-    expect(lastResults(restored).map((result) => result.content)).toEqual([
-      'done:one',
-      'done:two',
-    ]);
+    expect(lastResults(restored).map((result) => result.content)).toEqual(['done:one', 'done:two']);
   });
 
   it('never replays an uncertain call and skips every remaining call in that response', async () => {
@@ -952,9 +891,9 @@ describe('result bounds, cancellation, and lifecycle', () => {
       worker.config,
     );
 
-    await expect(
-      resumePendingToolTurn(restored, savedPending!),
-    ).resolves.toEqual({ kind: 'working' });
+    await expect(resumePendingToolTurn(restored, savedPending!)).resolves.toEqual({
+      kind: 'working',
+    });
     expect(execute).not.toHaveBeenCalled();
     const results = lastResults(restored);
     expect(results.map((result) => result.tool_use_id)).toEqual(['one', 'two']);
@@ -993,13 +932,9 @@ describe('snapshots and metrics', () => {
 
   it('reports and writes aggregate metrics from the persistent budget', async () => {
     let clock = 100;
-    const worker = session(
-      scriptedDriver([
-        accepted([{ type: 'text', text: 'continuing' }]),
-      ]),
-      [],
-      { deps: { now: () => clock } },
-    );
+    const worker = session(scriptedDriver([accepted([{ type: 'text', text: 'continuing' }])]), [], {
+      deps: { now: () => clock },
+    });
     await runWorkerTurn(worker);
     clock = 175;
 
@@ -1014,8 +949,6 @@ describe('snapshots and metrics', () => {
     });
 
     writeWorkerMetrics(worker, 'incomplete');
-    expect(
-      JSON.parse(readFileSync(join(runDir, 'metrics.json'), 'utf8')),
-    ).toEqual(metrics);
+    expect(JSON.parse(readFileSync(join(runDir, 'metrics.json'), 'utf8'))).toEqual(metrics);
   });
 });

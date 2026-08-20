@@ -1,12 +1,7 @@
 import { Buffer } from 'node:buffer';
 
 import type { OutputContract } from '../initializer/outputContract.schema.js';
-import type {
-  CallModel,
-  Message,
-  ToolResultBlock,
-  ToolUseBlock,
-} from '../../model/messages.js';
+import type { CallModel, Message, ToolResultBlock, ToolUseBlock } from '../../model/messages.js';
 import {
   createAnthropicModelDriver,
   type ModelAttemptEvent,
@@ -15,11 +10,7 @@ import {
 } from '../../model/modelDriver.js';
 import type { RunBudgetTracker } from '../../run/runBudget.js';
 import { verifierPrompt } from '../../prompts/index.js';
-import {
-  toApiToolDefs,
-  type ApiToolDef,
-  type ToolCtx,
-} from '../../tools/registry.js';
+import { toApiToolDefs, type ApiToolDef, type ToolCtx } from '../../tools/registry.js';
 import type {
   FinishDefect,
   FinishFacts,
@@ -28,10 +19,7 @@ import type {
   TableFact,
 } from '../completion/finishChecks.js';
 import { createBudgetedCallModel } from '../../model/budgetedCall.js';
-import {
-  RoleBudgetExceededError,
-  isRoleBudgetExceededError,
-} from '../../run/runBudget.js';
+import { RoleBudgetExceededError, isRoleBudgetExceededError } from '../../run/runBudget.js';
 import {
   createVerifierPathPolicy,
   createVerifierRegistry,
@@ -116,9 +104,7 @@ export interface VerifierModelConfig {
   createStream?: ModelDriverConfig['createStream'];
 }
 
-export function createVerifierModelDriver(
-  config: VerifierModelConfig = {},
-): ModelDriver {
+export function createVerifierModelDriver(config: VerifierModelConfig = {}): ModelDriver {
   return createAnthropicModelDriver({
     model: config.model ?? VERIFIER_MODEL,
     system: verifierPrompt,
@@ -127,9 +113,7 @@ export function createVerifierModelDriver(
     ...(config.maxTokensRetryOutputTokens === undefined
       ? {}
       : { maxTokensRetryOutputTokens: config.maxTokensRetryOutputTokens }),
-    ...(config.createStream === undefined
-      ? {}
-      : { createStream: config.createStream }),
+    ...(config.createStream === undefined ? {} : { createStream: config.createStream }),
   });
 }
 
@@ -167,9 +151,7 @@ export function isVerifierAccountingPersistenceError(
 
 /** Run the preserved read-only fresh verifier with aggregate accounting
  * and one immutable contract revision. */
-export function runVerifier(
-  options: RunVerifierOptions,
-): Promise<VerifierOutcome> {
+export function runVerifier(options: RunVerifierOptions): Promise<VerifierOutcome> {
   options.signal?.throwIfAborted();
   const callModel = createBudgetedCallModel({
     model: options.model,
@@ -208,9 +190,7 @@ async function runVerifierLoop(
   const registry = createVerifierRegistry(pathPolicy);
   const toolCtx: ToolCtx = {
     runDir: options.runDir,
-    ...(options.signal === undefined
-      ? {}
-      : { abortSignal: options.signal }),
+    ...(options.signal === undefined ? {} : { abortSignal: options.signal }),
   };
   let repairUsed = false;
   let forced = false;
@@ -228,9 +208,7 @@ async function runVerifierLoop(
       ) {
         throw error;
       }
-      return unavailable(
-        `verifier model call failed: ${errorMessage(error)}`,
-      );
+      return unavailable(`verifier model call failed: ${errorMessage(error)}`);
     }
 
     options.signal?.throwIfAborted();
@@ -238,9 +216,7 @@ async function runVerifierLoop(
     const toolUses = response.content.filter(
       (block): block is ToolUseBlock => block.type === 'tool_use',
     );
-    const reports = toolUses.filter(
-      (block) => block.name === REPORT_VERIFICATION_TOOL.name,
-    );
+    const reports = toolUses.filter((block) => block.name === REPORT_VERIFICATION_TOOL.name);
 
     if (reports.length > 0) {
       const structuralProblem =
@@ -270,9 +246,7 @@ async function runVerifierLoop(
         return parsed.data;
       }
       if (repairUsed || forced) {
-        return invalidVerdict(
-          `invalid report_verification input: ${validityProblem}`,
-        );
+        return invalidVerdict(`invalid report_verification input: ${validityProblem}`);
       }
       repairUsed = true;
       await appendRepair(
@@ -287,9 +261,7 @@ async function runVerifierLoop(
 
     if (toolUses.length === 0) {
       if (repairUsed || forced) {
-        return invalidVerdict(
-          'verifier ended without a valid report_verification call',
-        );
+        return invalidVerdict('verifier ended without a valid report_verification call');
       }
       repairUsed = true;
       messages.push({
@@ -322,20 +294,12 @@ async function runVerifierLoop(
       await accountVerifierResults(options, results);
       messages.push({
         role: 'user',
-        content: [
-          ...results,
-          { type: 'text', text: FORCED_REPORT_PROMPT },
-        ],
+        content: [...results, { type: 'text', text: FORCED_REPORT_PROMPT }],
       });
       continue;
     }
 
-    const results = await executeVerifierToolUses(
-      registry,
-      toolUses,
-      toolCtx,
-      pathPolicy,
-    );
+    const results = await executeVerifierToolUses(registry, toolUses, toolCtx, pathPolicy);
     await accountVerifierResults(options, results);
     messages.push({ role: 'user', content: results });
   }
@@ -365,10 +329,7 @@ async function accountVerifierResults(
   throwIfVerifierBudgetExceeded(options.budget);
 }
 
-function closeToolUses(
-  toolUses: readonly ToolUseBlock[],
-  message: string,
-): ToolResultBlock[] {
+function closeToolUses(toolUses: readonly ToolUseBlock[], message: string): ToolResultBlock[] {
   return toolUses.map((block) => ({
     type: 'tool_result',
     tool_use_id: block.id,
@@ -404,15 +365,11 @@ function invalidVerdict(reason: string): VerifierOutcome {
  * `artifact_repair` may only cite evidence that is actually surfaced. */
 function findVerificationValidityProblem(
   result: VerificationResult,
-  options: Pick<
-    RunVerifierOptions,
-    'finish' | 'structuralFindings' | 'surfacedArtifacts'
-  >,
+  options: Pick<RunVerifierOptions, 'finish' | 'structuralFindings' | 'surfacedArtifacts'>,
 ): string | undefined {
   if (
     result.status === 'verified' &&
-    (options.finish.unresolved.length > 0 ||
-      (options.structuralFindings?.length ?? 0) > 0)
+    (options.finish.unresolved.length > 0 || (options.structuralFindings?.length ?? 0) > 0)
   ) {
     return (
       'verified is never valid while unresolved requirements or objective ' +
@@ -422,14 +379,10 @@ function findVerificationValidityProblem(
     );
   }
   if (result.status === 'needs_correction') {
-    const surfacedPaths = new Set(
-      options.surfacedArtifacts.map((artifact) => artifact.filename),
-    );
+    const surfacedPaths = new Set(options.surfacedArtifacts.map((artifact) => artifact.filename));
     for (const finding of result.findings) {
       if (finding.kind !== 'artifact_repair') continue;
-      const unsurfaced = finding.evidencePaths.filter(
-        (path) => !surfacedPaths.has(path),
-      );
+      const unsurfaced = finding.evidencePaths.filter((path) => !surfacedPaths.has(path));
       if (unsurfaced.length > 0) {
         return (
           'artifact_repair evidencePaths must name only already-surfaced files; ' +
@@ -496,11 +449,7 @@ export function buildVerifierOpeningInput(
     ...columnCoverage,
     ...(structuralFindings.length === 0
       ? []
-      : [
-          '',
-          '# Deterministic structural findings',
-          JSON.stringify(structuralFindings, null, 2),
-        ]),
+      : ['', '# Deterministic structural findings', JSON.stringify(structuralFindings, null, 2)]),
     ...(verificationHistory.length === 0
       ? []
       : [
@@ -514,9 +463,7 @@ export function buildVerifierOpeningInput(
 /** Render per-column nonblank cell counts as plain informational coverage
  * facts alongside the settled row count. Absent for outputs loaded from a
  * checkpoint written before this field existed, and never a threshold. */
-function formatColumnCoverage(
-  outputs: readonly OutputFact[] | undefined,
-): string[] {
+function formatColumnCoverage(outputs: readonly OutputFact[] | undefined): string[] {
   const tables = (outputs ?? []).filter(
     (output): output is TableFact =>
       output.kind === 'table' && output.columnNonblankCounts !== undefined,
@@ -535,9 +482,7 @@ function formatColumnCoverage(
   ];
 }
 
-async function persistVerifierAccounting(
-  options: RunVerifierOptions,
-): Promise<void> {
+async function persistVerifierAccounting(options: RunVerifierOptions): Promise<void> {
   if (options.afterAccounting === undefined) return;
   try {
     await options.afterAccounting();
@@ -557,9 +502,7 @@ function throwIfVerifierBudgetExceeded(budget: RunBudgetTracker): void {
 function verifierResultBytes(results: readonly ToolResultBlock[]): number {
   return results.reduce((total, result) => {
     const content =
-      typeof result.content === 'string'
-        ? result.content
-        : JSON.stringify(result.content);
+      typeof result.content === 'string' ? result.content : JSON.stringify(result.content);
     return total + Buffer.byteLength(content, 'utf8');
   }, 0);
 }

@@ -81,7 +81,12 @@ function readTaskJson(
     requiresAuth?: unknown;
     requiresLogin?: unknown;
   };
-  if (typeof parsed !== 'object' || parsed === null || typeof obj.task !== 'string' || obj.task === '') {
+  if (
+    typeof parsed !== 'object' ||
+    parsed === null ||
+    typeof obj.task !== 'string' ||
+    obj.task === ''
+  ) {
     throw new Error(`task "${name}": task.json must have a non-empty string "task" field`);
   }
   if (obj.startUrl !== undefined && typeof obj.startUrl !== 'string') {
@@ -99,7 +104,10 @@ function readTaskJson(
 
   let requiresLogin: string[] = [];
   if (obj.requiresLogin !== undefined) {
-    if (!Array.isArray(obj.requiresLogin) || obj.requiresLogin.some((id) => typeof id !== 'string')) {
+    if (
+      !Array.isArray(obj.requiresLogin) ||
+      obj.requiresLogin.some((id) => typeof id !== 'string')
+    ) {
       throw new Error(
         `task "${name}": task.json "requiresLogin" must be an array of service id strings when present`,
       );

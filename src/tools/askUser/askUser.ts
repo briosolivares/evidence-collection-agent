@@ -13,29 +13,18 @@ const nonBlankString = (maximum: number, description: string) =>
 
 const optionSchema = z.strictObject({
   label: nonBlankString(80, 'Choice label shown to the user'),
-  description: nonBlankString(
-    240,
-    'Optional one-line explanation of the choice',
-  ).optional(),
+  description: nonBlankString(240, 'Optional one-line explanation of the choice').optional(),
 });
 
 export const askUserInputSchema = z.strictObject({
-  question: nonBlankString(
-    500,
-    'One concise question for the user, written in natural language',
-  ),
-  context: nonBlankString(
-    2_000,
-    'Optional context the user needs to answer safely',
-  ).optional(),
+  question: nonBlankString(500, 'One concise question for the user, written in natural language'),
+  context: nonBlankString(2_000, 'Optional context the user needs to answer safely').optional(),
   options: z
     .array(optionSchema)
     .min(2)
     .max(4)
     .refine(
-      (options) =>
-        new Set(options.map((option) => option.label.trim())).size ===
-        options.length,
+      (options) => new Set(options.map((option) => option.label.trim())).size === options.length,
       { message: 'option labels must be unique' },
     )
     .optional()
@@ -66,9 +55,7 @@ export const askUserTool: ToolDef<AskUserInput> = {
   getAccess: (): ToolAccess => ({ reads: [], writes: [], exclusive: true }),
   requiresUserInteraction: true,
   execute(input) {
-    const parsed = answersSchema.safeParse(
-      (input as AskUserInput & { answers?: unknown }).answers,
-    );
+    const parsed = answersSchema.safeParse((input as AskUserInput & { answers?: unknown }).answers);
     if (!parsed.success) {
       throw new Error(
         'ask_user ran without a valid answer; it must resolve through the interactive permission gate.',

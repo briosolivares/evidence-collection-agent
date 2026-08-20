@@ -17,10 +17,7 @@ describe('resolveSherlockPaths', () => {
     expect(paths.runsBaseDir).toBe('/home/u/.sherlock/runs');
     expect(paths.evalsDir).toBe('/home/u/.sherlock/evals/datasets');
     expect(paths.evalResultsDir).toBe('/home/u/.sherlock/runs/eval-results');
-    expect(paths.envFileCandidates).toEqual([
-      '/somewhere/else/.env',
-      '/home/u/.sherlock/.env',
-    ]);
+    expect(paths.envFileCandidates).toEqual(['/somewhere/else/.env', '/home/u/.sherlock/.env']);
   });
 
   it('keeps a dev checkout repo-anchored, regardless of cwd', () => {
@@ -47,10 +44,7 @@ describe('resolveSherlockPaths', () => {
     expect(paths.dataHome).toBe('/custom');
     expect(paths.profileDir).toBe('/custom/chrome-profile');
     expect(paths.runsBaseDir).toBe('/custom/runs');
-    expect(paths.envFileCandidates).toEqual([
-      '/somewhere/else/.env',
-      '/custom/.env',
-    ]);
+    expect(paths.envFileCandidates).toEqual(['/somewhere/else/.env', '/custom/.env']);
   });
 
   it('SHERLOCK_RUNS_DIR moves only the runs base; results follow it', () => {

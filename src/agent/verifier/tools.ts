@@ -11,11 +11,7 @@ import { extname, join, relative, resolve, sep } from 'node:path';
 import { z } from 'zod';
 
 import { detectContentFormat, splitLines } from '../../tools/contentReader.js';
-import type {
-  ImageBlock,
-  ToolResultBlock,
-  ToolUseBlock,
-} from '../../model/messages.js';
+import type { ImageBlock, ToolResultBlock, ToolUseBlock } from '../../model/messages.js';
 import { ARTIFACTS_DIR } from '../../run/artifacts.js';
 import { resolveRunPath } from '../../run/runDir.js';
 import { executeToolCall, type ToolCallResult } from '../../tools/pipeline.js';
@@ -44,9 +40,7 @@ export const verifierReadFileInputSchema = z.strictObject({
     .string()
     .min(1)
     .max(1_024)
-    .describe(
-      'Path to a surfaced UTF-8 text file or PNG/JPEG artifact',
-    ),
+    .describe('Path to a surfaced UTF-8 text file or PNG/JPEG artifact'),
   offset: z.number().int().min(1).optional(),
   limit: z.number().int().min(1).max(1_000).optional(),
 });
@@ -79,15 +73,11 @@ export function createVerifierPathPolicy(
   allowedArtifactPaths: readonly string[] = [],
 ): VerifierPathPolicy {
   return {
-    allowedArtifactPaths: new Set(
-      allowedArtifactPaths.map(normalizeAllowedArtifactPath),
-    ),
+    allowedArtifactPaths: new Set(allowedArtifactPaths.map(normalizeAllowedArtifactPath)),
   };
 }
 
-function createReadFileTool(
-  policy: VerifierPathPolicy,
-): ToolDef<ReadInput> {
+function createReadFileTool(policy: VerifierPathPolicy): ToolDef<ReadInput> {
   return {
     name: 'read_file',
     description:
@@ -120,10 +110,7 @@ function createReadFileTool(
       const limit = input.limit ?? READ_DEFAULT_LINES;
       const selected = lines.slice(offset - 1, offset - 1 + limit);
       const rendered = selected
-        .map(
-          (line, index) =>
-            `${String(offset + index).padStart(LINE_NUMBER_PAD, ' ')}→${line}`,
-        )
+        .map((line, index) => `${String(offset + index).padStart(LINE_NUMBER_PAD, ' ')}→${line}`)
         .join('\n');
       const more = offset - 1 + selected.length < lines.length;
       return boundText(
@@ -152,15 +139,9 @@ function createGrepTool(policy: VerifierPathPolicy): ToolDef<GrepInput> {
     async execute(input, ctx) {
       throwIfAborted(ctx.abortSignal);
       const givenPath = input.path ?? ARTIFACTS_DIR;
-      const files = collectSurfacedFiles(
-        ctx.runDir,
-        givenPath,
-        policy,
-        VERIFIER_MAX_FILES,
-      );
-      const needle = input.case_sensitive === false
-        ? input.pattern.toLocaleLowerCase('en-US')
-        : input.pattern;
+      const files = collectSurfacedFiles(ctx.runDir, givenPath, policy, VERIFIER_MAX_FILES);
+      const needle =
+        input.case_sensitive === false ? input.pattern.toLocaleLowerCase('en-US') : input.pattern;
       const maxResults = input.max_results ?? 100;
       const matches: string[] = [];
       let totalBytes = 0;
@@ -184,9 +165,7 @@ function createGrepTool(policy: VerifierPathPolicy): ToolDef<GrepInput> {
         if (text === undefined) continue;
         for (const [index, line] of splitLines(text).entries()) {
           throwIfAborted(ctx.abortSignal);
-          const haystack = input.case_sensitive === false
-            ? line.toLocaleLowerCase('en-US')
-            : line;
+          const haystack = input.case_sensitive === false ? line.toLocaleLowerCase('en-US') : line;
           if (!haystack.includes(needle)) continue;
           matches.push(`${file.relativePath}:${index + 1}: ${line}`);
           if (matches.length >= maxResults) {
@@ -264,12 +243,7 @@ async function readImageResult(
       VERIFIER_MAX_IMAGE_BYTES + 1,
       signal,
     );
-    return verifierImageResultFromBytes(
-      toolUseId,
-      target.relativePath,
-      mediaType,
-      bytes,
-    );
+    return verifierImageResultFromBytes(toolUseId, target.relativePath, mediaType, bytes);
   } catch (error) {
     if (isAbortError(error)) throw error;
     return {
@@ -354,14 +328,10 @@ function imageDimensions(
   bytes: Buffer,
   mediaType: ImageBlock['source']['media_type'],
 ): { width: number; height: number } | undefined {
-  return mediaType === 'image/png'
-    ? pngDimensions(bytes)
-    : jpegDimensions(bytes);
+  return mediaType === 'image/png' ? pngDimensions(bytes) : jpegDimensions(bytes);
 }
 
-function pngDimensions(
-  bytes: Buffer,
-): { width: number; height: number } | undefined {
+function pngDimensions(bytes: Buffer): { width: number; height: number } | undefined {
   if (
     bytes.length < 24 ||
     !bytes.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE) ||
@@ -372,9 +342,7 @@ function pngDimensions(
   return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
 }
 
-function jpegDimensions(
-  bytes: Buffer,
-): { width: number; height: number } | undefined {
+function jpegDimensions(bytes: Buffer): { width: number; height: number } | undefined {
   if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8) {
     return undefined;
   }
@@ -386,13 +354,7 @@ function jpegDimensions(
       offset += 2;
       continue;
     }
-    if (
-      marker >= 0xc0 &&
-      marker <= 0xcf &&
-      marker !== 0xc4 &&
-      marker !== 0xc8 &&
-      marker !== 0xcc
-    ) {
+    if (marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc) {
       return {
         height: bytes.readUInt16BE(offset + 5),
         width: bytes.readUInt16BE(offset + 7),
@@ -425,11 +387,7 @@ function resolveSurfacedFile(
   return { absolutePath, relativePath };
 }
 
-function assertNoSymlinkComponents(
-  root: string,
-  absolutePath: string,
-  givenPath: string,
-): void {
+function assertNoSymlinkComponents(root: string, absolutePath: string, givenPath: string): void {
   let cursor = root;
   for (const segment of relative(root, absolutePath).split(sep).filter(Boolean)) {
     cursor = join(cursor, segment);
@@ -453,9 +411,7 @@ function collectSurfacedFiles(
   maximum: number,
 ): PublishedPath[] {
   const root = resolve(runDir);
-  const requested = relative(root, resolveRunPath(runDir, givenPath))
-    .split(sep)
-    .join('/');
+  const requested = relative(root, resolveRunPath(runDir, givenPath)).split(sep).join('/');
   const prefix = requested === ARTIFACTS_DIR ? `${ARTIFACTS_DIR}/` : `${requested}/`;
   const matching = [...policy.allowedArtifactPaths]
     .filter((path) => path === requested || path.startsWith(prefix))
@@ -494,9 +450,7 @@ async function readRegularFileNoFollow(
 ): Promise<Buffer> {
   throwIfAborted(signal);
   const flags =
-    fsConstants.O_RDONLY |
-    (fsConstants.O_NOFOLLOW ?? 0) |
-    (fsConstants.O_NONBLOCK ?? 0);
+    fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0) | (fsConstants.O_NONBLOCK ?? 0);
   const fd = openSync(absolutePath, flags);
   try {
     const stat = fstatSync(fd);
@@ -530,7 +484,9 @@ async function readRegularFileNoFollow(
 function decodeText(bytes: Buffer, filename: string): string {
   const text = tryDecodeText(bytes, filename);
   if (text === undefined) {
-    throw new Error(`${filename} is not bounded UTF-8 text; inspect it as its published binary type`);
+    throw new Error(
+      `${filename} is not bounded UTF-8 text; inspect it as its published binary type`,
+    );
   }
   return text;
 }
@@ -564,9 +520,7 @@ function boundText(content: string, suffix = ''): string {
   return content.slice(0, low) + marker;
 }
 
-function imageMediaType(
-  filePath: string,
-): ImageBlock['source']['media_type'] | undefined {
+function imageMediaType(filePath: string): ImageBlock['source']['media_type'] | undefined {
   switch (extname(filePath).toLowerCase()) {
     case '.png':
       return 'image/png';
