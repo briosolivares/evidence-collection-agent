@@ -227,6 +227,50 @@ describe('Chromium target control', () => {
     expect(fake.detachCalls[0]).toHaveBeenCalledOnce();
   });
 
+  it('binds an empty browser-scoped context to the first created target’s context', async () => {
+    // Attached Chrome hides the user's tabs, so Playwright's context starts
+    // empty and no page can name Chrome's default context up front.
+    const fake = fakeChromium({ browserContextId: 'context-default' });
+    (fake.context as unknown as { pages: () => Page[] }).pages = () => [];
+    fake.addTarget('target-incognito', 'context-incognito');
+    const browser = {
+      contexts: () => [fake.context],
+      newBrowserCDPSession: vi.fn(async () => ({
+        send: (method: string, params?: Record<string, unknown>) =>
+          fake.send(fake.anchorPage, method, params),
+        detach: vi.fn(async () => undefined),
+      })),
+    } as unknown as Browser;
+
+    const control = await createChromiumTargetControl({ context: fake.context, browser });
+    expect(fake.send).not.toHaveBeenCalledWith(
+      fake.anchorPage,
+      'Target.getBrowserContexts',
+      expect.anything(),
+    );
+    // Unbound: nothing is in scope yet, and the first create names no context.
+    await expect(control.listPageTargets()).resolves.toHaveLength(0);
+    const first = await control.createPageTarget('about:blank#first');
+    expect(fake.send).toHaveBeenCalledWith(fake.anchorPage, 'Target.createTarget', {
+      url: 'about:blank#first',
+    });
+
+    // Bound: later creates pin the same context and inventory is scoped to it.
+    await control.createPageTarget('about:blank#second');
+    expect(fake.send).toHaveBeenCalledWith(fake.anchorPage, 'Target.createTarget', {
+      url: 'about:blank#second',
+      browserContextId: 'context-default',
+    });
+    const listed = await control.listPageTargets();
+    expect(listed.map((target) => target.url).sort()).toEqual([
+      'about:blank',
+      'about:blank#first',
+      'about:blank#second',
+    ]);
+    await control.closeTarget(first);
+    await control.close();
+  });
+
   it('omits browserContextId when Chromium reports the default context', async () => {
     const fake = fakeChromium();
     const control = await createChromiumTargetControl({

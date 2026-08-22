@@ -15,7 +15,10 @@ import { join, posix, win32 } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { setTimeout as delay } from 'node:timers/promises';
 
-import { AttachedChromeBrowserSessionProvider } from './attachedChromeBrowserSessionProvider.js';
+import {
+  AttachedChromeBrowserSessionProvider,
+  AttachedChromeSessionError,
+} from './attachedChromeBrowserSessionProvider.js';
 import { ATTACHED_CHROME_ENDPOINT_ENV_VAR } from './cdpEndpoint.js';
 import { resolveRealChromePath } from './localChromeExecutable.js';
 import type { BrowserController } from './controller.js';
@@ -337,10 +340,14 @@ export class AttachedChromeSetupBrowserSessionProvider implements BrowserSession
     );
     try {
       return await provider.createSession();
-    } catch {
+    } catch (error) {
+      // The attached provider's own errors are written to be shown; anything
+      // else (Playwright, transport) may carry the endpoint and stays opaque.
+      const detail = error instanceof AttachedChromeSessionError ? ` ${error.message}` : '';
       throw new AttachedChromeSetupError(
-        'Chrome remote debugging was discovered, but Sherlock could not attach. ' +
-          `Open ${ATTACHED_CHROME_SETUP_URL}, approve the connection, and retry.`,
+        `Chrome remote debugging was discovered, but Sherlock could not attach.${detail} ` +
+          `If Chrome showed a connection prompt, approve it and retry; otherwise open ` +
+          `${ATTACHED_CHROME_SETUP_URL} and confirm remote debugging is still enabled.`,
       );
     }
   }

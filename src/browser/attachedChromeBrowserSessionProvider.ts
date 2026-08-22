@@ -19,6 +19,7 @@ import { assertLoopbackCdpUrl } from './cdpEndpoint.js';
 import { createChromiumTargetControl } from './chromiumTargetControl.js';
 import { assembleBrowserController } from './controllerAssembly.js';
 import { PlaywrightBrowserController } from './playwrightBrowserController.js';
+import { openScopedCdpProxy, type ScopedCdpProxy, ScopedCdpProxyError } from './scopedCdpProxy.js';
 import type { BrowserSessionDiagnostics, BrowserSessionProvider } from './sessionProvider.js';
 
 const ATTACHED_SESSION_DIAGNOSTICS = Object.freeze({
@@ -35,13 +36,16 @@ export interface AttachedChromeBrowserSessionOptions {
   connectionTimeoutMs?: number;
   /** Test seam; production uses Playwright Chromium directly. */
   connectOverCDP?: (cdpEndpoint: string) => Promise<Browser>;
+  /** Test seam; production scopes Playwright behind a loopback proxy which
+   * hides every target that was open before Sherlock attached. */
+  openScopedProxy?: (cdpEndpoint: string, connectionTimeoutMs: number) => Promise<ScopedCdpProxy>;
   /** Crash-test seam, awaited after an exact target commit and before page
    * marker work. Required by the real SIGKILL sentinel regression. */
   afterTargetCreated?: () => Promise<void> | void;
 }
 
 /** An error whose text is safe to expose without revealing the endpoint. */
-class AttachedChromeSessionError extends Error {}
+export class AttachedChromeSessionError extends Error {}
 
 /**
  * Validate before any connection attempt and never echo the rejected value.
@@ -81,15 +85,17 @@ function requirePositiveTimeout(value: number | undefined): number {
 /**
  * Playwright's public `Browser.close()` disconnects a browser obtained from
  * `connectOverCDP`; it does not send `Browser.close` to the user-owned Chrome.
- * Keep the operation idempotent independently of the controller so the same
- * closer is also safe on partial-initialization failure paths.
+ * Closing the proxy afterwards ends the one upstream Chrome session. Keep the
+ * operation idempotent independently of the controller so the same closer is
+ * also safe on partial-initialization failure paths.
  */
-function createClientDisconnect(browser: Browser): () => Promise<void> {
+function createClientDisconnect(browser: Browser, proxy: ScopedCdpProxy): () => Promise<void> {
   let disconnectPromise: Promise<void> | undefined;
 
   return () => {
     disconnectPromise ??= Promise.resolve()
       .then(() => browser.close())
+      .finally(() => proxy.close().catch(() => undefined))
       .catch(() => {
         throw new AttachedChromeSessionError(
           "Could not disconnect Sherlock's Playwright client from attached Chrome.",
@@ -112,12 +118,22 @@ function safeSetupError(error: unknown, cleanupFailed: boolean): Error {
 /** Creates Sherlock sessions inside an already-running local Chrome. */
 export class AttachedChromeBrowserSessionProvider implements BrowserSessionProvider {
   private readonly cdpEndpoint: string;
+  private readonly connectionTimeoutMs: number;
   private readonly connect: (cdpEndpoint: string) => Promise<Browser>;
+  private readonly openProxy: (
+    cdpEndpoint: string,
+    connectionTimeoutMs: number,
+  ) => Promise<ScopedCdpProxy>;
   private readonly afterTargetCreated: (() => Promise<void> | void) | undefined;
 
   constructor(options: AttachedChromeBrowserSessionOptions) {
     this.cdpEndpoint = requireLoopbackEndpoint(options.cdpEndpoint);
     const connectionTimeoutMs = requirePositiveTimeout(options.connectionTimeoutMs);
+    this.connectionTimeoutMs = connectionTimeoutMs;
+    this.openProxy =
+      options.openScopedProxy ??
+      ((cdpEndpoint, timeoutMs) =>
+        openScopedCdpProxy(cdpEndpoint, { connectionTimeoutMs: timeoutMs }));
     this.connect =
       options.connectOverCDP ??
       ((cdpEndpoint: string) =>
@@ -131,18 +147,33 @@ export class AttachedChromeBrowserSessionProvider implements BrowserSessionProvi
   }
 
   async createSession(): Promise<BrowserController> {
-    let browser: Browser;
+    // The proxy owns the one Chrome connection: its handshake is where the
+    // user approves Chrome's prompt, and its target snapshot is what keeps
+    // Playwright from attaching to (and stalling on) the user's own tabs.
+    let proxy: ScopedCdpProxy;
     try {
-      browser = await this.connect(this.cdpEndpoint);
-    } catch {
-      // Playwright's connection errors commonly include the endpoint. Do not
-      // retain one as `cause`, because recursive error serializers expose it.
+      proxy = await this.openProxy(this.cdpEndpoint, this.connectionTimeoutMs);
+    } catch (error) {
       throw new AttachedChromeSessionError(
-        'Could not connect Sherlock to the configured attached Chrome endpoint.',
+        error instanceof ScopedCdpProxyError
+          ? error.message
+          : 'Could not connect Sherlock to the configured attached Chrome endpoint.',
       );
     }
 
-    const disconnect = createClientDisconnect(browser);
+    let browser: Browser;
+    try {
+      browser = await this.connect(proxy.endpoint);
+    } catch {
+      await proxy.close().catch(() => undefined);
+      // Playwright's connection errors commonly include the endpoint. Do not
+      // retain one as `cause`, because recursive error serializers expose it.
+      throw new AttachedChromeSessionError(
+        'Playwright could not initialize against the attached Chrome session.',
+      );
+    }
+
+    const disconnect = createClientDisconnect(browser, proxy);
     return assembleBrowserController({
       build: async (own) => {
         const contexts = browser.contexts();

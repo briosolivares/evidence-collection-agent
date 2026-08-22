@@ -303,6 +303,12 @@ async function createAttachedLocalHarness(): Promise<ProviderHarness> {
     clientClose = clientBrowser.close;
     const provider = new AttachedChromeBrowserSessionProvider({
       cdpEndpoint: ATTACHED_CONNECT_URL,
+      // The Playwright client is faked below, so there is no socket to scope.
+      openScopedProxy: async (endpoint) => ({
+        endpoint,
+        hiddenTargetCount: 0,
+        close: async () => undefined,
+      }),
       connectOverCDP: async (requestedEndpoint) => {
         expect(requestedEndpoint).toBe(ATTACHED_CONNECT_URL);
         return clientBrowser.browser;

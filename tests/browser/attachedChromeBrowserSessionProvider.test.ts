@@ -5,8 +5,14 @@ import {
   AttachedChromeBrowserSessionProvider,
   type AttachedChromeBrowserSessionOptions,
 } from '../../src/browser/attachedChromeBrowserSessionProvider.js';
+import { type ScopedCdpProxy, ScopedCdpProxyError } from '../../src/browser/scopedCdpProxy.js';
 
 const ENDPOINT = 'http://127.0.0.1:9222';
+
+/** Production scopes Playwright behind a loopback proxy; these tests bypass it. */
+async function passthroughProxy(endpoint: string): Promise<ScopedCdpProxy> {
+  return { endpoint, hiddenTargetCount: 0, close: async () => undefined };
+}
 
 function fakePage(url: string): {
   page: Page;
@@ -120,6 +126,7 @@ function provider(
   overrides: Partial<AttachedChromeBrowserSessionOptions> = {},
 ): AttachedChromeBrowserSessionProvider {
   return new AttachedChromeBrowserSessionProvider({
+    openScopedProxy: passthroughProxy,
     cdpEndpoint: ENDPOINT,
     connectOverCDP: async () => browser,
     ...overrides,
@@ -156,6 +163,7 @@ describe('AttachedChromeBrowserSessionProvider endpoint boundary', () => {
     const { browser } = fakeBrowser([context]);
     const connectOverCDP = vi.fn(async () => browser);
     const attached = new AttachedChromeBrowserSessionProvider({
+      openScopedProxy: passthroughProxy,
       cdpEndpoint,
       connectOverCDP,
     });
@@ -172,6 +180,7 @@ describe('AttachedChromeBrowserSessionProvider endpoint boundary', () => {
       expect(
         () =>
           new AttachedChromeBrowserSessionProvider({
+            openScopedProxy: passthroughProxy,
             cdpEndpoint: ENDPOINT,
             connectionTimeoutMs,
             connectOverCDP,
@@ -181,9 +190,82 @@ describe('AttachedChromeBrowserSessionProvider endpoint boundary', () => {
     },
   );
 
+  it('connects Playwright to the scoped proxy endpoint and closes the proxy last', async () => {
+    const { context } = fakeContext();
+    const { browser, close } = fakeBrowser([context]);
+    const proxyClose = vi.fn(async () => undefined);
+    const openScopedProxy = vi.fn(async () => ({
+      endpoint: 'ws://127.0.0.1:1/proxied',
+      hiddenTargetCount: 26,
+      close: proxyClose,
+    }));
+    const connectOverCDP = vi.fn(async () => browser);
+    const attached = new AttachedChromeBrowserSessionProvider({
+      cdpEndpoint: ENDPOINT,
+      connectionTimeoutMs: 1_234,
+      openScopedProxy,
+      connectOverCDP,
+    });
+
+    const session = await attached.createSession();
+    expect(openScopedProxy).toHaveBeenCalledExactlyOnceWith(ENDPOINT, 1_234);
+    expect(connectOverCDP).toHaveBeenCalledExactlyOnceWith('ws://127.0.0.1:1/proxied');
+    expect(proxyClose).not.toHaveBeenCalled();
+
+    await session.close();
+    expect(close).toHaveBeenCalledTimes(1);
+    expect(proxyClose).toHaveBeenCalledTimes(1);
+    expect(close.mock.invocationCallOrder[0]).toBeLessThan(proxyClose.mock.invocationCallOrder[0]!);
+  });
+
+  it('closes the proxy when Playwright cannot connect and redacts the failure', async () => {
+    const proxyClose = vi.fn(async () => undefined);
+    const attached = new AttachedChromeBrowserSessionProvider({
+      cdpEndpoint: ENDPOINT,
+      openScopedProxy: async () => ({
+        endpoint: 'ws://127.0.0.1:1/p',
+        hiddenTargetCount: 0,
+        close: proxyClose,
+      }),
+      connectOverCDP: async () => {
+        throw new Error('Timeout 30000ms exceeded ws://127.0.0.1:1/p');
+      },
+    });
+
+    await expect(attached.createSession()).rejects.toThrow(/could not initialize/i);
+    await expect(attached.createSession()).rejects.not.toThrow(/127\.0\.0\.1/);
+    expect(proxyClose).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows the proxy’s own error text and hides anything else it throws', async () => {
+    const connectOverCDP = vi.fn(async () => fakeBrowser([]).browser);
+    const approval = new AttachedChromeBrowserSessionProvider({
+      cdpEndpoint: ENDPOINT,
+      openScopedProxy: async () => {
+        throw new ScopedCdpProxyError('Chrome did not approve the remote-debugging connection.');
+      },
+      connectOverCDP,
+    });
+    await expect(approval.createSession()).rejects.toThrow(
+      'Chrome did not approve the remote-debugging connection.',
+    );
+
+    const opaque = new AttachedChromeBrowserSessionProvider({
+      cdpEndpoint: ENDPOINT,
+      openScopedProxy: async () => {
+        throw new Error(`ECONNREFUSED ${ENDPOINT}`);
+      },
+      connectOverCDP,
+    });
+    await expect(opaque.createSession()).rejects.toThrow(/could not connect/i);
+    await expect(opaque.createSession()).rejects.not.toThrow(/9222/);
+    expect(connectOverCDP).not.toHaveBeenCalled();
+  });
+
   it('redacts connection errors and does not retain the original as a cause', async () => {
     const secretEndpoint = `${ENDPOINT}/?token=do-not-print-me`;
     const attached = new AttachedChromeBrowserSessionProvider({
+      openScopedProxy: passthroughProxy,
       cdpEndpoint: secretEndpoint,
       connectOverCDP: async () => {
         throw new Error(`connect ECONNREFUSED ${secretEndpoint}`);

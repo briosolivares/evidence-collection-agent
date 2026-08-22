@@ -13,6 +13,7 @@ import {
   defaultChromeUserDataDir,
   discoverAttachedChromeEndpoint,
 } from '../../src/browser/attachedChromeSetup.js';
+import { AttachedChromeSessionError } from '../../src/browser/attachedChromeBrowserSessionProvider.js';
 
 const DISCOVERED_ENDPOINT = 'ws://127.0.0.1:61545/devtools/browser/private-discovery-token';
 const controller = {} as BrowserController;
@@ -219,6 +220,25 @@ describe('AttachedChromeSetupBrowserSessionProvider', () => {
     expect(message).toContain('could not attach');
     expect(message).not.toContain(DISCOVERED_ENDPOINT);
     expect(states.join('\n')).not.toContain(DISCOVERED_ENDPOINT);
+  });
+
+  it('forwards the attached provider’s own error text, which carries no endpoint', async () => {
+    const provider = new AttachedChromeSetupBrowserSessionProvider({
+      onSetupState: () => undefined,
+      discoverEndpoint: async () => DISCOVERED_ENDPOINT,
+      createAttachedProvider: () => ({
+        createSession: async () => {
+          throw new AttachedChromeSessionError(
+            'Chrome did not approve the remote-debugging connection within 30 seconds.',
+          );
+        },
+      }),
+    });
+
+    await expect(provider.createSession()).rejects.toThrow(
+      /could not attach\. Chrome did not approve the remote-debugging connection within 30 seconds\./,
+    );
+    await expect(provider.createSession()).rejects.not.toThrow(DISCOVERED_ENDPOINT);
   });
 
   it('rejects an unsafe explicit endpoint before discovery or setup effects', () => {

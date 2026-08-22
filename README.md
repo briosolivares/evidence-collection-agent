@@ -65,8 +65,9 @@ By default, the interactive TUI attaches to your current local Chrome session
 so existing logins are available. If Chrome remote debugging is not enabled,
 Sherlock opens `chrome://inspect/#remote-debugging` and waits for you to enable
 “Allow remote debugging for this browser instance” and approve the connection.
-Sherlock preserves tabs that existed before the run and closes only task-owned
-pages when the run ends.
+Chrome asks for that approval once per Sherlock launch. Sherlock preserves tabs
+that existed before the run, leaves tabs Chrome has put to sleep untouched, and
+closes only task-owned pages when the run ends.
 
 To see the interface without starting a browser or using model tokens:
 

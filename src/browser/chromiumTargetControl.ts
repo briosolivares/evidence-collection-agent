@@ -120,22 +120,6 @@ function parseCreatedTargetId(value: unknown): string {
   return value.targetId;
 }
 
-function parseBrowserContextIds(value: unknown): string[] {
-  if (!isRecord(value) || !Array.isArray(value.browserContextIds)) {
-    throw new ChromiumTargetControlError('Target.getBrowserContexts returned an invalid response.');
-  }
-  const ids: string[] = [];
-  for (const candidate of value.browserContextIds) {
-    if (!isNonEmptyCdpId(candidate) || ids.includes(candidate)) {
-      throw new ChromiumTargetControlError(
-        'Target.getBrowserContexts returned an invalid response.',
-      );
-    }
-    ids.push(candidate);
-  }
-  return ids;
-}
-
 function parseCloseResponse(value: unknown): void {
   if (!isRecord(value) || typeof value.success !== 'boolean') {
     throw new ChromiumTargetControlError('Target.closeTarget returned an invalid response.');
@@ -224,7 +208,7 @@ class PlaywrightChromiumTargetControl implements ChromiumTargetControl {
   constructor(
     private readonly context: BrowserContext,
     private readonly session: CDPSession,
-    private readonly browserContextId: string | undefined,
+    private browserContextId: string | undefined,
     private readonly operationTimeoutMs: number,
     private readonly afterTargetCreated:
       | ((target: ChromiumPageTargetRef) => Promise<void> | void)
@@ -306,6 +290,12 @@ class PlaywrightChromiumTargetControl implements ChromiumTargetControl {
         );
       }
       const target = await this.targetInfo(createdTargetId, options.signal);
+      // An empty context (attached Chrome hides the user's tabs) has no page
+      // to name Chrome's default context. The first target Chrome creates for
+      // Sherlock answers that; every later target must land in the same one.
+      if (this.browserContextId === undefined && target.type === 'page') {
+        this.browserContextId = target.browserContextId;
+      }
       this.requireScopedPage(target, 'Created Chromium target');
       if (validatedTargetUrl(target.url, 'Target.getTargetInfo') !== exactUrl) {
         throw new ChromiumTargetControlError(
@@ -628,7 +618,7 @@ export async function createChromiumTargetControl(
             timeoutMs,
             options.signal,
           )
-        : await inspectBrowserScopedContextId(options.context, session, timeoutMs, options.signal);
+        : await inspectBrowserScopedContextId(options.context, timeoutMs, options.signal);
     return new PlaywrightChromiumTargetControl(
       options.context,
       session,
@@ -675,7 +665,6 @@ async function inspectAnchorBrowserContextId(
 
 async function inspectBrowserScopedContextId(
   context: BrowserContext,
-  browserSession: CDPSession,
   timeoutMs: number,
   signal: AbortSignal | undefined,
 ): Promise<string | undefined> {
@@ -706,17 +695,10 @@ async function inspectBrowserScopedContextId(
     return target.browserContextId;
   }
 
-  const response = await runWithDeadline(
-    'Inspect empty Chromium target-control context',
-    () => arbitraryCdpSend(browserSession)('Target.getBrowserContexts'),
-    timeoutMs,
-    signal,
-  );
-  const browserContextIds = parseBrowserContextIds(response);
-  if (browserContextIds.length > 1) {
-    throw new ChromiumTargetControlError(
-      'An empty Playwright context could not be mapped to one Chromium context.',
-    );
-  }
-  return browserContextIds[0];
+  // No live page to ask. `Target.getBrowserContexts` cannot answer either:
+  // Chrome lists only non-default contexts there, so it would name an
+  // incognito window or another profile rather than the default context new
+  // targets actually land in. Leave the control unbound; it binds itself to
+  // the context of the first target it creates.
+  return undefined;
 }
